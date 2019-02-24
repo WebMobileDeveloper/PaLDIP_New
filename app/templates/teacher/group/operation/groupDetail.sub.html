@@ -1,0 +1,201 @@
+<div ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="row content-header">
+		<div class="container">
+			<div class="col-md-12 title texteffect ">{{$root.settings.groupName}}&nbsp;/&nbsp;{{subGroupName}}
+			</div>
+		</div>
+
+	</div>
+	<div class="container">
+		<br>
+		<div class="row tab-row">
+			<div class="col-md-6 col-sm-6" ng-class="getClass('QuestionSet')" ng-click="setActive('QuestionSet')">Question Sets
+			</div>
+			<div class="col-md-6 col-sm-6" ng-class="getClass('GroupSet')" ng-click="setActive('GroupSet')">Sub Groupsets</div>
+		</div>
+		<div class="row">
+			<div class="content-div" ng-show="selectedTab=='QuestionSet'">
+				<div class="col-md-12 groupdetails" ng-repeat="set in  groupData.QuestionSets track by $index"
+					ng-class="getQstClass(set)" ng-click="questions(set)">
+					<div class="setname">{{set.setname}}</div>
+					<div class="pull-left left-button-div">
+						<span class="btn eye ml-1" myclick="changeHideState(set, $index)">
+							<i class="glyphicon glyphicon-eye-open" ng-hide="set.hidden">
+								<md-tooltip class="custom-tooltip" md-direction="top">Show in student side</md-tooltip>
+							</i>
+							<i class="glyphicon glyphicon-eye-close" ng-show="set.hidden">
+								<md-tooltip class="custom-tooltip" md-direction="top">Hide in student side</md-tooltip>
+							</i>
+						</span>
+					</div>
+					<div class="pull-right right-button-div">
+						<div ng-if="set.LikertType" style="display:inline-block;">
+							<button class="btn btn-primary" ng-if="!links[set.key]" myclick="addLink(set)">
+								<i class="glyphicon glyphicon-link"></i>
+								<md-tooltip class="custom-tooltip" md-direction="top">Add link</md-tooltip>
+							</button>
+							<div ng-if="links[set.key]">
+								<button class="btn btn-danger" myclick="deletelink(set.key)">
+									<i class="glyphicon glyphicon-trash"></i>
+									<md-tooltip class="custom-tooltip" md-direction="top">Remove link</md-tooltip>
+								</button>
+								<button class="btn btn-info" myclick="copyToClipboard(set.key)">
+									<i class="glyphicon glyphicon-copy"></i>
+									<md-tooltip class="custom-tooltip" md-direction="top">Copy link</md-tooltip>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="content-div" ng-show="selectedTab=='GroupSet'">
+			<div class="col-md-6 col-sm-6 ">
+				<div class="groupsets">
+					<div class="box-title">Subgroup Set</div>
+					<div class="col-md-12 groupset" ng-repeat="groupset in  groupData.subgroupsets track by $index"
+						ng-class="getGroupClass(groupset)" ng-click="selectGroup(groupset.key)">
+						{{groupset.name}}
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6 col-sm-6 ">
+				<div class="groupsets">
+					<div class="box-title">{{selectedGroup.name}}</div>
+					<div class="col-md-12 groupset" ng-repeat="group in selectedGroup.data.groups"
+						ng-class="getSubGroupClass($index)" ng-click="secondGroup(group,$index)">
+						<span ng-if="group.name">{{group.name}}</span>
+						<span ng-if="!group.name">{{selectedGroup.name}}&nbsp;{{$index+1}}</span>
+						&emsp;({{group.member_count}})
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+</div>
+<style>
+	.content-header {
+		background-color: #42b3f4;
+	}
+
+	.title {
+		color: yellow;
+	}
+
+	.groupdetails .setname {
+		display: inline;
+	}
+
+	.groupdetails.active {
+		background-color: #f8b7b7;
+		border: solid 1px #f9ff00;
+	}
+
+	.groupdetails.section .setname {
+		display: block;
+		width: 80%;
+		margin: 0px auto;
+		background-color: #04a243;
+		border-radius: 10px;
+	}
+
+	.section-detail {
+		position: absolute;
+		display: none;
+	}
+
+	.groupdetails.section:hover .section-detail {
+		display: block;
+		z-index: 1000;
+		background-color: #1476b4;
+		margin-top: 3px;
+		width: 80%;
+		margin: 3px 10%;
+		border: solid 2px #999;
+		border-top: none;
+		color: white;
+	}
+
+	.groupdetails.section:hover .section-detail:hover {
+		display: none;
+	}
+
+	div.groupsets {
+		border: solid 1px #355086;
+		height: 50vh;
+		background-color: #e0edf9;
+		margin-top: 20px;
+		padding: 20px 20px;
+		overflow-y: auto;
+	}
+
+	div.box-title {
+		font-size: 2em;
+		text-align: center;
+		margin: 10px 0px;
+		color: #0716ba;
+	}
+
+	div.groupset {
+		background: #0576d5;
+		color: white;
+		margin: 10px auto;
+		font-size: 1.8em;
+		text-align: center;
+		line-height: 1.8em;
+		border-radius: 15px;
+		cursor: pointer;
+		border: solid 2px transparent;
+	}
+
+	.groupset.active {
+		border: solid 2px #17e320;
+	}
+
+	div.groupset span {
+		font-size: 0.8em;
+		cursor: pointer;
+		line-height: 2.3em;
+		color: yellow;
+	}
+
+	div.groupset span {
+		font-size: 0.8em;
+		cursor: pointer;
+		/* margin-top: 0px; */
+		color: yellow;
+	}
+
+	.container {
+		padding-left: 0px;
+		padding-right: 0px;
+	}
+
+	.glyphicon-eye-open {
+		color: #09159b;
+	}
+
+	.glyphicon-eye-close {
+		color: #7e7e7e;
+	}
+
+	.right-button-div {
+		width: 190px;
+		text-align: right;
+		padding-right: 10px;
+	}
+
+	@media (max-width: 650px) {
+		div.groupsets {
+			padding: 20px 10px;
+		}
+
+		div.groupset {
+			font-size: 1.3em;
+			line-height: 1.8em;
+			border-radius: 15px;
+		}
+	}
+</style>

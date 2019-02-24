@@ -1,0 +1,171 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="row center" style="margin-top: 50px">
+		<div class="col-md-12 center">
+			<h2>
+				{{currSet.setname}}
+				<button class="btn btn-primary ml-5" myclick="showEditLikertInfoModal()">
+					<md-tooltip class="custom-tooltip" md-direction="top">Edit Group LikertSet Information</md-tooltip>
+					Group Setting
+				</button>
+			</h2>
+			<div class="chart-container" ng-if="graphData">
+				<div class="sibling-setname-div">
+					<span ng-repeat="setname in setNames track by $index" class="sibling-setname">{{setname}}</span>
+					<md-input-container ng-show="origin_groupKey && groupLikertSettings.showVersion">
+						<label>Select Version Group:</label>
+						<md-select ng-model="versionIndex" ng-change="changeVersionIndex(versionIndex)">
+							<md-option ng-repeat="group in versionGroups track by $index" ng-selected="$index == versionIndex"
+								ng-value="$index">{{group.name}}</md-option>
+						</md-select>
+					</md-input-container>
+				</div>
+				<canvas id="mychart" basechart="" width="1000px" height="500px"
+					style="display: block; width: 1000px; height: 500px;" ng-init="paintgraph()"></canvas>
+			</div>
+		</div>
+	</div>
+	<div class="row"
+		style="text-align: center;	font-style: oblique; font-weight: bold; color: #f75a9a; font-size: 1.2em; margin-top: 10px;">
+		<div class="col-md-12">
+			<b>Answer count &emsp; &emsp;</b>
+			Current Group&emsp;:&emsp;{{classCounts[1]}}&emsp;&emsp;
+			<span ng-show="groupLikertSettings.showOther">All Group&emsp;:&emsp;{{allCounts[1]}}</span>
+		</div>
+	</div>
+	<div class="row button-row">
+		<a class="btn btn-link" myclick="$root.back()">Back</a>
+	</div>
+	<div class="row" ng-init="$root.getInstFeedback($root.settings.groupKey, $root.settings.selectedQuestionSetKey)">
+		<md-input-container>
+			<h4>Instructor Feedback</h4>
+			<textarea class="Instructor_view_area" ng-model="$root.settings.instructor_feedback"
+				ng-change="$root.update_instFeedRef($root.settings.groupKey, $root.settings.selectedQuestionSetKey)"></textarea>
+		</md-input-container>
+	</div>
+
+	<!-- notes for quesiton -->
+	<div class="row mb-5" ng-init="$root.getTeacherNote($root.settings.selectedQuestionSetKey, true)">
+		<div class="row" ng-show="$root.allTeacherNotes">
+			<h4 class="center">Feedback from students</h4>
+			<div class="all-notes">
+				<md-input-container ng-repeat="note in $root.allTeacherNotes track by $index" ng-show="note">
+					<textarea class="users-note" ng-model="note" ng-disabled="true"></textarea>
+				</md-input-container>
+			</div>
+		</div>
+		<div class="row" ng-show="$root.allPublicNotes">
+			<h4 class="center">Notes from all students</h4>
+			<div class="all-notes">
+				<md-input-container ng-repeat="note in $root.allPublicNotes track by $index" ng-show="note">
+					<textarea class="users-note" ng-model="note" ng-disabled="true"></textarea>
+				</md-input-container>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="editLikertInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+	aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Edit Group LikertSet Information</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body pt-5">
+				<div class="row">
+					<div class="col-md-12">
+						<h3 class="center mt-0 mb-0">{{currSet.setname}}</h3>
+					</div>
+					<!-- Show Other Group Data in student side -->
+					<div class="col-md-12">
+						<md-input-container class="md-block mb-0">
+							<b class="modal-sub-title">Other Group Data Show State</b>
+							<md-radio-group ng-model="tempSettings.showOther" layout="row">
+								<md-radio-button ng-value="false" class="md-primary" style="margin-right:40px;">Hide
+								</md-radio-button>
+								<md-radio-button ng-value="true" class="md-primary">Show</md-radio-button>
+							</md-radio-group>
+						</md-input-container>
+					</div>
+					<!-- Show Other Version Group Data in student side -->
+					<div class="col-md-12">
+						<md-input-container class="md-block mb-0">
+							<b class="modal-sub-title">Version Group Data Show State</b>
+							<md-radio-group ng-model="tempSettings.showVersion" layout="row">
+								<md-radio-button ng-value="false" class="md-primary" style="margin-right:40px;">Hide
+								</md-radio-button>
+								<md-radio-button ng-value="true" class="md-primary">Show</md-radio-button>
+							</md-radio-group>
+						</md-input-container>
+					</div>
+					<!-- Show Unique IDs on Graphs in student side -->
+					<div class="col-md-12">
+						<md-input-container class="md-block mb-0">
+							<b class="modal-sub-title">Show Unique IDs on Graphs</b>
+							<md-radio-group ng-model="tempSettings.showUniqueId" layout="row">
+								<md-radio-button ng-value="false" class="md-primary" style="margin-right:40px;">Hide
+								</md-radio-button>
+								<md-radio-button ng-value="true" class="md-primary">Show</md-radio-button>
+							</md-radio-group>
+						</md-input-container>
+					</div>
+					<!-- Visible score in student side -->
+					<div class="col-md-12">
+						<md-input-container class="md-block mb-0">
+							<b class="modal-sub-title">Visible score in student side</b>
+							<md-radio-group ng-model="tempSettings.showScore" layout="row">
+								<md-radio-button ng-value="false" class="md-primary" style="margin-right:40px;">Hide
+								</md-radio-button>
+								<md-radio-button ng-value="true" class="md-primary">Show</md-radio-button>
+							</md-radio-group>
+						</md-input-container>
+					</div>
+					<!-- Access to Response Page After Submission -->
+					<div class="col-md-12">
+						<md-input-container class="md-block mb-0">
+							<b class="modal-sub-title">Access to Response Page After Submission</b>
+							<md-radio-group ng-model="tempSettings.showResponse" layout="row">
+								<md-radio-button ng-value="false" class="md-primary" style="margin-right:40px;">Disable
+								</md-radio-button>
+								<md-radio-button ng-value="true" class="md-primary">Enable</md-radio-button>
+							</md-radio-group>
+						</md-input-container>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" myclick="saveLikertSettings()">Save Change</button>
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.chart-container {
+		max-width: 1000px;
+		margin: 20px auto;
+	}
+
+	.sibling-setname-div {
+		display: inline-block;
+		text-align: left;
+	}
+
+	.sibling-setname {
+		display: block;
+		color: #0a0ab4;
+		font-weight: bold;
+	}
+
+	.modal-sub-title {
+		color: #040a87;
+		border-bottom: solid 2px;
+		padding-bottom: 4px;
+		margin-bottom: 13px;
+		display: inline-block;
+	}
+</style>

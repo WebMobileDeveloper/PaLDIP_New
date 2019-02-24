@@ -1,0 +1,169 @@
+<div class="container" ng-init="getanswer()">
+	<div class="answer-form" ng-if="$root.settings.loadingfinished">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 title">
+				<span class="qst-title" ng-show='question.title'>{{question.title}}:</span>
+				{{question.question}}</div>
+			<div class="col-md-12 center">
+				<hr />
+			</div>
+		</div>
+		<div class="row img-row" ng-init="$root.loadimage()" ng-show="$root.imgSrc">
+			<div class="col-md-12">
+				<img ng-src="{{$root.imgSrc}}">
+			</div>
+			<div class="col-md-12 center">
+				<hr />
+			</div>
+		</div>
+
+		<div class="row center" ng-show="videoURL">
+			<div id="playerWrapOuter">
+				<div id="playerWrap">
+					<iframe id="video-iframe" width="420" height="315" src="{{videoURL}}" frameborder="0"></iframe>
+				</div>
+			</div>
+			<div class="col-md-12 center">
+				<hr />
+			</div>
+		</div>
+		<!-- Extra Links -->
+		<div class="row" ng-show="question.links">
+			<div class="col-md-12">
+				<md-input-container flex class="margin-vertical-0">
+					<h3>Extra Links</h3>
+					<div class="sub-question" ng-repeat="link in question.links track by $index">
+						<a href={{link.url}} target="_blank" style="font-size:20px; margin-left:30px;">{{link.title}}</a>
+					</div>
+				</md-input-container>
+			</div>
+			<div class="col-md-12">
+				<hr />
+			</div>
+		</div>
+		<!-- Additional Information / Comments -->
+		<div class="row additional_info_container" ng-show="$root.additional_info" ng-init="$root.getAddInfo()">
+			<div class="col-md-12">
+				<md-input-container flex>
+					<h3>- Additional Information / Comments</h3>
+					<div id="additional_info"></div>
+				</md-input-container>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="well mt-0">
+					<div class="mid-cell">
+						<div class="answer-div">
+							<div class="answer-list" ng-repeat="item in items track by $index"
+								ng-class="($index == itemIndex)?'selected':'';" ng-click="changeIndex($index)">
+								{{$index+1}}.&emsp;{{item}}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row starfield-container" ng-show="type">
+			<!-- <label style="color: #a2a2a2;">Rating Options</label> -->
+			<hr />​
+			<div class="col-md-12 starfield">
+				<div class="row" ng-repeat="option in options track by $index">
+					<div class="col-md-8">
+						{{option}}
+					</div>
+					<div class="col-md-4 starrow center">
+						<span class="fa fa-star " ng-repeat="i in [0,1,2,3,4] track by $index" ng-class="getStarState(i,$parent.$index)"
+							myclick="setstar(i,$parent.$index)"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row" ng-if="type % 2 == 0">
+			<hr />​
+			<md-input-container flex>
+				<label>Feedback</label>
+				<textarea class="feedback-text" ng-model="answer[itemIndex].feedbacktext" rows="3" ng-change="submitAnswer()"
+					style="border-radius:5px;height:10px;font-size:18px"></textarea>
+			</md-input-container>
+		</div>
+		<div ng-show="isAward">
+			<div class="row">
+				<div class="col-md-12">
+					<md-input-container class="mt-0">
+						{{question.isInvestment?'Investment Amount':'Award Score'}}
+						<input type='number' ng-model="nextAwardScore[itemIndex]" ng-change="changeAward()" required="required"
+							numbers-only="numbers-only" />
+					</md-input-container>
+				</div>
+				<div class="col-md-12">
+					<md-input-container flex class="mt-0">
+						<div class="col-md-6">
+							<span ng-if="!question.isInvestment">Remained Score:</span>
+							<span ng-if="question.isInvestment">Budget Remaining</span>
+							&emsp; {{totalAwardScore}} / {{question.awardScore}}</span>
+						</div>
+						<div class="col-md-6">
+							<span ng-if="!question.isInvestment">Users:</span>
+							<span ng-if="question.isInvestment">No. of Investments:</span>
+							&emsp; {{totalAwardPeople}} / {{question.awardPeoples}}
+						</div>
+					</md-input-container>
+				</div>
+
+			</div>
+		</div>
+		<div class="row center navigation-row">
+			<div class="col-md-6 col-sm-6 col-xs-6">
+				<button class="btn btn-default" myclick="decreaseindex()">&#9664;</button>
+			</div>
+			<div class="col-md-6 col-sm-6 col-xs-6">
+				<button class="btn btn-default" myclick="increaseindex()">&#9654;</button>
+			</div>
+		</div>
+		<div class="row button-row">
+			<a class="btn btn-link" myclick="$root.back()">Back</a>
+			<a class="btn btn-link" ng-if="$root.settings.shareRate && !$rootScope.settings.disabledQuestion"
+				myclick="$root.go('viewRating')">Group Results</a>
+		</div>
+
+	</div>
+</div>
+<style>
+	.answer-form {
+		margin: 20px auto;
+	}
+
+	.title {
+		margin-top: 20px;
+		color: green;
+		text-align: left;
+	}
+
+	.well {
+		padding: 20px 0px;
+	}
+
+	.mid-cell {
+		width: 95%;
+		margin: auto;
+	}
+
+	.answer-div {
+		padding: 10px;
+	}
+
+	.checked {
+		color: orange;
+	}
+
+	.navigation-row button {
+		width: 80%;
+		max-width: 100px;
+		color: green;
+		margin-bottom: 20px;
+	}
+</style>

@@ -1,0 +1,198 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="row answer-form">
+		<div class="row">
+			<label class="qst-title" ng-if='question.title'>{{question.title}}</label>
+			<div class="col-md-12 col-xs-12 title">{{question.question}}</div>
+		</div>
+		<hr />
+
+		<!-- <label style="margin-left: 10%;	color: #a2a2a2;">Items</label> -->
+		<div class="row">
+			<div class="well ">
+				<label style="margin-left: 20px; color: #a2a2a2;">{{top_answers?'Top '+  top_answers : 'All'}} Items</label>
+				<md-radio-group ng-model="orderBy" ng-change="orderChanged(orderBy)" class="order-radio" ng-disabled="!isAward">
+					<md-radio-button value="rating" class="md-primary">Rating</md-radio-button>
+					<md-radio-button value="awardScore" class="md-primary">Award Score</md-radio-button>
+				</md-radio-group>
+				<label class="order-radio-label">Order By</label>
+
+				<div class="mid-cell">
+					<div class="answer-div">
+						<div class="answer-list" ng-repeat="item in answer track by $index"
+							ng-class="($index == itemIndex)?'selected':'';" ng-click="changeIndex($index)">
+							{{$index+1}}.&emsp;{{item.itemName}}
+							<span class="pull-right">{{orderBy=='rating'?item.avRating:item.awardScore}}&emsp;</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row starfield-container" ng-show="type">
+			<div class="col-md-12 pb-3">
+				<label style="color: #a2a2a2;">Average Rates{{feedbackSetting.showIndividual?'(Student:Teacher)':''}}</label>
+				<button class="btn btn-primary pull-right" myclick="showGroupSettingModal()">
+					Group Setting
+				</button>
+			</div>
+			<div class="col-md-12 starfield">
+				<div class="row option-row" ng-repeat="option in options track by $index">
+					<div class="col-md-6 col-sm-6  col-xs-8  option">
+						{{option}}
+					</div>
+					<div class="col-md-6  col-sm-6 col-xs-4  value center" ng-show="feedbackSetting.showIndividual">
+						<span>{{answer[itemIndex].rating[$index].stRating}}</span>
+						({{answer[itemIndex].rating[$index].stCount}} users) :
+						<span>{{answer[itemIndex].rating[$index].teRating}}</span>
+						({{answer[itemIndex].rating[$index].teCount}} users)
+					</div>
+					<div class="col-md-6  col-sm-6 col-xs-4  value center" ng-hide="feedbackSetting.showIndividual">
+						<span>{{answer[itemIndex].rating[$index].totalRating}}</span>
+						({{answer[itemIndex].rating[$index].totalCount}} users)
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row" ng-if="type % 2 == 0">
+			<div class="row well ">
+				<label style="margin-left: 20px; color: #a2a2a2;">Feedbacks</label>
+				<div class="mid-cell">
+					<div class="answer-div">
+						<div ng-repeat="feed in answer[itemIndex].feedbacktext track by $index" class="feedback">
+							{{$index+1}}.&emsp;{{feed}}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row center navigation-row">
+			<div class="col-md-6 col-sm-6 col-xs-6">
+				<button class="btn btn-default" myclick="decreaseindex()">&#9664;</button>
+			</div>
+			<div class="col-md-6 col-sm-6 col-xs-6">
+				<button class="btn btn-default" myclick="increaseindex()">&#9654;</button>
+			</div>
+		</div>
+		<div class="row button-row">
+			<a class="btn btn-link" myclick="$root.back()">Back</a>
+		</div>
+
+		<div class="row"
+			ng-init="$root.getInstFeedback($root.settings.groupKey, $root.settings.selectedQuestionSetKey, $root.settings.selectedQuestionKey)">
+			<md-input-container class="mt-0">
+				<h4>Instructor Feedback</h4>
+				<textarea class="Instructor_view_area" ng-model="$root.settings.instructor_feedback"
+					ng-change="$root.update_instFeedRef($root.settings.groupKey, $root.settings.selectedQuestionSetKey, $root.settings.selectedQuestionKey)"></textarea>
+			</md-input-container>
+		</div>
+
+		<!-- notes for quesiton -->
+		<div class="row mb-5" ng-init="$root.getTeacherNote($root.settings.selectedQuestionKey, true)">
+			<div class="row" ng-show="$root.allTeacherNotes">
+				<h4 class="center">Feedback from students</h4>
+				<div class="all-notes">
+					<md-input-container ng-repeat="note in $root.allTeacherNotes track by $index" ng-show="note">
+						<textarea class="users-note" ng-model="note" ng-disabled="true"></textarea>
+					</md-input-container>
+				</div>
+			</div>
+			<div class="row" ng-show="$root.allPublicNotes">
+				<h4 class="center">Notes from all students</h4>
+				<div class="all-notes">
+					<md-input-container ng-repeat="note in $root.allPublicNotes track by $index" ng-show="note">
+						<textarea class="users-note" ng-model="note" ng-disabled="true"></textarea>
+					</md-input-container>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="groupSettingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+	aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Text Type Question Group Setting</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body pt-5">
+				<div class="row">
+					<div class="col-md-12">
+						<label style="margin-left:50px;	color: #a2a2a2;">Total Score Setting(%)</label>
+					</div>
+					<div class="col-md-6">
+						<md-input-container>
+							<input type="number" ng-model="feedbackSetting.studentRate" placeholder="Student Score Rating"
+								ng-change="changeRate(feedbackSetting.studentRate,'student')" />
+						</md-input-container>
+					</div>
+					<div class="col-md-6">
+						<md-input-container>
+							<input type="number" ng-model="feedbackSetting.teacherRate" placeholder="Teacher Score Rating"
+								ng-change="changeRate(feedbackSetting.teacherRate,'teacher')" />
+						</md-input-container>
+					</div>
+				</div>
+				<div class="row">
+					<!-- Show Other Group Data in student side -->
+					<div class="col-md-12">
+						<md-input-container class="md-block mb-5">
+							<b class="modal-sub-title">Show score by:</b>
+							<md-radio-group ng-model="feedbackSetting.showIndividual" layout="row" ng-change="saveSetting()">
+								<md-radio-button ng-value="false" class="md-primary" style="margin-right:40px;">Combined
+								</md-radio-button>
+								<md-radio-button ng-value="true" class="md-primary">Individually</md-radio-button>
+							</md-radio-group>
+						</md-input-container>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	.answer-form {
+		margin: 20px auto;
+	}
+
+	.title {
+		margin-top: 20px;
+		color: green;
+	}
+
+	.well {
+		padding: 20px 0px;
+		margin-left: 20px;
+		margin-right: 20px;
+	}
+
+	.mid-cell {
+		width: 95%;
+		margin: auto;
+	}
+
+	.answer-div {
+		padding: 10px;
+	}
+
+	.checked {
+		color: orange;
+	}
+
+	.navigation-row button {
+		width: 80%;
+		max-width: 100px;
+		color: green;
+		margin-bottom: 20px;
+	}
+
+	.feedback {
+		font-size: 20px;
+	}
+</style>

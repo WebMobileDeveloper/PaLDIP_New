@@ -1,0 +1,244 @@
+<div ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="container">
+		<div class="row border-bottom margin-top-20">
+			<div class="col-md-12 group-title">
+				{{$root.settings.groupName}}
+			</div>
+		</div>
+		<br />
+		<div class="row tab-row">
+			<div class="col-md-6 col-sm-6" ng-class="getClass('Questions')" ng-click="setActive('Questions')">Questions</div>
+			<div class="col-md-6 col-sm-6" ng-class="getClass('GroupSet')" ng-click="setActive('GroupSet')">Group Sets</div>
+		</div>
+		<div class="row" ng-show="selectedTab=='Questions'">
+			<md-switch class="md-primary sort-switch" md-no-ink aria-label="Switch selfRate" ng-model="sort">
+				<span ng-if="!sort">Sort By Question Set</span>
+				<span ng-if="sort">Sort By Question Type</span>
+			</md-switch>
+		</div>
+		<div class="row question-div" ng-show="selectedTab=='Questions'">
+			<div ng-repeat="set in setQuestions | orderObjectBy :'order':false track by $index" ng-if="!sort">
+				<div ng-if="set.questions.length>0">
+					<div class="type-title">
+						<label class="type">{{set.setName}}</label>
+					</div>
+					<div class="type-content">
+						<div class="row question-row" ng-repeat="obj in set.questions  track by $index" style="margin-top:5px;" ng-hide="deletingprogresskey">
+							<div class="col col-md-2 col-sm-2 col-xs-2 qtdetails" style="color: black;background-color: #d2e5f5;border-color: white;text-align:right;">
+								<div style="margin-top:4px; ">&nbsp;&nbsp;&nbsp;{{obj.questionType}}</div>
+							</div>
+							<div class="col col-md-9 col-sm-9 col-xs-9  qtdetails">
+								<div style="margin-top:4px;"><span class="qst-title" ng-show='obj.title'>{{obj.title}}:</span>&emsp;{{obj.question}}
+									<span class="anonymous" ng-if="obj.anonymous">Anonymous</span>
+								</div>
+							</div>
+							<div class="col col-md-1 col-sm-1 col-xs-1 btn-col">
+								<div>
+									<div>
+										<button type="button" class="btn btn-success exportbtn" style="background-color:#177c48;border-color:white;"
+										 myclick="exportQuestionDatas(obj, obj.questionType)">
+											<i class="glyphicon glyphicon-export"></i>
+											<span class="hide-in-small">Export</span>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div ng-repeat="type in types track by $index" ng-if="sort">
+				<div ng-if="questions[type].length>0">
+					<div class="type-title">
+						<label class="type">{{type}}</label>
+						<a ng-if="type!='Likert Type'" type="button" id="exportAllbtn" class="btn btn-primary pull-right exportAllbtn"
+						 myclick="exportAllQuestionDatas(questions[type],type)">
+							<i class="glyphicon glyphicon-export"></i>Export All
+						</a>
+					</div>
+					<div class="type-content">
+						<div class="row question-row" ng-repeat="obj in questions[type] track by $index" style="margin-top:5px;" ng-hide="deletingprogresskey">
+							<div class="col col-md-2 col-sm-2 col-xs-2 qtdetails" style="color: black;background-color: #d2e5f5;border-color: white;text-align:right;">
+								<div style="margin-top:4px; ">&nbsp;&nbsp;&nbsp;{{obj.setname}}</div>
+							</div>
+							<div class="col col-md-9 col-sm-9 col-xs-9  qtdetails">
+								<div style="margin-top:4px;"><span class="qst-title" ng-show='obj.title'>{{obj.title}}:</span>&emsp;{{obj.question}}
+									<span class="anonymous" ng-if="obj.anonymous">Anonymous</span>
+								</div>
+							</div>
+							<div class="col col-md-1 col-sm-1 col-xs-1 btn-col">
+								<div>
+									<div>
+										<button type="button" class="btn btn-success exportbtn" style="background-color:#177c48;border-color:white;"
+										 myclick="exportQuestionDatas(obj, type)">
+											<i class="glyphicon glyphicon-export"></i>
+											<span class="hide-in-small">Export</span>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+
+		<div ng-if="selectedTab=='GroupSet'">
+			<div class="row" ng-if="groupsets">
+				<div class="col-md-6 col-sm-6 ">
+					<div class="groupsets">
+						<div class="box-title">Groupsets</div>
+						<div class="groupset" ng-repeat="groupset in  groupsets  track by $index" ng-class="getGroupClass(groupset)"
+						 ng-click="selectGroupset(groupset.key)">{{groupset.name}}</div>
+					</div>
+				</div>
+				<div class="col-md-6 col-sm-6">
+					<div class="groupsets">
+						<div class="box-title">{{selectedGroup.name}}</div>
+						<div class="groupset" ng-repeat="group in selectedGroup.data.groups  track by $index" ng-class="getSubGroupClass($index)"
+						 ng-click="selectGroup($index, group.name)">{{group.name}}</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<style>
+	/* page style */
+	.group-title {
+		text-align: center;
+		text-align: center;
+		font-size: 2.2em;
+		font-weight: 600;
+		font-style: oblique;
+		color: #4a407d;
+		text-shadow: 1px 2px #0077ff75;
+	}
+
+	.sort-switch {
+		margin-left: 40px !important;
+		font-size: 20px;
+		font-weight: bold;
+	}
+
+	.question-div {
+		height: calc(100vh - 260px);
+		overflow-y: auto;
+		border: solid 1px #656464;
+		padding: 15px 5px;
+
+	}
+
+	.type-title {
+		padding-top: 40px;
+		padding-right: 20px;
+	}
+
+	.type-title .type {
+		padding: 0px 20px;
+		font-size: 20px;
+		font-weight: bold;
+		color: #070769;
+		border-bottom: solid;
+	}
+
+	.type-content {
+		border: solid 1px #0569da;
+	}
+
+
+
+
+	/* question row styles */
+
+	.question-row {
+		display: flex;
+		background-color: #d9edf7;
+	}
+
+	.qtdetails {
+		font-size: 14px;
+		padding: 10px;
+		line-height: 22px;
+	}
+
+	span.anonymous {
+		font-weight: bold;
+		color: black;
+		font-style: italic;
+		float: right;
+	}
+
+
+
+	.row {
+		margin-left: 0px;
+		margin-right: 0px;
+	}
+
+	.col {
+		padding-top: 0px;
+		padding-bottom: 0px;
+	}
+
+	.btn-col {
+		padding: 0px;
+		text-align: center;
+	}
+
+	.btn-col>div {
+		display: table;
+		height: 100%;
+		width: 100%;
+	}
+
+	.btn-col>div>div {
+		display: table-cell;
+		vertical-align: middle;
+		height: 100%;
+		width: 100%;
+	}
+
+	.exportbtn:hover {
+		color: #fcad4e;
+	}
+
+	/* groupset styles */
+
+	.groupsets {
+		border: solid 1px #355086;
+		height: calc(100vh - 300px);
+		background-color: #e0edf9;
+		margin-top: 20px;
+		padding: 20px 10%;
+		overflow-y: auto;
+	}
+
+	.box-title {
+		font-size: 2em;
+		text-align: center;
+		margin: 10px 0px;
+		color: #0716ba;
+	}
+
+	.groupset {
+		background: #0576d5;
+		color: white;
+		margin: 10px auto;
+		font-size: 1.8em;
+		text-align: center;
+		line-height: 1.8em;
+		border-radius: 15px;
+		cursor: pointer;
+	}
+
+	.groupset.active {
+		border: solid 3px #17e320;
+	}
+</style>

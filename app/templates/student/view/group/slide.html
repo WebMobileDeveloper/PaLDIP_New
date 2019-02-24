@@ -1,0 +1,120 @@
+<div class="main" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="container" style="margin-top: 5vh">
+
+		<div class="col-xs-12 col-md-6" style="text-align:center;">
+			<h5>Your Answer</h5>
+			<div>
+				<canvas id="mychart" basechart="" width="420" height="420" style="display: block; width: 420px; height: 420px;"></canvas>
+			</div>
+		</div>
+
+		<div class="col-xs-12 col-md-6" style="text-align:center;">
+			<h5>Class Answer
+				<span ng-show="numberOfAnswers">({{numberOfAnswers}} answers)</span>
+			</h5>
+			<div>
+				<canvas id="classchart" basechart="" width="420" height="420" style="display: block; width: 420px; height: 420px;"></canvas>
+			</div>
+		</div>
+	</div>
+
+	<div class="row mt-5">
+		<div class="col-md-6">
+			<div class="row" ng-show="question.enableGroup">
+				<div class="col-md-4 center" style="line-height: 34px;">
+					<strong>Filter By:</strong>
+				</div>
+				<div class="col-md-8">
+					<div class="form-group mb-0">
+						<select class="form-control" ng-model="selectedFilter" ng-change="finalCalc()">
+							<option ng-repeat="item in filterList track by $index" ng-value="item" ng-selected="item==selectedFilter">{{item}}</option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6 main-other-choice">
+			<md-radio-group ng-model="groupChoice" ng-change="changeGroupChoice()" layout="row">
+				<md-radio-button value="main" class="md-primary">This Group</md-radio-button>
+				<md-radio-button value="other" class="md-primary">Other Groups</md-radio-button>
+				<md-radio-button value="all" class="md-primary">All Groups</md-radio-button>
+			</md-radio-group>
+		</div>
+	</div>
+
+	<div class="row" ng-init="$root.getInstFeedback($root.settings.groupKey, $root.settings.questionSetKey, $root.settings.questionKey)"
+	 ng-show="$root.settings.instructor_feedback">
+		<md-input-container>
+			<h4>Instructor Feedback</h4>
+			<textarea ng-disabled='true' class="Instructor_view_area">{{$root.settings.instructor_feedback}}</textarea>
+		</md-input-container>
+	</div>
+
+	<div class="row">
+		<!-- Result String -->
+		<md-input-container flex ng-show="question.result_string">
+			<label>Result Text</label>
+			<textarea ng-disabled="true" ng-model="question.result_string" style="min-height: 100px;	max-height: 200px; overflow-y: auto; color: black;	
+									height: 0px;	border: solid 1px #b8f2f9;	background-color: aliceblue; border-radius: 7px; padding: 10px;"></textarea>
+		</md-input-container>
+		<!-- upload result image -->
+		<md-input-container flex class="center img-row" ng-init="$root.load_result_image()" ng-show="$root.result_imgSrc">
+			<label class="text-left">Result Image</label>
+			<img ng-src="{{$root.result_imgSrc}}">
+		</md-input-container>
+		<!-- result video url -->
+		<md-input-container flex ng-show="question.result_videoURL" class="center">
+			<label class="text-left">Result Video</label>
+			<div id="playerWrapOuter">
+				<div id="playerWrap">
+					<iframe id="video-iframe" width="420" height="315" src="{{question.result_videoURL}}" frameborder="0"></iframe>
+				</div>
+			</div>
+		</md-input-container>
+	</div>
+
+	<div class="row">
+		<md-input-container flex style="text-align:center;">
+			<a class="btn btn-link" myclick="$root.back()">Back</a>
+			<a class="btn btn-link" ui-sref="questions" ui-sref-active="active">Select Question</a>
+			<a class="btn btn-link" myclick="$root.goSubmitNextAnswer()" ng-if="!$root.checkLast()">Next Question</a>
+			<a class="btn btn-link" myclick="$root.go('studentGroupDetail')" ng-if="$root.checkLast()">Question Sets</a>
+		</md-input-container>
+	</div>
+
+	<!-- notes for quesiton -->
+	<div class="row mb-5" ng-init="$root.getNote($root.settings.questionKey)">
+		<md-input-container class="mb-0">
+			<label>Feedback to Teacher</label>
+			<textarea ng-model="$root.teacherNote" class="note-area" ng-change="$root.changeTeacherNote()"></textarea>
+		</md-input-container>
+		<md-input-container class="mb-0">
+			<label>Your Private Note for Question</label>
+			<textarea ng-model="$root.privateNote" class="note-area" ng-change="$root.changePrivateNote()"></textarea>
+		</md-input-container>
+		<md-input-container class="mb-0">
+			<label>Your Public Note for Question</label>
+			<textarea ng-model="$root.publicNote" class="note-area" ng-change="$root.changePublicNote()"></textarea>
+		</md-input-container>
+	</div>
+	<div class="row" ng-show="$root.allPublicNotes">
+		<h4 class="center">Notes from all students</h4>
+		<div class="all-notes">
+			<md-input-container ng-repeat="note in $root.allPublicNotes track by $index" ng-show="note">
+				<textarea class="users-note" ng-model="note" ng-disabled="true"></textarea>
+			</md-input-container>
+		</div>
+	</div>
+</div>
+
+<style>
+	.main {
+		position: relative;
+		margin-left: 5%;
+		width: 90%;
+	}
+
+	.checked {
+		color: orange;
+	}
+</style>

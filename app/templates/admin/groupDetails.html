@@ -1,0 +1,199 @@
+<div ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="row content-header">
+		<div class="container title texteffect ">
+			{{$root.settings.selectedTeacherEmail}}&emsp;/&emsp;{{$root.settings.groupName}}
+			<div class="pull-right">
+				<a class="btn btn-success" myclick="$state.go('adminExportInGroup');">Export All</a>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<br>
+		<div class="row tab-row">
+			<div class="col-md-6 col-sm-6" ng-class="getClass('QuestionSet')" ng-click="setActive('QuestionSet')">Question Sets</div>
+			<div class="col-md-6 col-sm-6" ng-class="getClass('GroupSet')" ng-click="setActive('GroupSet')">Group Sets</div>
+		</div>
+		<div class="row">
+			<div class="content-div" ng-show="selectedTab=='QuestionSet'">
+				<div class="col-md-12 groupdetails" ng-repeat="obj in  groupData.QuestionSets" ng-class="getQstClass(obj)" ng-click="showQuestions(obj)">{{obj.setname}}</div>
+			</div>
+			<div class="content-div" ng-show="selectedTab=='GroupSet'">
+				<div class="row" ng-show="groupData.groupsets">
+					<div class="col-md-6 col-sm-6 ">
+						<div class="groupsets">
+							<div class="box-title">Groupsets</div>
+							<div class="col-md-12 groupset" ng-repeat="obj in  groupData.groupsets" ng-class="getGroupClass(obj)" ng-click="selectGroup(obj.key)">{{obj.name}}</div>
+						</div>
+					</div>
+					<div class="col-md-6 col-sm-6">
+						<div class="groupset-details center">
+							<div class="box-title">{{selectedGroup.name}}</div>
+
+							<!-- properties -->
+							<div class="row">
+								<div class="col-md-12 col-sm-12">
+									<label>Sub Group Properties</label>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-7 col-sm-7"> Number of subgroups </div>
+								<div class="col-md-5 col-sm-5">{{selectedGroup.count}}</div>
+							</div>
+							<div class="row">
+								<div class="col-md-7 col-sm-7"> Maximum students per subgroup</div>
+								<div class="col-md-5 col-sm-5">{{selectedGroup.max_member}}</div>
+							</div>
+							<div class="row">
+								<div class="col-md-7 col-sm-7"> Exclusive</div>
+								<div class="col-md-5 col-sm-5">
+									<span ng-show="selectedGroup.exclusive">Yes</span>
+									<span ng-show="!selectedGroup.exclusive">No</span>
+								</div>
+							</div>
+
+							<br/>
+
+							<!-- question sets -->
+							<div class="row">
+								<div class="col-md-12 col-sm-12">
+									<label>Sub Group QuestionSets</label>
+								</div>
+							</div>
+							<div class="row sub-questionsets">
+								<div class="col-md-12" ng-repeat="obj in selectedGroup.QuestionSets">
+									{{obj.setname}}
+								</div>
+							</div>
+
+							<!-- 2nd subgroupsets -->
+							<div class="row">
+								<div class="col-md-12 col-sm-12">
+									<label>2nd Sub GroupSets</label>
+								</div>
+							</div>
+							<div class="row sub-groupsets">
+								<div class="col-md-12" ng-repeat="obj in selectedGroup.subgroupsets" ng-click="secondDetails(selectedGroup,obj)">
+									{{obj.name}}
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.content-header {
+		background-color: #426af4;
+	}
+
+	.content-div {
+		height: calc(100vh - 220px);
+	}
+
+	.groupdetails.active {
+		background-color: #f8b7b7;
+		border: solid 1px #f9ff00;
+	}
+
+	.title {
+		color: yellow;
+	}
+
+	div.groupsets {
+		border: solid 1px #355086;
+		height: calc(100vh - 300px);
+		background-color: #e0edf9;
+		margin-top: 20px;
+		padding: 20px 20%;
+		overflow-y: auto;
+	}
+
+	div.box-title {
+		font-size: 2em;
+		text-align: center;
+		margin: 10px 0px;
+		color: #0716ba;
+	}
+
+	div.groupset {
+		background: #0576d5;
+		color: white;
+		margin: 10px auto;
+		font-size: 1.8em;
+		text-align: center;
+		line-height: 1.8em;
+		border-radius: 15px;
+		cursor: pointer;
+	}
+
+	.groupset.active {
+		border: solid 3px #17e320;
+	}
+
+	div.groupset span {
+		font-size: 0.8em;
+		cursor: pointer;
+		line-height: 2.3em;
+		color: yellow;
+	}
+
+
+	div.groupset-details {
+		border: solid 1px #355086;
+		height: calc(100vh - 300px);
+		background-color: #e0edf9;
+		margin-top: 20px;
+		padding: 20px 0%;
+		font-size: 1.2em;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	div.groupset-details>div {
+		margin-bottom: 20px;
+	}
+
+	.sub-questionsets {
+		max-height: 50%;
+		border: solid 1px #9c9c9c;
+		overflow-y: auto;
+		width: 96%;
+		margin: 0px auto;
+		padding: 10px;
+		margin-bottom: 0px;
+		/* background-color: azure; */
+	}
+
+	.sub-questionsets>div {
+		background-color: #75c8e3;
+		margin: 5px 0px;
+		border-radius: 10px;
+		font-size: 17px;
+		padding: 5px;
+		border: solid 1px #085699;
+	}
+
+	.sub-groupsets {
+		max-height: 50%;
+		border: solid 1px #9c9c9c;
+		overflow-y: auto;
+		width: 96%;
+		margin: 0px auto;
+		padding: 10px;
+		margin-bottom: 0px;
+		/* background-color: azure; */
+	}
+
+	.sub-groupsets>div {
+		background-color: #83a5f5;
+		margin: 5px 0px;
+		border-radius: 10px;
+		font-size: 17px;
+		padding: 5px;
+		border: solid 1px #085699;
+	}
+</style>

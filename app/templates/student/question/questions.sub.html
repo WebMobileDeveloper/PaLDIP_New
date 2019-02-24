@@ -1,0 +1,92 @@
+<div ng-init="getSetData()">
+
+	<h2 class="text-center title">Question Set: {{$root.settings.questionSetName}}</h2>
+
+	<hr />
+
+
+	<div class="container content-div">
+		<div class="row">
+			<div class="col-md-12 center">
+				<span class="title">Questions</span>
+			</div>
+			<div class="col-md-12 qtdetails" ng-repeat="obj in questions track by $index" ng-click="goSubmitAnswer(obj,$index)" ng-show="showByLastCompleted($index)">
+				<span class="pull-left">{{$index+1}}&nbsp;-&nbsp;</span>
+
+				<span class="question-span">
+					<!-- <span class="type-span">[{{obj.questionType}}]</span>&emsp; -->
+					<!-- <span ng-if="obj.new" class="blink">[new]&nbsp;</span> -->
+					<span class="qst-title" ng-show='obj.title'>{{obj.title}}:</span>
+					{{obj.question}}
+				</span>
+
+				<div class="pull-right center" style="width:40px;	height: 100%;">
+					<span ng-if="obj.completed" class="glyphicon glyphicon-ok completed" title="Completed Questionset"></span>
+					<div ng-if="obj.completed==undefined" class="waiting" title="waiting"></div>
+					<span ng-if="obj.completed==false" title="waiting">&nbsp;</span>
+				</div>
+				<span ng-if="obj.anonymous" class="anonymous">Anonymous</span>
+			</div>
+
+			<div class="col-md-12 note" ng-if="note">
+				*&emsp;{{note}}
+			</div>
+		</div>
+		<div class="row subscaleSection" ng-if="setData.MultipleType && setData.subscales && !note">
+			<div class="col-md-12 center">
+				<span class="title">Subscale Feedback</span>
+			</div>
+			<div class="col-md-12 scale-row" ng-repeat="scale in setData.subscales track by $index">
+				<b>{{scale.title}}:</b>&nbsp; [{{scale.result.score}}]&emsp;{{scale.result.text}}
+			</div>
+		</div>
+	</div>
+
+
+</div>
+
+
+</div>
+<style>
+	.title {
+		color: black;
+	}
+
+	@media screen and (max-width: 600px) {
+		.title {
+			font-size: 1em;
+		}
+	}
+
+	.content-div {
+		height: calc(100vh - 150px);
+	}
+
+	.question-span {
+		width: calc(100% - 120px);
+		display: inline-block;
+	}
+
+	span.anonymous {
+		font-weight: bold;
+		color: black;
+		font-style: italic;
+		float: right;
+	}
+
+	.note {
+		text-align: center;
+		color: #5289c8;
+		margin-top: 20px;
+		font-size: 1.2em;
+	}
+
+	.subscaleSection {
+		margin-top: 20px;
+	}
+
+	.scale-row {
+		padding: 30px 15px 0px;
+		font-size: 1.2em;
+	}
+</style>

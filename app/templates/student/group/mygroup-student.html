@@ -1,0 +1,28 @@
+<div class="row content-header" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="col-md-6 col-md-offset-3 col-xs-6 title texteffect">
+		<div>My Groups</div>
+	</div>
+	<div class="col-md-3 col-xs-6">
+		<a class="btn btn-success" myclick="$root.setData('backUrl', 'myGroups'); $state.go('joinGroup');"> Join Group </a>
+	</div>
+</div>
+<div class="row">
+	<div class="container content-div" >
+		<div class="col-md-12 groupdetails" ng-repeat="obj in studentgroups  track by $index" ng-click="studentGroupDetails(obj)" ng-class="getClass(obj)">
+			{{obj.groupname}}
+		</div>
+	</div>
+</div>
+
+<style>
+	.content-header {
+		background-color: #7084db;
+		height: 50px;
+		line-height: 50px;
+	}
+
+	.groupdetails.active {
+		background-color: #abc9f6;
+		color: #0600ff;
+	}
+</style>

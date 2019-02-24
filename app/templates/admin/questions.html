@@ -1,0 +1,37 @@
+
+
+<div ng-init="getAllQuestions()">
+
+		<h2 class="text-center title">Question Set: {{$root.settings.questionSetName}}</h2>
+	
+		<hr />
+	
+		<div class="row">
+			<div class="container content-div">
+				<div class="col-md-12 qtdetails" ng-repeat="obj in questions track by $index" ng-click="showDetail(obj)" ng-class="setActive(obj)">
+					<span class="order-span">{{$index+1}}&nbsp;-&nbsp;</span>
+					<!-- <span ng-if="obj.new" class="blink">[new]&nbsp;</span> -->
+					{{obj.question}}
+					<span ng-if="obj.anonymous" class="anonymous">Anonymous</span>
+				</div>			
+			</div>
+		</div>
+	
+	</div>
+	
+	
+	</div>
+	<style>
+		.title {
+			color: black;
+		}	
+		span.anonymous {
+			font-weight: bold;
+			color: black;
+			font-style: italic;
+			float: right;
+		}
+		.qtdetails.active{
+			background-color: bisque;
+		}
+	</style>

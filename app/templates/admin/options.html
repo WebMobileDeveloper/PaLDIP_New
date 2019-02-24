@@ -1,0 +1,230 @@
+<div class="container">
+	<div class="row" style="text-align: center;">
+		<div class="col-md-12">
+			<div class="row">
+				<div class="col-md-12 col-sm-12 col-xs-12">
+					<h2>{{teacherEmail}}</h2>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container data-div" ng-init="init()" ng-show="$root.settings.loadingfinished">
+
+	<div class="row title-row center ">
+		<div class="col-md-12">Teacher Options & setting</div>
+	</div>
+
+	<div class="row content-row pt-5 pb-5">
+		<div class="col-md-12 center">
+			<h3>Global Options</h3>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Approve teacher</label>
+			<md-switch class="md-primary" ng-model="settings.approved" md-no-ink aria-label="Switch Approved" ng-change="changeApprove()"></md-switch>
+			<label class="detail-label" ng-if="settings.approved">Approved</label>
+			<label class="detail-label" ng-if="!settings.approved">Non-Approved</label>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Anonymous Enabled</label>
+			<md-switch ng-model="settings.anonym_enabled" md-no-ink aria-label="Switch Non-Anonymous" ng-change="changeAnonym()"></md-switch>
+			<label class="detail-label" ng-if="settings.anonym_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.anonym_enabled">Disabled</label>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Export Answer Function</label>
+			<md-switch ng-model="settings.export_enabled" md-no-ink aria-label="Switch Extra Link" ng-change="changeExport()"></md-switch>
+			<label class="detail-label" ng-if="settings.export_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.export_enabled">Disabled</label>
+		</div>
+
+
+
+		<div class="col-md-12 center">
+			<hr />
+			<h3>Group Related Options</h3>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Group Name Editable</label>
+			<md-switch ng-model="settings.editGroupName_enabled" md-no-ink aria-label="Switch Edit Question" ng-change="changeEditGroupName()"></md-switch>
+			<label class="detail-label" ng-if="settings.editGroupName_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.editGroupName_enabled">Disabled</label>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Add Member to Groupset</label>
+			<md-switch ng-model="settings.addToGroup_enabled" md-no-ink aria-label="Switch Edit Question" ng-change="changeAddToGroup()"></md-switch>
+			<label class="detail-label" ng-if="settings.addToGroup_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.addToGroup_enabled">Disabled</label>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Export Group User List</label>
+			<md-switch ng-model="settings.exportUserList_enabled" md-no-ink aria-label="Switch Extra Link" ng-change="exportUserListChanged()"></md-switch>
+			<label class="detail-label" ng-if="settings.exportUserList_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.exportUserList_enabled">Disabled</label>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Add Release Rule to Questionset</label>
+			<md-switch ng-model="settings.release_enabled" md-no-ink aria-label="Switch Extra Link" ng-change="changeReleaseRule()"></md-switch>
+			<label class="detail-label" ng-if="settings.release_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.release_enabled">Disabled</label>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Add Combined Release Rule</label>
+			<md-switch ng-model="settings.combinedRelease_enabled" md-no-ink aria-label="Switch Extra Link" ng-change="changeCombinedReleaseRule()"></md-switch>
+			<label class="detail-label" ng-if="settings.combinedRelease_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.combinedRelease_enabled">Disabled</label>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Reminder Function</label>
+			<md-switch ng-model="settings.reminder_enabled" md-no-ink aria-label="Switch Extra Link" ng-change="changeReminder_enabled()"></md-switch>
+			<label class="detail-label" ng-if="settings.reminder_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.reminder_enabled">Disabled</label>
+		</div>
+
+
+
+
+		<div class="col-md-12 center">
+			<hr />
+			<h3>QuestionSet Related Options</h3>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Questionset Private Setting</label>
+			<md-switch ng-model="settings.private_enabled" md-no-ink aria-label="Switch Private Set" ng-change="changePrivate()"></md-switch>
+			<label class="detail-label" ng-if="settings.private_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.private_enabled">Disabled</label>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Lock Next Question</label>
+			<md-switch ng-model="settings.lockNext_enabled" md-no-ink aria-label="Switch Extra Link" ng-change="changeLockNext()"></md-switch>
+			<label class="detail-label" ng-if="settings.lockNext_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.lockNext_enabled">Disabled</label>
+		</div>
+
+
+
+
+
+		<div class="col-md-12 center">
+			<hr />
+			<h3>Question Related Options</h3>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Question Editable</label>
+			<md-switch ng-model="settings.editqst_enabled" md-no-ink aria-label="Switch Edit Question" ng-change="changeEditQst()"></md-switch>
+			<label class="detail-label" ng-if="settings.editqst_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.editqst_enabled">Disabled</label>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Share Question to Others</label>
+			<md-switch ng-model="settings.shareQuestion_enabled" md-no-ink aria-label="Switch Edit Question" ng-change="changeShareQuestion()"></md-switch>
+			<label class="detail-label" ng-if="settings.shareQuestion_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.shareQuestion_enabled">Disabled</label>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Extra Link Editable</label>
+			<md-switch ng-model="settings.link_enabled" md-no-ink aria-label="Switch Extra Link" ng-change="changeExtraLink()"></md-switch>
+			<label class="detail-label" ng-if="settings.link_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.link_enabled">Disabled</label>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Add Video For Question</label>
+			<md-switch ng-model="settings.video_enabled" md-no-ink aria-label="Switch Extra Link" ng-change="changeAddVideo()"></md-switch>
+			<label class="detail-label" ng-if="settings.video_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.video_enabled">Disabled</label>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Add Result Media</label>
+			<md-switch ng-model="settings.result_video_enabled" md-no-ink aria-label="Switch Extra Link" ng-change="changeAddResultVideo()"></md-switch>
+			<label class="detail-label" ng-if="settings.result_video_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.result_video_enabled">Disabled</label>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Add Image</label>
+			<md-switch ng-model="settings.image_enabled" md-no-ink aria-label="Switch Extra Link" ng-change="changeAddImage()"></md-switch>
+			<label class="detail-label" ng-if="settings.image_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.image_enabled">Disabled</label>
+		</div>
+		<div class="col-md-12">
+			<label class="title-label">Add Live Feedback</label>
+			<md-switch ng-model="settings.feedback_enabled" md-no-ink aria-label="Switch Extra Link" ng-change="changeFeedback()"></md-switch>
+			<label class="detail-label" ng-if="settings.feedback_enabled">Enabled</label>
+			<label class="detail-label" ng-if="!settings.feedback_enabled">Disabled</label>
+		</div>
+
+
+		<div class="col-md-12 center">
+			<hr />
+			<h3>Create Question Options</h3>
+		</div>
+		<div ng-repeat="item in createQuestionSettings track by $index">
+			<div class="col-md-12">
+				<label class="title-label">{{item.type}}</label>
+				<md-switch ng-model="item.value" md-no-ink ng-change="changeCreateQuestionSetting(item)"></md-switch>
+				<label class="detail-label" ng-if="true">Enabled</label>
+				<label class="detail-label" ng-if="false">Disabled</label>
+			</div>
+		</div>
+		<br />
+	</div>
+</div>
+
+<style>
+	.title-row {
+		border: solid 1px #5d5d5d;
+		background-color: #69b5ff;
+		padding: 7px;
+		font-size: 20px;
+	}
+
+	.content-row {
+		border: solid 1px #a8a8a8;
+		max-height: calc(100vh - 200px);
+		overflow-y: auto;
+	}
+
+	md-switch {
+		display: inline-flex;
+		margin: 0px;
+		height: 44px;
+	}
+
+	md-switch[disabled].activeDisabled .md-container>div {
+		cursor: default;
+		background: #C2C2C2;
+	}
+
+	md-switch[disabled].activeDisabled .md-container>div>div {
+		background: #DDDDDD;
+	}
+
+	md-switch[disabled].activeDisabled.md-checked .md-container>div {
+		cursor: default;
+		background: #BCBECD;
+	}
+
+	md-switch[disabled].activeDisabled.md-checked .md-container>div>div {
+		background: #A6ACC9;
+	}
+
+	.title-label {
+		font-size: 20px;
+		width: 600px;
+		text-align: center;
+		padding-bottom: 10px;
+		display: inline-block;
+	}
+
+	.detail-label {
+		font-size: 20px;
+		text-align: left;
+		padding-left: 20px;
+		padding-bottom: 10px;
+		display: inline-block;
+	}
+
+	h3 {
+		font-weight: bold;
+		color: #2206b4;
+	}
+</style>

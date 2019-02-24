@@ -1,0 +1,258 @@
+<div class="container">
+
+	<!-- Question string -->
+	<div class="row center">
+		<div class="col-md-12">
+			<h2>{{$root.settings.question.question}}</h2>
+		</div>
+	</div>
+	<!-- Question Image -->
+	<div class="row" ng-init="$root.loadimage()">
+		<div class="col-md-12 img-row center" ng-init="$root.loadimage()" ng-show="$root.imgSrc">
+			<img ng-src="{{$root.imgSrc}}">
+		</div>
+	</div>
+
+	<div class="question-content col-md-8 col-md-offset-2">
+		<!-- Question Set name -->
+		<div class="row">
+			<div class="col-md-6 ">
+				<label>Question Set: </label>
+			</div>
+			<div class="col-md-6">{{$root.settings.questionSetName}}</div>
+		</div>
+		<hr/>
+		<!-- Question Type -->
+		<div class="row">
+			<div class="col-md-6">
+				<label>Question Type:</label>
+			</div>
+			<div class="col-md-6">
+				{{$root.settings.question.questionType}}&nbsp; Question
+			</div>
+		</div>
+		<hr/>
+
+		<!-- Creator  -->
+		<div class="row">
+			<div class="col-md-6">
+				<label>Creator:</label>
+			</div>
+			<div class="col-md-6">
+				{{$root.settings.question.teacher}}
+			</div>
+		</div>
+
+		<!-- Anonymous  -->
+		<div class="row">
+			<div class="col-md-6">
+				<label>Anonymous Type: </label>
+			</div>
+			<div class="col-md-6">
+				<span ng-if="$root.settings.question.anonymous">
+					<b>Anonymous</b>&nbsp;(show user ID)</span>
+				<span ng-if="!$root.settings.question.anonymous">
+					<b>Non-Anonymous</b>&nbsp;(show user Email)</span>
+			</div>
+		</div>
+		<hr />
+
+
+
+
+
+
+
+
+		<!-- ======================  only feedback type ===================================  -->
+
+
+		<div ng-if="$root.settings.question.questionType=='Feedback Type'">
+
+			<div class="row">
+				<div class="col-md-6">
+					<label>List Type: </label>
+				</div>
+				<div class="col-md-6">
+					<b ng-if="$root.settings.question.listType">Yes</b>
+					<b ng-if="!$root.settings.question.listType">No</b>
+				</div>
+			</div>
+			<hr/>
+
+			<div class="row">
+				<div class="col-md-6">
+					<label>Self Rate: </label>
+				</div>
+				<div class="col-md-6">
+					<b ng-if="$root.settings.question.selfRate">Yes</b>
+					<b ng-if="!$root.settings.question.selfRate">No</b>
+				</div>
+			</div>
+			<hr/>
+
+			<div class="row">
+				<div class="col-md-6">
+					<label>Feedback Type: </label>
+				</div>
+				<div class="col-md-6">
+					<b ng-if="$root.settings.question.type==0">Text</b>
+					<b ng-if="$root.settings.question.type==1">Scale</b>
+					<b ng-if="$root.settings.question.type==2">Scale & Text</b>
+				</div>
+			</div>
+			<hr/>
+
+			<!-- feedback questions-->
+
+			<div class="row" ng-if="$root.settings.question.feedqts">
+				<div class="col-md-6">
+					<label>Feedback Questions: </label>
+				</div>
+				<div class="col-md-6">
+					<div ng-repeat="qts in $root.settings.question.feedqts track by $index">
+						<b>{{$index+1}}</b>&emsp;-&emsp;{{qts}}</div>
+				</div>
+			</div>
+			<hr ng-if="$root.settings.question.feedqts" />
+		</div>
+
+		<!-- ++++++++++++++++++++++++++++++++  -->
+
+
+
+		<!-- ================ only rating type ==========================  -->
+
+		<div ng-if="$root.settings.question.questionType=='Rating Type'">
+			<div class="row">
+				<div class="col-md-6">
+					<label>Share Rate: </label>
+				</div>
+				<div class="col-md-6">
+					<span ng-if="$root.settings.question.shareRate">
+						<b>Yes</b>&nbsp;(show other's rate)</span>
+					<span ng-if="!$root.settings.question.shareRate">
+						<b>No</b>&nbsp;(show only own rate)</span>
+				</div>
+			</div>
+			<hr />
+
+			<div class="row">
+				<div class="col-md-6">
+					<label>Rating Type: </label>
+				</div>
+				<div class="col-md-6">
+					<b ng-if="$root.settings.question.ratingtype==0">Text</b>
+					<b ng-if="$root.settings.question.ratingtype==1">Scale</b>
+					<b ng-if="$root.settings.question.ratingtype==2">Scale & Text</b>
+				</div>
+			</div>
+			<hr/>
+
+			<!-- rating items  -->
+			<div class="row" ng-if="$root.settings.question.ratingItems">
+				<div class="col-md-6">
+					<label>Rating Items: </label>
+				</div>
+				<div class="col-md-6">
+					<div ng-repeat="item in $root.settings.question.ratingItems track by $index">
+						<b>{{$index+1}}</b>&emsp;-&emsp;{{item}}</div>
+				</div>
+			</div>
+			<hr ng-if="$root.settings.question.ratingItems" />
+
+			<!-- rating options  -->
+			<div class="row" ng-if="$root.settings.question.ratingOptions">
+				<div class="col-md-6">
+					<label>Rating Options: </label>
+				</div>
+				<div class="col-md-6">
+					<div ng-repeat="option in $root.settings.question.ratingOptions">
+						<b>{{$index+1}}</b>&emsp;-&emsp;{{option}}</div>
+				</div>
+			</div>
+			<hr ng-if="$root.settings.question.ratingOptions" />
+
+		</div>
+
+		<!-- ++++++++++++++++++++++++++++++++  -->
+
+
+
+		<!-- ======================  only multiple type ===================================  -->
+		<div class="row" ng-if="$root.settings.question.maximumSelection">
+			<div class="col-md-6">
+				<label>Maximum Selection: </label>
+			</div>
+			<div class="col-md-6">
+				{{$root.settings.question.maximumSelection}}
+			</div>
+		</div>
+		<hr ng-if="$root.settings.question.maximumSelection" />
+		<!-- ++++++++++++++++++++++++++++++++  -->
+
+
+		<!-- ======================  only dropdown, multiple type ===================================  -->
+		<div class="row" ng-if="$root.settings.question.options">
+			<div class="col-md-6">
+				<label>Options: </label>
+			</div>
+			<div class="col-md-6">
+				<div ng-repeat="option in $root.settings.question.options">
+					<b>{{$index+1}}</b>&emsp;-&emsp;{{option}}</div>
+			</div>
+		</div>
+		<hr ng-if="$root.settings.question.options" />
+		<!-- ++++++++++++++++++++++++++++++++  -->
+
+
+		<!-- ======================  only slide type ===================================  -->
+		<div class="row" ng-if="$root.settings.question.properties">
+			<div class="col-md-6">
+				<label>Properties: </label>
+			</div>
+			<div class="col-md-6">
+				<div ng-repeat="property in $root.settings.question.properties">
+					<b>{{$index+1}}</b>&emsp;-&emsp;Left: &nbsp;{{property.left}}, &emsp;Right: &nbsp;{{property.right}},&emsp;&emsp;PropertyQuestion:
+					&nbsp;{{property.propertyquestion}}
+				</div>
+			</div>
+		</div>
+		<hr ng-if="$root.settings.question.properties" />
+		<!-- ++++++++++++++++++++++++++++++++  -->
+
+
+
+
+
+	</div>
+
+</div>
+<style>
+	.container {
+		margin-top: 20px;
+		font-size: 1.5em;
+	}
+
+	.container .row {
+		margin-top: 20px;
+	}
+
+	h2 {
+		border-bottom: ridge 3px black;
+		padding-bottom: 10px;
+		margin-left: 10%;
+		margin-right: 10%;
+	}
+
+	@media screen and (min-width: 1200px) {
+		.question-content .row>div:first-child {
+			text-align: right;
+			padding-right: 30px;
+		}
+		.question-content .row>div:nth-child(2) {
+			text-align: left;
+			padding-left: 30px;
+		}
+	}
+</style>

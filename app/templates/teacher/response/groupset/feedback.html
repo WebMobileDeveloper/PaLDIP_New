@@ -1,0 +1,167 @@
+<div class="container" ng-init="initExport()" style="margin-top:10px; margin-bottom: 40px;">
+
+    <div class="row question-div center">
+        <label class="qst-title" ng-if='question.title'>{{question.title}}</label>
+        {{question.question}}
+    </div>
+
+    <div class="row button-row center">
+        <div class="col-md-6 col-sm-6">
+            <md-input-container flex>
+                <label for="username">Sub Groupset</label>
+                <md-select data-ng-model="GroupIndex" class="md-block flex-gt-sm" ng-change="changeGroup()"
+                    md-container-class="dropDown">
+                    <md-option data-ng-value="$index" data-ng-repeat="name in subNames">{{ name }}</md-option>
+                </md-select>
+            </md-input-container>
+        </div>
+        <div class="col-md-6 col-sm-6">
+            <md-input-container flex>
+                <label for="username">2nd Sub Groupset</label>
+                <md-select data-ng-model="SubGroupIndex" class="md-block flex-gt-sm" ng-change="changeGroup()"
+                    md-container-class="dropDown" ng-disabled="$root.settings.groupType =='sub'">
+                    <md-option data-ng-value="$index" data-ng-repeat="name in secondNames">{{ name }}</md-option>
+                </md-select>
+            </md-input-container>
+        </div>
+
+    </div>
+    <div class="row center">
+        <h4 ng-if="answers[selectedIndex].length==0">There isn't any answer data!</h4>
+    </div>
+    <div class="answer-form" ng-if="answers[selectedIndex].length>0">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="well">
+                    <label style="margin-left: 20px; color: #a2a2a2;">Answers</label>
+                    <md-radio-group ng-model="orderBy" ng-change="orderChanged(orderBy)" class="order-radio">
+                        <md-radio-button value="rating" class="md-primary">Rating</md-radio-button>
+                        <md-radio-button value="awardScore" class="md-primary">Award Score</md-radio-button>
+                    </md-radio-group>
+                    <label class="order-radio-label">Order By</label>
+                    <div class="mid-cell">
+                        <div class="answer-div">
+                            <div class="answer-list" ng-repeat="item in answers[selectedIndex]"
+                                ng-class="($index == itemIndex)?'selected':'';" ng-click="changeIndex($index)">
+                                {{$index+1}}.&emsp;{{item.answer}}
+                                <span class="pull-right"
+                                    ng-if="orderBy=='rating'">{{item.avRating?item.avRating:'-'}}&emsp;</span>
+                                <span class="pull-right" ng-if="orderBy=='awardScore'">{{item.awardScore}}&emsp;</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row starfield-container" ng-show="type">
+            <label style="color: #a2a2a2;">
+                Average Scores(&nbsp;{{answers[selectedIndex][itemIndex].userCount}}&nbsp; Feedbacks)
+            </label>
+            <div class="col-md-12 starfield">
+                <div class="row option-row" ng-repeat="option in feedqts track by $index">
+                    <div class="col-md-9 col-sm-9  col-xs-9 option">
+                        {{option}}
+                    </div>
+                    <div class="col-md-3  col-sm-3 col-xs-3 center value">
+                        <span>{{answers[selectedIndex][itemIndex].scores[$index]}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <hr ng-if="type % 2 == 0" />​ -->
+        <div class="row feedText" ng-if="type % 2 == 0">
+            <div class="col-md-12">
+                <div class="well ">
+                    <label style="margin-left: 20px;	color: #a2a2a2;">Feedbacks</label>
+                    <div class="mid-cell">
+                        <div class="answer-div">
+                            <div ng-repeat="feed in answers[selectedIndex][itemIndex].feedbacktext track by $index">
+                                {{$index+1}}.&emsp;{{feed}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <hr /> -->
+        <div class="row center navigation-row">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <button class="btn btn-default" myclick="decreaseindex()">&#9664;</button>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <button class="btn btn-default" myclick="increaseindex()">&#9654;</button>
+            </div>
+        </div>
+        <div class="row button-row">
+            <a class="btn btn-link" myclick="$root.back()">Back</a>
+        </div>
+    </div>
+</div>
+<style>
+    md-input-container label {
+        font-size: 20px;
+    }
+
+    .dropDown {
+        top: 150px !important;
+        border: solid 1px #d1d1d1;
+        font-size: 20px !important;
+    }
+
+    md-option {
+        border-bottom: solid 1px #e7e7e7;
+    }
+
+    .question-div {
+        font-size: 2em;
+        color: #1d22f9;
+        border-bottom: solid 1px #00000052;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+        padding-right: 15%;
+        padding-left: 15%;
+    }
+
+    .question-div .rating {
+        color: black;
+        font-size: 0.7em;
+    }
+
+    .answer-form {
+        margin: 20px auto;
+    }
+
+    .title {
+        margin-top: 20px;
+        color: green;
+        padding: 0px 20px;
+    }
+
+    .well {
+        padding: 20px 0px;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    .mid-cell {
+        width: 95%;
+        margin: auto;
+    }
+
+    .answer-div {
+        padding: 10px;
+    }
+
+    .checked {
+        color: orange;
+    }
+
+    .navigation-row button {
+        width: 80%;
+        max-width: 100px;
+        color: green;
+        margin-bottom: 20px;
+    }
+</style>

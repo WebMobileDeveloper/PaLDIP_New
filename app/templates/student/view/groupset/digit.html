@@ -1,0 +1,59 @@
+<div class="container" ng-init="getclassAverage()">
+	<div class="row answer-form">
+		<div class="row">
+			<md-input-container flex>
+				<label>Your Answer</label>
+				<textarea class="answer-div" style="border-radius:5px;height:10px" readonly="true">{{$root.settings.prevAnswer}}</textarea>
+			</md-input-container>
+		</div>
+
+		<div class="row">
+			<md-input-container flex>
+				<label>Average Answer</label>
+				<input rows="3" readonly="true" ng-model="averageanswer">
+			</md-input-container>
+		</div>
+		<div class="row" ng-init="$root.getInstFeedback($root.settings.groupKey, $root.settings.questionSetKey, $root.settings.questionKey)"
+		 ng-show="$root.settings.instructor_feedback">
+			<md-input-container>
+				<h4>Instructor Feedback</h4>
+				<textarea ng-disabled='true' class="Instructor_view_area">{{$root.settings.instructor_feedback}}</textarea>
+			</md-input-container>
+		</div>
+		<div class="row">
+			<!-- Result String -->
+			<md-input-container flex ng-show="question.result_string">
+				<textarea ng-disabled="true" ng-model="question.result_string" style="min-height: 100px;	max-height: 200px; overflow-y: auto; color: black;	
+				height: 0px;	border: solid 1px #b8f2f9;	background-color: aliceblue; border-radius: 7px; padding: 10px;"></textarea>
+			</md-input-container>
+			<!-- upload result image -->
+			<md-input-container flex class="center img-row" ng-init="$root.load_result_image()" ng-show="$root.result_imgSrc">
+				<img ng-src="{{$root.result_imgSrc}}">
+			</md-input-container>
+			<!-- result video url -->
+			<md-input-container flex ng-show="question.result_videoURL" class="center">
+				<div id="playerWrapOuter">
+					<div id="playerWrap">
+						<iframe id="video-iframe" width="420" height="315" src="{{question.result_videoURL}}" frameborder="0"></iframe>
+					</div>
+				</div>
+			</md-input-container>
+		</div>
+		<div class="row button-row">
+			<a class="btn btn-link" myclick="$root.back()">Back</a>
+			<a class="btn btn-link" myclick="$root.go('subQuestions')">Select Question</a>
+			<a class="btn btn-link" myclick="$root.goSubmitNextGroupAnswer()" ng-if="!$root.checkLast()">Next Question</a>
+			<a class="btn btn-link" myclick="$root.go('studentSubGroupDetail')" ng-if="$root.checkLast() && $root.settings.groupType=='sub'">Question
+				Sets</a>
+			<a class="btn btn-link" myclick="$root.go('studentSecondGroupDetail')" ng-if="$root.checkLast() && $root.settings.groupType=='second'">Question
+				Sets</a>
+		</div>
+	</div>
+</div>
+<style>
+	md-input-container .md-input.answer-div,
+	.answer-div {
+		border-bottom: 1px solid #0ea3cbb3;
+		background-color: #f0f6f6;
+	}
+</style>

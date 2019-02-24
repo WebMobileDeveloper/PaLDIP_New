@@ -1,0 +1,93 @@
+<div class="container">
+	<div class="answer-form">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 title">
+				<span class="qst-title" ng-show='question.title'>{{question.title}}:</span>
+				{{question.question}}</div>
+			<div class="col-md-12 center">
+				<hr />
+			</div>
+		</div>
+		<div class="row img-row" ng-init="$root.loadimage()" ng-show="$root.imgSrc">
+			<div class="col-md-12">
+				<img ng-src="{{$root.imgSrc}}">
+			</div>
+			<div class="col-md-12 center">
+				<hr />
+			</div>
+		</div>
+
+		<div class="row center" ng-show="videoURL">
+			<div id="playerWrapOuter">
+				<div id="playerWrap">
+					<iframe id="video-iframe" width="420" height="315" src="{{videoURL}}" frameborder="0"></iframe>
+				</div>
+			</div>
+			<div class="col-md-12 center">
+				<hr />
+			</div>
+		</div>
+		<!-- Extra Links -->
+		<div class="row" ng-show="question.links">
+			<div class="col-md-12">
+				<md-input-container flex class="margin-vertical-0">
+					<h3>Extra Links</h3>
+					<div class="sub-question" ng-repeat="link in question.links track by $index">
+						<a href={{link.url}} target="_blank"
+							style="font-size:20px; margin-left:30px;">{{link.title}}</a>
+					</div>
+				</md-input-container>
+			</div>
+			<div class="col-md-12">
+				<hr />
+			</div>
+		</div>
+		<div class="row additional_info_container" ng-show="$root.additional_info" ng-init="$root.getAddInfo()">
+			<div class="col-md-12">
+				<md-input-container flex>
+					<h3>- Additional Information / Comments</h3>
+					<div id="additional_info"></div>
+				</md-input-container>
+			</div>
+		</div>
+		<div class="row" ng-hide="$root.settings.prevAnswer">
+			<md-input-container flex>
+				<label>Your Answer</label>
+				<input ng-model="$root.currAnswer" rows="3" type="number" style="border-radius:5px;min-height:20px"
+					required />
+			</md-input-container>
+		</div>
+
+		<div class="row" ng-show="$root.settings.prevAnswer">
+			<h4 class="center answered">You already submitted answer about this question before.</h4>
+			<md-input-container flex>
+				<label>Your answer</label>
+				<textarea ng-model="$root.settings.prevAnswer" readonly="true"></textarea>
+			</md-input-container>
+		</div>
+		<hr />
+		<div class="row button-row">
+			<a class="btn btn-link" ui-sref="questions" ui-sref-active="active">Back</a>
+			<button class="btn btn-primary" myclick="$root.saveanswer()"
+				ng-hide="$root.settings.prevAnswer">Submit</button>
+			<a class="btn btn-link" myclick="goNext()" ng-show="$root.settings.prevAnswer">Next</a>
+		</div>
+	</div>
+</div>
+
+
+<style>
+	.title {
+		color: green;
+		text-align: left;
+	}
+
+	md-input-container .md-input {
+		max-height: 200px;
+		overflow-y: auto;
+		background-color: #f8f6f9;
+		border-bottom: solid 1px #60a3f999;
+		border-radius: 10px;
+		padding: 10px;
+	}
+</style>

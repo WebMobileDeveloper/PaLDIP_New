@@ -1,0 +1,44 @@
+<div class="container center" ng-init="init()">
+	<div class="row content-header title texteffect">
+		Group Name
+		<div class="pull-right mr-1">
+			<a class="btn btn-success" myclick="$state.go('createGroup');">Create Group</a>
+			<a class="btn btn-primary" myclick="$state.go('uploadList');">Upload List</a>
+			<!-- <a class="btn btn-primary" myclick="createOldGroup()">Add Institution</a> -->
+		</div>
+	</div>
+	<div class="row content-div" ng-show="groups">
+		<div class="col-md-12">
+			<div class="row groupdetails" ng-repeat="obj in groups" ng-class="setActive(obj)">
+				<div class="col-md-10 col-sm-10 col-xs-9">
+					<div ng-click="gotoGroupDetails(obj)">{{obj.groupName}}</div>
+				</div>
+				<div class="col-md-2 col-sm-2 col-xs-3" style="text-align:right;">
+					<span ng-show="!obj.byMe" style="margin: 0px 5px;">shared</span>
+					<!-- <button ng-show="obj.byMe" class="btn btn-danger" myclick="deletegroup(obj)" title="Delete group" style="margin-right:20px;">
+						<i class="glyphicon glyphicon-trash"></i>
+					</button> -->
+					<button class="btn btn-info" myclick="copyToClipboard(obj.code)" title="Copy group key">
+						<i class="glyphicon glyphicon-copy"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.mr-1 {
+		margin-right: 1em;
+	}
+
+	.content-header {
+		background-color: palevioletred;
+		height: auto;
+		line-height: 50px;
+	}
+
+	.groupdetails.active {
+		background-color: #bbc2f2;
+	}
+</style>

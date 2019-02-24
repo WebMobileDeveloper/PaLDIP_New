@@ -1,0 +1,156 @@
+<div ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="row title-div">
+		<div class="container">
+			<span>{{$root.settings.groupName}}/{{groupSet.name}}</span>
+			<span class="btn-add-member pull-right" style="margin-right: 20px;" myclick="finalCalc()">Initialize</span>
+			<span class="btn-add-member pull-right" style="margin-right: 20px;" myclick="saveChange()">Save Members</span>
+			<!-- <span class="btn-add-member pull-right" style="margin-right: 20px;" myclick="applyRandomRule()" ng-show="groupSet.addRule.type=='randomly'">Apply Random Rule</span>
+			<span class="btn-add-member pull-right" style="margin-right: 20px;" myclick="applyCriteriaRule()" ng-show="groupSet.addRule.type=='criteria'">Apply Criteria Rule</span> -->
+
+		</div>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-4 col-sm-4 user-list">
+				<div class="row group-users" dragula='"drag-div"' dragula-model="availableUsers">
+					<span class="user-span" ng-repeat="user in availableUsers track by $index" useremail="{{user.ID}}" ng-class="{'used':user.used}">
+						{{user.ID}}
+						<span class="pull-right glyphicon glyphicon-ok mt-1" ng-if="user.used">
+							<md-tooltip class="custom-tooltip" md-direction="top">
+								Joined User
+							</md-tooltip>
+						</span>
+					</span>
+				</div>
+			</div>
+			<div class="col-md-8 col-sm-8 user-list">
+				<div class="row group-div" ng-repeat="group in groups track by $index" ng-class="{'acceptable' : group.acceptable}">
+					<div class="col-md-12">
+						<span class="glyphicon mr-3" ng-class="{'glyphicon-triangle-right': !group.expand, 'glyphicon-triangle-bottom': group.expand}" myclick="group.expand=!group.expand"></span>
+						<span class="group-name-span">{{group.name}}</span>
+						<span>{{group.users.length}} / {{groupSet.max_member}}&emsp;Students</span>
+					</div>
+					<div class="col-md-12 child-group-users" dragula='"drag-div"' dragula-model="group.users" groupindex="{{$index}}" usercount="{{group.users.length}}" ng-class="{'no-user':group.users.length==0, 'contracted': !group.expand, 'expanded': group.expand}">
+						<span class="user-span" ng-repeat="user in group.users track by $index" ng-class="{'joined':user.joined}" useremail="{{user.ID}}">
+							{{user.ID}}
+							<span class="pull-right glyphicon glyphicon-link mt-1" ng-if="user.joined">
+								<md-tooltip class="custom-tooltip" md-direction="top">
+									Joined User
+								</md-tooltip>
+							</span>
+						</span>
+
+						<!-- <div class="row center" ng-show="group.users.length==0">
+							<span class="empty-span">There are currently no students in this group. Add a student to get started.</span>
+						</div> -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+</div>
+
+<style>
+	.user-span {
+		display: block;
+		width: 250px;
+		margin: 5px 0px;
+		padding: 5px;
+		color: #444;
+		border: solid 1px #a4a4a4;
+		border-radius: 3px;
+		cursor: pointer;
+	}
+
+	.user-span::before {
+		content: '⣿';
+	}
+
+	.user-span.joined {
+		color: #f94949;
+	}
+
+	span.used .glyphicon-ok {
+		color: #22399c;
+	}
+
+	.user-list {
+		height: calc(100vh - 200px);
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	.group-users {
+		height: calc(100vh - 200px);
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	.group-div {
+		border-bottom: 1px dashed #c2c8d0;
+		padding-top: 20px;
+		padding-bottom: 10px;
+	}
+
+	.group-name-span {
+		width: 400px;
+		display: inline-block;
+	}
+
+	.child-group-users {
+		min-height: 50px;
+		width: calc(100% - 100px);
+		margin: 10px 50px;
+		background-color: white;
+	}
+
+	.child-group-users.contracted {
+		min-height: 20px;
+		margin-top: 0px;
+		margin-bottom: 0px;
+	}
+
+	.child-group-users.expanded {
+		margin-top: 30px;
+	}
+
+
+	.child-group-users.no-user.expanded {
+		border: 1px dashed #c2c8d0;
+	}
+
+	.child-group-users.no-user.expanded::before {
+		position: absolute;
+		white-space: pre;
+		display: inline;
+		top: 36px;
+		left: 50%;
+		transform: translate(-50%, -25px);
+		content: 'There are currently no students in this group. Add a student to get started.';
+	}
+
+	.child-group-users.contracted .user-span {
+		display: none;
+	}
+
+	.acceptable {
+		background-color: #d1d1d1;
+	}
+
+	.btn-add-member {
+		color: #2d46b4;
+		font-weight: bold;
+		cursor: pointer;
+		text-shadow: none;
+		font-size: 16px;
+		line-height: 40px;
+	}
+
+	.btn-add-member:hover {
+		text-shadow: 1px 1px #d1d1d1;
+		color: blue;
+	}
+</style>

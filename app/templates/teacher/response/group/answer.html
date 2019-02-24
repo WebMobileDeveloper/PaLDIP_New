@@ -1,0 +1,173 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="answer-form">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 title">
+				<span class="qst-title" ng-show='question.title'>{{question.title}}:</span>
+				{{question.question}}</div>
+			<div class="col-md-12 center">
+				<hr />
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12 student-title">
+				Student {{selectedIndex+1}}
+				<span ng-show="question.show_id"> / {{answers[selectedIndex].show_id}}</span>
+				<span ng-show="answers[selectedIndex].userKey == $root.settings.userId">( My Answer )</span>
+			</div>
+		</div>
+		<div class="row answers-div">
+			<div class="col-md-12" ng-repeat="answer in answers[selectedIndex].answers track by $index">
+				<div class="row qst-row">
+					<div class="col-md-12">
+						<span class="number-span">Question {{$index+1}} : </span>
+						<span class="title-span" ng-show="answer.title">{{answer.title}} </span>
+						{{answer.question}}
+					</div>
+				</div>
+				<div class="row answer-row">
+					<div class="col-md-12">
+						<span class="number-span">Answer : </span>
+						<span class="selected-option" ng-show="answer.questionType=='Text Type' || answer.questionType=='Digit Type' || answer.questionType=='Feedback Type'">{{answer.answer}}</span>
+					</div>
+
+					<!-- contingent type answer -->
+					<div class="col-md-12 option-row" ng-show="answer.answer && answer.questionType=='Contingent Type'" ng-repeat="subQuestion in answer.subQuestions track by $index">
+						<span class="option-num">SubQuestion {{$index+1}} : </span> {{subQuestion.question}}
+						<div class="col-md-12 option-row" ng-repeat="option in subQuestion.options track by $index">
+							<span class="option-num">Option {{$index+1}} : </span> {{option}}
+							<span ng-show="answer.answer[$parent.$index]==$index" class="selected-option">&emsp;Seleted</span>
+						</div>
+					</div>
+
+					<!-- dropdown and multiple type answer -->
+					<div class="col-md-12 option-row" ng-show="answer.answer && answer.options" ng-repeat="option in answer.options track by $index">
+						<span class="option-num">Option {{$index+1}} : </span> {{option}}
+						<span ng-show="answer.answer[$index]" class="selected-option">&emsp;Seleted</span>
+					</div>
+
+					<!-- rating type answer -->
+					<div class="col-md-12 option-row" ng-show="answer.answer && answer.ratingItems" ng-repeat="item in answer.ratingItems track by $index">
+						<span class="option-num">Item {{$index+1}} : </span> {{item}}
+						<div class="col-md-12 option-row">
+							Feedback Text :&emsp;{{answer.answer[$index].feedbacktext}}
+						</div>
+						<div class="col-md-12 option-row" ng-repeat="option in answer.ratingOptions track by $index">
+							<span class="option-num">Option {{$index+1}}&emsp;&emsp;</span>
+							Score : <span class="selected-option">{{answer.answer[$parent.$index].rating[$index]}}</span>&emsp;Option : {{option}}
+						</div>
+					</div>
+					<!-- slide type answer -->
+					<div class="col-md-12 option-row" ng-show="answer.answer && answer.properties" ng-repeat="property in answer.properties track by $index">
+						<span class="option-num">Property {{$index+1}} : </span> {{property.propertyquestion}}
+						<div class="col-md-12 option-row center">
+							<b class="pull-left">{{property.left}}</b>
+							<b class="selected-option">
+								{{answer.answer[$index]}} %
+							</b>
+							<b class="pull-right">{{property.right}}</b>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row center navigation-row">
+			<div class="col-md-6 col-sm-6 col-xs-6">
+				<button class="btn btn-default" myclick="decIndex()">&#9664;
+					<md-tooltip class="custom-tooltip no-tail" md-direction="top">
+						Prev Student
+					</md-tooltip>
+				</button>
+			</div>
+			<div class="col-md-6 col-sm-6 col-xs-6">
+				<button class="btn btn-default" myclick="incIndex()">&#9654;
+					<md-tooltip class="custom-tooltip no-tail" md-direction="top">
+						Next Student
+					</md-tooltip>
+				</button>
+			</div>
+		</div>
+		<hr />
+		<div class="row button-row">
+			<a class="btn btn-link" myclick="$root.back()">Back</a>
+		</div>
+	</div>
+</div>
+
+
+<style>
+	.title {
+		color: green;
+		text-align: center;
+	}
+
+	.student-title {
+		padding-left: 7%;
+		font-size: 20px;
+		font-weight: bold;
+		text-decoration: underline;
+		color: blueviolet;
+		margin-bottom: 10px;
+	}
+
+	.answers-div {
+		width: 90%;
+		max-height: 400px;
+		margin: 0px auto 10px;
+		padding: 10px;
+		border: solid 1px #5f9ea066;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	.qst-row {
+		font-size: 16px;
+		font-weight: bold;
+		margin-bottom: 5px;
+	}
+
+	.number-span {
+		color: #04049b;
+		font-weight: bold;
+		font-size: 18px;
+	}
+
+	.title-span {
+		color: blue;
+	}
+
+	.option-row {
+		padding-left: 10%;
+		margin-top: 5px;
+	}
+
+	.option-num {
+		color: blue;
+	}
+
+	.answer-row {
+		border-bottom: solid 1px beige;
+		margin-bottom: 10px;
+		padding-bottom: 10px;
+	}
+
+	.selected-option {
+		color: red;
+		font-weight: bold;
+	}
+
+	.navigation-row button {
+		width: 80%;
+		max-width: 100px;
+		color: green;
+		margin-bottom: 20px;
+		border: solid 1px cadetblue;
+	}
+
+	button.btn.btn-default:hover,
+	button.btn.btn-default:focus {
+		color: green !important;
+		background: aliceblue !important;
+		border: solid 1px !important;
+	}
+</style>

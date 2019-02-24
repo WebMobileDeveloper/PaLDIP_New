@@ -1,0 +1,46 @@
+<div class="loginform">
+	<h3 class="text-center ">Forgot Password</h3>
+	<br>
+	<div class="row">
+		<md-input-container flex>
+			<label for="username">Email</label>
+			<input ng-model="requestmail" name="username" required="true" type="text">
+		</md-input-container>
+	</div>
+
+	<div class="row">
+		<md-input-container flex>
+			<button myclick="resetpwd()" id="resetpwd" class="btn btn-primary" style="margin-left:15%" >Send Request</button>
+			<a class="btn btn-link" ui-sref="login" ui-sref-active="active" style="margin-left:15%">Back</a>
+		</md-input-container>
+	</div>
+</div>
+<style>
+	.loginform {
+		position: absolute;
+		top: 20%;
+		left: 50%;
+		width: calc(100% - 30px);
+		max-width: 350px;
+		padding: 50px 20px 30px 20px;
+		-webkit-transform: translate(-50%, -50%);
+		transform: translate(-50%, -50%);
+		border-radius: 5px;
+		box-shadow: 0 0 5px hsla(0, 0%, 59%, .8);
+		background: #ffffff;
+	}
+	body {
+		background: url("../../Coverimage.jpg");
+		background-repeat: no-repeat;
+		background-attachment: fixed;
+		background-size: 100% auto;
+		background-size: 100% 100%;
+		background-repeat: no-repeat;
+
+	}
+
+	input {
+		height: 155px;
+		font-size: 25px
+	}
+</style>

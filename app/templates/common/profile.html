@@ -1,0 +1,277 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+
+	<div class="profile-div">
+		<!-- title -->
+		<div class="row">
+			<div class="content-header center col-md-12"> Profile Setting </div>
+		</div>
+		<hr />
+
+
+		<!-- show_id -->
+		<div class="row">
+			<div class="col-md-12 center">
+				<span class="title-span">My Id:</span>
+				<span>{{userProfile.show_id}}</span>
+			</div>
+		</div>
+		<hr />
+
+		<!-- profile image -->
+		<div class="row">
+			<div class="col-md-12">
+				<span class="title-span">Profile Image:</span>
+			</div>
+		</div>
+		<div class="row" ng-init="fileupload()">
+			<div class="col-md-12 center">
+				<div class="title-span">
+					<img class="profile-img" ng-src="{{userProfile.profile_image}}" err-src="{{defaultImage}}">
+				</div>
+
+				<div class="form-group">
+					<div class="input-group">
+						<span class="input-group-btn">
+							<span class="btn btn-default btn-file">
+								Browse…
+								<input type="file" id="fileButton" id="imgInp">
+							</span>
+						</span>
+						<input type="text" id='nameText' class="form-control" readonly>
+					</div>
+					<progress value="0" max="100" id="uploader" style="width:100%; margin:5px 0px 10px; height: 4px;">0%</progress>
+				</div>
+			</div>
+		</div>
+		<hr />
+
+		<!-- Nick Name -->
+		<div class="row">
+			<div class="col-md-12 center">
+				<span class="title-span">Nick Name:</span>
+				<div class="form-group">
+					<input type="text" class="form-control" ng-model="userProfile.nick_name">
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 center">
+				<b>Show to Others:</b>
+				<md-radio-group class="show-radio" ng-model="userProfile.showNickname">
+					<md-radio-button ng-value="false" class="md-primary">Hide</md-radio-button>
+					<md-radio-button ng-value="true" class="md-primary">Show</md-radio-button>
+				</md-radio-group>
+			</div>
+		</div>
+		<hr />
+
+		<div ng-if="userProfile.Usertype=='Student'" class="profile-section">
+			<!-- institution -->
+			<div class="row">
+				<div class="col-md-12 center">
+					<span class="title-span">Institution:</span>
+					<div class="form-group">
+						<md-select ng-model="userProfile.institution">
+							<md-option ng-repeat="cnt in instList track by $index" ng-value="cnt">{{cnt}}</md-option>
+						</md-select>
+					</div>
+				</div>
+			</div>
+
+			<!-- country -->
+			<div class="row">
+				<div class="col-md-12 center">
+					<span class="title-span">Country:</span>
+					<div class="form-group">
+						<md-select ng-model="userProfile.country">
+							<md-option ng-repeat="cnt in country_list track by $index" ng-value="cnt">{{cnt}}</md-option>
+						</md-select>
+					</div>
+				</div>
+			</div>
+
+			<!-- age -->
+			<div class="row">
+				<div class="col-md-12 center">
+					<span class="title-span">Age:</span>
+					<div class="form-group">
+						<input type="text" class="form-control" ng-model="userProfile.age">
+					</div>
+				</div>
+			</div>
+
+			<!-- Gender -->
+			<div class="row">
+				<div class="col-md-12 center">
+					<span class="title-span">Gender:</span>
+					<div class="form-group">
+						<md-select ng-model="userProfile.gender">
+							<md-option ng-repeat="gender in genders track by $index" ng-value="gender">{{gender}}</md-option>
+						</md-select>
+					</div>
+				</div>
+			</div>
+
+			<!-- profession -->
+			<div class="row">
+				<div class="col-md-12 center">
+					<span class="title-span">Profession:</span>
+					<div class="form-group">
+						<input type="text" class="form-control" ng-model="userProfile.profession">
+					</div>
+				</div>
+			</div>
+
+			<!-- country language -->
+			<div class="row">
+				<div class="col-md-12 center">
+					<span class="title-span">Mother Tongue:</span>
+					<div class="form-group">
+						<md-select ng-model="userProfile.countrylanguage">
+							<md-option ng-repeat="lang in languages track by $index" ng-value="lang">{{lang}}</md-option>
+						</md-select>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row button-row">
+			<button class="btn btn-primary" myclick="saveProfile()">Save Change</button>
+		</div>
+	</div>
+</div>
+<style>
+	.content-header {
+		font-size: 30px;
+	}
+
+	.profile-div {
+		line-height: 30px;
+		margin-top: 50px;
+		margin-right: auto;
+		margin-left: auto;
+		width: calc(100% - 50px);
+		max-width: 650px;
+		padding: 50px 20px 10px 20px;
+		border-radius: 5px;
+		box-shadow: 0 0 5px hsla(0, 0%, 59%, .8);
+	}
+
+	.title-span {
+		float: left;
+		font-weight: bold;
+		width: 100px;
+		text-align: center;
+		line-height: 30px;
+	}
+
+	.form-group {
+		width: 60%;
+		display: inline-block;
+	}
+
+	.profile-img {
+		vertical-align: middle;
+		width: 80px;
+		height: 80px;
+		border-radius: 50%;
+		border: solid 2px #0000ff4d;
+		margin-top: 10px;
+	}
+
+	.btn-file {
+		position: relative;
+		overflow: hidden;
+	}
+
+	.btn-file input[type=file] {
+		position: absolute;
+		top: 0;
+		right: 0;
+		min-width: 100%;
+		min-height: 100%;
+		font-size: 100px;
+		text-align: right;
+		filter: alpha(opacity=0);
+		opacity: 0;
+		outline: none;
+		background: white;
+		cursor: inherit;
+		display: block;
+	}
+
+	#img-upload {
+		width: 100%;
+	}
+
+	.input-group {
+		margin-top: 30px;
+	}
+
+	md-select {
+		margin: 0px;
+	}
+
+	.profile-section>.row {
+		margin-bottom: 16px;
+	}
+
+	/*  radio style */
+	md-radio-group {
+		display: inline-block;
+		height: 40px;
+		margin-left: 30px;
+		color: #08157a;
+		text-shadow: 1px 1px #fff;
+	}
+
+	md-radio-button {
+		display: inline-block;
+		margin-bottom: 0px;
+		margin-left: 10px;
+	}
+
+	@media screen and (max-width: 600px) {
+
+		html,
+		body {
+			overflow-x: hidden !important;
+		}
+
+		.container-fluid {
+			padding-right: 0px;
+			padding-left: 0px;
+		}
+
+		.content-header {
+			margin-top: 15px;
+			font-size: 22px;
+		}
+
+		.title-span {
+			margin-left: 3px;
+		}
+
+		.mobile-hidden {
+			display: none;
+		}
+
+		.profile-div {
+			width: 100%;
+			padding: 0px;
+			box-shadow: none;
+			margin-top: 0px;
+			overflow-x: hidden;
+		}
+
+		.profile-img {
+			width: 50px;
+			height: 50px;
+		}
+
+		.input-group {
+			margin-top: 15px;
+		}
+
+
+	}
+</style>

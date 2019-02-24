@@ -1,0 +1,117 @@
+<div ng-init="initExport();$root.getTeacherNote(question.code);" ng-cloak style="margin-top:20px;">
+
+	<div ng-show="$root.settings.loadingfinished && noAnswerMessage" class="no-data">
+		{{noAnswerMessage}}
+	</div>
+	<div ng-show="$root.settings.loadingfinished && !noAnswerMessage">
+		<button class="btn btn-link" myclick="$root.exportToExcel('#table-1')">
+			<span class="glyphicon glyphicon-share"></span> Export to Excel
+		</button>
+		<button class="btn btn-primary pull-right" ng-if="!anonymous" myclick="change_show_user()" ng-disabled="!anonym_enabled">
+			<span ng-show="show_email">Anonymous</span>
+			<span ng-hide="show_email">Non-Anonymous</span>
+		</button>
+
+		<table class="table table-bordered datatable" id="table-1" style="margin-top:10px;">
+			<thead>
+				<tr>
+					<th colspan="{{feedtextlimit+10}}">
+						<b style="font-size:1.5em;">{{groupName}}</b>
+						<br />
+					</th>
+				</tr>
+				<tr>
+					<th colspan="{{feedtextlimit+10}}">
+						<b>{{question.question}}</b>
+						<div ng-if="false" ng-repeat-start="subQst in question.subQuestions track by $index"></div>
+						<br style="mso-data-placement:same-cell;" />
+						<b>{{$index+1}}.&emsp;
+							<span>{{subQst.question}}&emsp;(&emsp;A:&emsp;{{subQst.options[0]}},&emsp;&emsp;B:&emsp;{{subQst.options[0]}}&emsp;)</span>
+						</b>
+						<div ng-if="false" ng-repeat-end></div>
+					</th>
+				</tr>
+
+				<tr>
+					<th>User</th>
+					<th>Gender</th>
+					<th>Age</th>
+					<th>Profession</th>
+					<th>Mother tongue</th>
+					<th>Date/Time</th>
+					<th>Answer</th>
+					<th ng-if="question.questionType=='Text Type'">Score</th>
+					<th ng-if="question.questionType=='Text Type'">Feedback</th>
+					<th class="detachingfield" ng-if="!hidefeedfield">Feedback</th>
+					<th class="detachingfield" ng-if="!hidefeedfield">Score</th>
+					<th class="detachingfield" ng-if="!hidefeedfield">Award</th>
+					<th>Private Note</th>
+					<th>Public Note</th>
+					<th>Feedback to Teacher</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="obj in answers track by $index">
+					<td>
+						<span ng-if="!show_email">{{obj.show_id}}</span>
+						<span ng-if="show_email">{{obj.mail}}</span>
+					</td>
+					<td>{{obj.Gender}}</td>
+					<td>{{obj.Age}}</td>
+					<td>{{obj.Profession}}</td>
+					<td>{{obj.Mothertongue}}</td>
+					<td>{{obj.datetime}}</td>
+					<td>{{obj.answer}}</td>
+					<td ng-if="question.questionType=='Text Type'">{{obj.score}}</td>
+					<td ng-if="question.questionType=='Text Type'">{{obj.feedback}}</td>
+					<td style="text-align:left" class="detachingfield" ng-if="!hidefeedfield">
+						<div ng-if="false" ng-repeat-start="feed in obj.feedtxt track by $index"></div>
+						<b>{{$index+1}}.&emsp;
+							<span ng-if="!show_email">{{feed.show_id}}</span>
+							<span ng-if="show_email">{{feed.mail}}</span>
+						</b>
+						<br style="mso-data-placement:same-cell;" />
+						<b ng-if="feed.text">&emsp;Feedback:&emsp;</b>{{feed.text}}
+						<br ng-if="feed.text" style="mso-data-placement:same-cell;" />
+						<b ng-if="feed.score">&emsp;Scores:&emsp;</b>{{feed.score}}
+						<br ng-if="feed.score" style="mso-data-placement:same-cell;" />
+						<br ng-if="feed.score" style="mso-data-placement:same-cell;" />
+						<div ng-if="false" ng-repeat-end></div>
+					</td>
+					<td class="detachingfield" ng-if="!hidefeedfield">{{obj.averagescore}}</td>
+					<td class="detachingfield" ng-if="!hidefeedfield">{{obj.awardScore}}</td>
+					<td>{{$root.allPrivateNotes?$root.allPrivateNotes[obj.Userkey]:''}}</td>
+					<td>{{$root.allPublicNotes?$root.allPublicNotes[obj.Userkey]:''}}</td>
+					<td>{{$root.allTeacherNotes?$root.allTeacherNotes[obj.Userkey]:''}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+</div>
+<style>
+	.main-div {
+		width: 100%;
+		padding: 2%;
+	}
+
+	.no-data {
+		margin: 100px auto;
+		width: 500px;
+		text-align: center;
+		font-size: 3em;
+		color: #fd6167;
+		font-style: italic;
+		font-weight: bold;
+	}
+
+	td>p {
+		margin: 0px;
+	}
+
+	.table>thead>tr>th,
+	.table>tbody>tr>td {
+		text-align: center;
+		vertical-align: middle;
+	}
+</style>

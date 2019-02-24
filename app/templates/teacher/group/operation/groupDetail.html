@@ -1,0 +1,745 @@
+<div ng-init="init()">
+	<div class="row content-header">
+		<div class="container">
+			<div class="col-md-12 title texteffect">
+				{{$root.settings.groupName}}
+				<button class="btn pull-left mt-3 mr-3" myclick="showCreateFinalScoreModal()"
+					ng-class="{'btn-warning': !groupData.finalScore, 'btn-success': groupData.finalScore}">
+					{{groupData.finalScore ? 'Edit Final Score': 'Create Final Score'}}
+				</button>
+				<button class="btn pull-left mt-3 mr-3" myclick="showAddBulkReminderModal()"
+					ng-class="{'btn-danger': !groupData.reminder, 'btn-success': groupData.reminder}"
+					ng-if="groupData.reminder || $root.teacherSettings.reminder_enabled">
+					<md-tooltip class="custom-tooltip" md-direction="bottom">
+						{{groupData.reminder ? 'Update Bulk Timed Reminder': 'Set Bulk Timed Reminder'}}</md-tooltip>
+					Bulk Reminder
+				</button>
+				<button class="btn btn-warning pull-right mt-3 ml-3" ng-if="groupData.finalScore" myclick="exportScores()">Export
+					Scores</button>
+				<button class="btn btn-success pull-right mt-3" myclick="exportUsers()">Export Users</button>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<br>
+		<div class="row tab-row">
+			<div class="col-md-6 col-sm-6" ng-class="getClass('QuestionSet')" ng-click="setActive('QuestionSet')">Question Sets
+			</div>
+			<div class="col-md-6 col-sm-6" ng-class="getClass('GroupSet')" ng-click="setActive('GroupSet')">Group Sets</div>
+		</div>
+		<div class="row">
+			<div class="content-div" ng-show="selectedTab=='QuestionSet'">
+				<div class="col-md-12 groupdetails" ng-repeat="set in  QuestionSets track by $index" ng-class="getQstClass(set)"
+					ng-click="questions(set)">
+					<div class="setname">
+						<span ng-show="!set.isSection" class="qst-title">{{set.key}} :
+							<md-tooltip class="custom-tooltip" md-direction="top">Question Set ID</md-tooltip>
+						</span>
+						{{set.setname}}
+						<span ng-show="set.code" class="qst-title">&emsp;[{{set.code}}]
+							<md-tooltip class="custom-tooltip" md-direction="top">Question Search Code for Student</md-tooltip>
+						</span>
+					</div>
+					<div class="center section-detail" ng-if="set.isSection && set.details">
+						{{set.details}}
+					</div>
+
+					<div class="pull-left left-button-div" ng-if="!set.isSection">
+						<span class="btn eye ml-1" myclick="changeHideState(set)">
+							<i class="glyphicon glyphicon-eye-open" ng-hide="set.hidden">
+								<md-tooltip class="custom-tooltip" md-direction="top">Show in student side</md-tooltip>
+							</i>
+							<i class="glyphicon glyphicon-eye-close" ng-show="set.hidden">
+								<md-tooltip class="custom-tooltip" md-direction="top">Hide in student side</md-tooltip>
+							</i>
+						</span>
+
+						<button class="btn btn-primary ml-1 add-button" myclick="showReleaseRuleModal(set)"
+							ng-if="!set.releaseRule">Add Rule
+							<md-tooltip class="custom-tooltip" md-direction="top">Add Release Rule</md-tooltip>
+						</button>
+						<button class="btn btn-success ml-1 add-button" myclick="showReleaseRuleModal(set)"
+							ng-if="set.releaseRule">
+							<span ng-if="set.releaseRule.type=='after'">By Complete</span>
+							<span ng-if="set.releaseRule.type=='time'">By Time</span>
+							<span ng-if="set.releaseRule.type=='or'">By Complete And Time</span>
+							<span ng-if="set.releaseRule.type=='and'">By Complete Or Time</span>
+							<md-tooltip class="custom-tooltip" md-direction="top">Update Release Rule</md-tooltip>
+						</button>
+						<button class="btn ml-1" myclick="showAddDeadlineModal(set)"
+							ng-class="{'btn-primary': !set.deadline, 'btn-success': set.deadline}"
+							ng-if="!set.hidden || set.releaseRule">
+							<md-tooltip class="custom-tooltip" md-direction="top">
+								{{set.deadline ? 'Update Deadline': 'Set Deadline'}}</md-tooltip>
+							<i class="glyphicon glyphicon-time"></i>
+						</button>
+						<button class="btn ml-1" myclick="showAddReminderModal(set)"
+							ng-class="{'btn-primary': !set.reminder, 'btn-success': set.reminder}"
+							ng-if="set.deadline && (set.reminder || $root.teacherSettings.reminder_enabled)">
+							<md-tooltip class="custom-tooltip" md-direction="top">
+								{{set.reminder ? 'Update Timed Reminder': 'Set Timed Reminder'}}</md-tooltip>
+							<i class="glyphicon glyphicon-envelope"></i>
+						</button>
+					</div>
+
+					<div class="pull-right right-button-div" ng-if="!set.isSection">
+						<div ng-if="set.LikertType" style="display:inline-block;">
+							<button class="btn btn-primary" ng-if="!links[set.key]" myclick="addLink(set)">
+								<i class="glyphicon glyphicon-link"></i>
+								<md-tooltip class="custom-tooltip" md-direction="top">Add link</md-tooltip>
+							</button>
+							<div ng-if="links[set.key]">
+								<button class="btn btn-danger" myclick="deletelink(set.key)">
+									<i class="glyphicon glyphicon-trash"></i>
+									<md-tooltip class="custom-tooltip" md-direction="top">Remove link</md-tooltip>
+								</button>
+								<button class="btn btn-info" myclick="copyToClipboard(set.key)">
+									<i class="glyphicon glyphicon-copy"></i>
+									<md-tooltip class="custom-tooltip" md-direction="top">Copy link</md-tooltip>
+								</button>
+							</div>
+						</div>
+						<button class="btn btn-primary" myclick="checkCompleteSet(set)">
+							<md-tooltip class="custom-tooltip" md-direction="top">Check complete and Send Reminder Email
+							</md-tooltip>
+							<i class="glyphicon glyphicon-check"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="content-div" ng-show="selectedTab=='GroupSet'">
+				<div class="col-md-6 col-sm-6">
+					<div class="groupsets">
+						<div class="box-title">Groupsets</div>
+						<div class="col-md-12 groupset" ng-repeat="obj in  groupData.groupsets track by $index"
+							ng-class="getGroupClass(obj)" ng-click="selectGroupset(obj.key)">
+							{{obj.name}}
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6 col-sm-6">
+					<div class="groupsets">
+						<div class="box-title">{{selectedGroup.name}} Groupset</div>
+						<div class="col-md-12 groupset" ng-repeat="obj in selectedGroup.data.groups track by $index"
+							ng-class="getSubGroupClass($index)" ng-click="selectGroup($index, obj.name)">
+							{{obj.name}}&nbsp;({{obj.member_count}})
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="releaseRuleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+	aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title"
+					id="exampleModalLongTitle">{{isRuleExist ? 'Update Release Rule' : 'Add Release Rule'}}</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-12">
+						<h3 class="center mt-0 mb-5">{{ruleSet.setname}}</h3>
+					</div>
+					<div class="col-md-12">
+						<div style="width:80%; margin:0px auto;">
+							<b class="modal-sub-title release-rule-title">Release Condition</b>
+							<div style="padding-left:20px;">
+								<div class="condition-div">
+									<span class="condition-title">By Complete :</span>
+									<span
+										class="condition-content">{{(!prevSet || prevSet.hidden)? 'None' : prevSet.setname}}</span>
+								</div>
+								<div class="condition-div">
+									<span class="condition-title">By&emsp;Time :</span>
+									<div class="form-group condition-content">
+										<div class='input-group date' id='releaseTimePicker'>
+											<input type='text' class="form-control picker-input" readonly />
+											<span class="input-group-addon" id="picker-span">
+												<span class="glyphicon glyphicon-calendar"></span>
+											</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-12">
+						<md-input-container class="md-block mb-0 mt-0">
+							<b class="modal-sub-title release-rule-title">Release Rule Type</b>
+							<md-radio-group ng-model="ruleSet.releaseRule.type">
+								<md-radio-button ng-value="'after'" class="md-primary" ng-disabled="getDisabled().after">By
+									Complete</md-radio-button>
+								<md-radio-button ng-value="'time'" class="md-primary" ng-disabled="getDisabled().time">By Time
+								</md-radio-button>
+								<md-radio-button ng-value="'or'" class="md-primary" ng-disabled="getDisabled().or">by Complete or
+									Time</md-radio-button>
+								<md-radio-button ng-value="'and'" class="md-primary" ng-disabled="getDisabled().and">By Complete
+									and Time</md-radio-button>
+							</md-radio-group>
+						</md-input-container>
+					</div>
+					<div class="col-md-12">
+						<md-input-container class="md-block mb-0">
+							<b class="modal-sub-title release-rule-title">Deadline</b>
+							<md-radio-group ng-model="setDeadline">
+								<md-radio-button ng-value="false" class="md-primary">No Deadline</md-radio-button>
+								<md-radio-button ng-value="true" class="md-primary">Set Deadline</md-radio-button>
+							</md-radio-group>
+						</md-input-container>
+					</div>
+					<div class="col-md-12">
+						<div style="width:80%; margin:0px auto;">
+							<div class='input-group date' id='releaseTimePicker2'
+								style="width: calc(100% - 150px);	float: right; margin-right: 10px;">
+								<input type='text' class="form-control picker-input" readonly />
+								<span class="input-group-addon" id="picker-span">
+									<span class="glyphicon glyphicon-calendar"></span>
+								</span>
+							</div>
+						</div>
+					</div>
+					<md-input-container class="mt-0 mb-0">
+						<div class="row">
+							<div class="col-md-12 note">
+								*&emsp;{{note}}
+							</div>
+						</div>
+						<div class="row" ng-if="noteEnable">
+							<div class="col-md-12 note all-disabled">
+								*&emsp;{{noteEnable}}
+							</div>
+						</div>
+						<div class="row" ng-if="noteHidden">
+							<div class="col-md-12 note curr-hidden">
+								*&emsp;{{noteHidden}}
+							</div>
+						</div>
+						<div class="row" ng-if="noteCombinedEnable">
+							<div class="col-md-12 note combined-disable">
+								*&emsp;{{noteCombinedEnable}}
+							</div>
+						</div>
+						<div class="row" ng-if="noteFirst">
+							<div class="col-md-12 note first">
+								*&emsp;{{noteFirst}}
+							</div>
+						</div>
+						<div class="row" ng-if="notePrevHidden">
+							<div class="col-md-12 note prev-hidden">
+								*&emsp;{{notePrevHidden}}
+							</div>
+						</div>
+					</md-input-container>
+
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-success" myclick="addRelaseRule()"
+					ng-if="isRuleExist && $root.teacherSettings.release_enabled">Update Rule</button>&emsp;
+				<button type="button" class="btn btn-danger" myclick="removeRelaseRule()" ng-if="isRuleExist">Remove
+					Rule</button>&emsp;
+				<button type="button" class="btn btn-primary" myclick="addRelaseRule()" ng-if="!isRuleExist">Add
+					Rule</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="deadLineModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+	aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title"
+					id="exampleModalLongTitle">{{isDeadlineExist ? 'Update Deadline' : 'Set Deadline'}}</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-12">
+						<h3 class="center mt-0 mb-0">{{DeadlineSetName}}</h3>
+					</div>
+					<div class="col-md-12">
+						<md-input-container class="md-block mb-0">
+							<b class="modal-sub-title release-rule-title">Deadline</b>
+							<md-radio-group ng-model="setDeadline">
+								<md-radio-button ng-value="false" class="md-primary">No Deadline</md-radio-button>
+								<md-radio-button ng-value="true" class="md-primary">Set Deadline</md-radio-button>
+							</md-radio-group>
+						</md-input-container>
+					</div>
+					<div class="col-md-12">
+						<div style="width:80%; margin:0px auto; padding-left: 50px;">
+							<div class='input-group date' id='releaseTimePicker1'>
+								<input type='text' class="form-control picker-input" readonly />
+								<span class="input-group-addon" id="picker-span">
+									<span class="glyphicon glyphicon-calendar"></span>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" myclick="updateDeadline()">Save</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="reminderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+	aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title"
+					id="exampleModalLongTitle">{{isReminderExist ? 'Update Timed Reminder' : 'Add Timed Reminder'}}</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-12">
+						<h3 class="center mt-0 mb-0">{{DeadlineSetName}}</h3>
+					</div>
+					<div class="col-md-12">
+						<md-input-container class="md-block mb-0">
+							<b class="modal-sub-title release-rule-title">Reminder Count</b>
+							<md-radio-group ng-model="reminder.count">
+								<md-radio-button ng-value="1" class="md-primary">One Reminder</md-radio-button>
+								<md-radio-button ng-value="2" class="md-primary">Two Reminders</md-radio-button>
+							</md-radio-group>
+						</md-input-container>
+					</div>
+					<div class="col-md-12">
+						<div style="width:80%; margin:0px auto;">
+							<b class="modal-sub-title release-rule-title">Reminders</b>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div style="width:80%; margin:0px auto; padding-left: 10px;">
+							&emsp;Send&nbsp;&nbsp;&nbsp;First&nbsp;&nbsp;&nbsp;Reminder
+							<div class='input-group reminder-input'>
+								<input type='number' class="form-control" ng-model="reminder.hour1" />
+							</div>
+							&nbsp;Hours
+							<div class='input-group reminder-input'>
+								<input type='number' class="form-control" ng-model="reminder.day1" />
+							</div>
+							&nbsp;Days after Deadline
+						</div>
+					</div>
+					<div class="col-md-12" ng-class="{'reminder-disabled': reminder.count==1}">
+						<div style="width:80%; margin:0px auto; padding-left: 10px;">
+							&emsp;Send Second Reminder
+							<div class='input-group reminder-input'>
+								<input type='number' class="form-control" ng-model="reminder.hour2"
+									ng-disabled="reminder.count==1" />
+							</div>
+							&nbsp;Hours
+							<div class='input-group reminder-input'>
+								<input type='number' class="form-control" ng-model="reminder.day2"
+									ng-disabled="reminder.count==1" />
+							</div>
+							&nbsp;Days after Deadline
+						</div>
+					</div>
+					<md-input-container class="mt-0 mb-0">
+						<div class="row">
+							<div class="col-md-12 note">
+								*&emsp;Timed reminder will be sent as email on set time automatically and it will be override bulk
+								reminder.
+							</div>
+						</div>
+					</md-input-container>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" myclick="updateReminder()"
+					ng-if="$root.teacherSettings.reminder_enabled">Save</button>&emsp;
+				<button type="button" class="btn btn-danger" myclick="removeReminder()"
+					ng-if="isReminderExist">Remove</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal fade" id="bulkReminderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+	aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title"
+					id="exampleModalLongTitle">{{isReminderExist ? 'Update Timed Bulk Reminder' : 'Add Timed Bulk Reminder'}}</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-12">
+						<h3 class="center mt-0 mb-0">{{groupData.groupname}}</h3>
+					</div>
+					<div class="col-md-12">
+						<md-input-container class="md-block mb-0">
+							<b class="modal-sub-title release-rule-title">Reminder Count</b>
+							<md-radio-group ng-model="reminder.count">
+								<md-radio-button ng-value="1" class="md-primary">One Reminder</md-radio-button>
+								<md-radio-button ng-value="2" class="md-primary">Two Reminders</md-radio-button>
+							</md-radio-group>
+						</md-input-container>
+					</div>
+					<div class="col-md-12">
+						<div style="width:80%; margin:0px auto;">
+							<b class="modal-sub-title release-rule-title">Reminders</b>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div style="width:80%; margin:0px auto; padding-left: 10px;">
+							&emsp;Send&nbsp;&nbsp;&nbsp;First&nbsp;&nbsp;&nbsp;Reminder
+							<div class='input-group reminder-input'>
+								<input type='number' class="form-control" ng-model="reminder.hour1" />
+							</div>
+							&nbsp;Hours
+							<div class='input-group reminder-input'>
+								<input type='number' class="form-control" ng-model="reminder.day1" />
+							</div>
+							&nbsp;Days after Deadline
+						</div>
+					</div>
+					<div class="col-md-12" ng-class="{'reminder-disabled': reminder.count==1}">
+						<div style="width:80%; margin:0px auto; padding-left: 10px;">
+							&emsp;Send Second Reminder
+							<div class='input-group reminder-input'>
+								<input type='number' class="form-control" ng-model="reminder.hour2"
+									ng-disabled="reminder.count==1" />
+							</div>
+							&nbsp;Hours
+							<div class='input-group reminder-input'>
+								<input type='number' class="form-control" ng-model="reminder.day2"
+									ng-disabled="reminder.count==1" />
+							</div>
+							&nbsp;Days after Deadline
+						</div>
+					</div>
+					<md-input-container class="mt-0 mb-0">
+						<div class="row">
+							<div class="col-md-12 note">
+								*&emsp;Timed Bulk reminder will be apply to all sets in group that have deadline but haven't timed
+								reminder.
+							</div>
+						</div>
+					</md-input-container>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" myclick="updateBulkReminder()"
+					ng-if="$root.teacherSettings.reminder_enabled">Save</button>&emsp;
+				<button type="button" class="btn btn-danger" myclick="removeBulkReminder()"
+					ng-if="isReminderExist">Remove</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Create and Edit final Score Modal -->
+<div class="modal fade" id="createFinalScoreModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+	aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title"
+					id="exampleModalLongTitle">{{groupData.finalScore ? 'Edit Final Score': 'Create Final Score'}}</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-12 mb-5">
+						<h3 class="center mt-0 mb-0">{{groupData.groupname}}</h3>
+					</div>
+					<!-- select Question -->
+					<div class="col-md-12">
+						<md-input-container class="md-block" style="width: 90%;	margin: 0px auto;">
+							<div class="col-md-12 center">
+								<strong class="choose-question" style="font-size:20px;">Choose Questions</strong>
+								<md-checkbox class="pull-right" ng-checked="selectAll" ng-click="toggleAll()">
+									Select All
+								</md-checkbox>
+							</div>
+							<div class="col-md-12">
+								<hr />
+							</div>
+						</md-input-container>
+						<md-input-container class="md-block"
+							style="width: 90%;	margin: 0px auto; max-height: 400px; overflow-y: auto;">
+							<div class="col-md-12 question-row" ng-repeat="(key,qst) in allQstForFinal track by $index">
+								<span class="number-span">{{$index+1}}.</span>
+								<md-checkbox class="check-box-item" ng-checked="finalScore[key]" ng-click="toggle(key)">
+									{{ qst.question }}
+								</md-checkbox>
+							</div>
+							<div class="col-md-12 center" ng-show="setQuestions.length == 0">There isn't any question in this set.
+							</div>
+						</md-input-container>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" myclick="saveFinalScore()" ng-if="!groupData.finalScore">Create
+					Final Score</button>&emsp;
+				<button type="button" class="btn btn-primary" myclick="saveFinalScore()" ng-if="groupData.finalScore">Save
+					Change</button>&emsp;
+				<button type="button" class="btn btn-danger" myclick="removeFinalScore()" ng-if="groupData.finalScore">Remove
+					Final Score</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<style>
+	.content-header {
+		background-color: #426af4;
+	}
+
+	.content-div {
+		height: calc(100vh - 190px);
+	}
+
+	.groupdetails.active {
+		background-color: #f8b7b7;
+		border: solid 1px #f9ff00;
+	}
+
+	.groupdetails .setname {
+		display: inline-block;
+	}
+
+	.groupdetails.section .setname {
+		width: 70%;
+		margin: 0px auto;
+		background-color: #04a243;
+		border-radius: 10px;
+	}
+
+	.section-detail {
+		position: absolute;
+		display: none;
+	}
+
+	.groupdetails.section:hover .section-detail {
+		display: block;
+		z-index: 1000;
+		background-color: #1476b4;
+		width: 70%;
+		margin-top: 3px;
+		left: 15%;
+		border: solid 2px #999;
+		border-top: none;
+		color: white;
+	}
+
+	.groupdetails.section:hover .section-detail:hover {
+		display: none;
+	}
+
+	.left-button-div {
+		width: 245px;
+		text-align: left;
+	}
+
+	.right-button-div {
+		width: 190px;
+		text-align: right;
+		padding-right: 10px;
+	}
+
+	.title {
+		color: yellow;
+	}
+
+	div.groupsets {
+		border: solid 1px #355086;
+		height: 50vh;
+		background-color: #e0edf9;
+		margin-top: 20px;
+		padding: 20px 20px;
+		overflow-y: auto;
+	}
+
+	div.box-title {
+		font-size: 2em;
+		text-align: center;
+		margin: 10px 0px;
+		color: #0716ba;
+	}
+
+	div.groupset {
+		background: #0576d5;
+		color: white;
+		margin: 10px auto;
+		font-size: 1.8em;
+		text-align: center;
+		line-height: 1.8em;
+		border-radius: 15px;
+		cursor: pointer;
+		border: solid 2px transparent;
+	}
+
+	.groupset.active {
+		border: solid 2px #17e320;
+	}
+
+	div.groupset span {
+		cursor: pointer;
+	}
+
+	.glyphicon-eye-open {
+		color: #09159b;
+	}
+
+	.glyphicon-eye-close {
+		color: #7e7e7e;
+	}
+
+	.picker-input {
+		letter-spacing: 0.2em;
+		font-size: 16px;
+		font-weight: bold;
+	}
+
+	.modal-sub-title {
+		color: #040a87;
+		border-bottom: solid 2px;
+		padding-bottom: 4px;
+		margin-bottom: 13px;
+		display: block;
+	}
+
+	.modal-sub-title.release-rule-title {
+		width: 170px;
+	}
+
+	md-radio-button {
+		margin-left: 20px;
+		margin-bottom: 8px;
+	}
+
+	md-radio-button.md-checked {
+		font-weight: bold;
+		color: blue;
+	}
+
+	md-radio-group.inline-radio md-radio-button {
+		display: inline-block;
+	}
+
+	.condition-div {
+		vertical-align: top;
+		display: flex;
+	}
+
+	.condition-title {
+		display: inline-block;
+		width: 120px;
+		color: #250dc9;
+	}
+
+	.condition-content {
+		text-align: center;
+		display: inline-block;
+		width: calc(100% - 130px);
+	}
+
+	.note {
+		color: #5289c8;
+		margin-top: 20px;
+	}
+
+	.note.combined-disable,
+	.note.first,
+	.note.prev-hidden {
+		color: #ef8b0a;
+	}
+
+	.note.curr-hidden,
+	.note.all-disabled {
+		color: red;
+	}
+
+	.input-group.reminder-input {
+		display: inline-block;
+		width: 59px;
+	}
+
+	.input-group.reminder-input input {
+		padding: 0px 0px 0px 16px;
+		height: 20px;
+		border: none;
+		border-bottom: solid 1px blue;
+		box-shadow: none;
+		margin: 0px 5px;
+	}
+
+	.add-button {
+		width: 100px;
+		min-height: 32px;
+		white-space: normal;
+		padding: 2px 5px;
+		line-height: 16px;
+	}
+
+	.reminder-disabled {
+		text-decoration-line: line-through;
+	}
+
+	@media (max-width: 650px) {
+		div.groupsets {
+			padding: 20px 10px;
+		}
+
+		div.groupset {
+			font-size: 1.3em;
+			line-height: 1.8em;
+			border-radius: 15px;
+		}
+	}
+
+	.container {
+		padding-left: 0px;
+		padding-right: 0px;
+	}
+
+	.question-row {
+		border-bottom: solid 1px beige;
+		padding-top: 10px;
+	}
+
+	.number-span {
+		width: 30px;
+		display: inline-block;
+	}
+
+	.check-box-item {
+		width: calc(100% - 50px);
+	}
+</style>

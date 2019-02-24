@@ -1,0 +1,64 @@
+<div ng-init="init()"  ng-show="$root.settings.loadingfinished">
+	<div class="row content-header">
+		<div class="container">
+			<div class="col-md-12 title texteffect">
+				{{$root.settings.groupName}} / {{groupset.name}}
+			</div>
+		</div>
+	</div>
+	<div ng-cloak style="margin-top:20px;">
+		<button class="btn btn-link" myclick="$root.exportToExcel('#table-1')">
+			<span class="glyphicon glyphicon-share"></span> Export to Excel
+		</button>
+
+		<table class="table table-bordered datatable" id="table-1" style="margin-top:10px;">
+			<thead>
+				<tr>
+					<th colspan="11">{{$root.settings.groupName}} / {{groupset.name}}</th>
+				</tr>
+				<tr>
+					<th>No</th>
+					<th>Email</th>
+					<th>Unique ID</th>
+					<th>Gender</th>
+					<th>Age</th>
+					<th>Nationality</th>
+					<th>Language</th>
+					<th>Institution</th>
+					<th>Profession</th>
+					<th>Other</th>
+					<th>Joined Groups</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="user in Users track by $index">
+					<td>
+						{{$index + 1}}
+					</td>
+					<td>{{user.ID}}</td>
+					<td>{{user.show_id}}</td>
+					<td>{{user.gender}}</td>
+					<td>{{user.age}}</td>
+					<td>{{user.country}}</td>
+					<td>{{user.countrylanguage}}</td>
+					<td>{{user.institution}}</td>
+					<td>{{user.profession}}</td>
+					<td>{{user.other}}</td>
+					<td>{{user.joinedGroups}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<style>
+	.content-header {
+		background-color: #426af4;
+	}
+
+	.table>thead>tr>th,
+	.table>tbody>tr>td {
+		text-align: center;
+		vertical-align: middle;
+	}
+</style>

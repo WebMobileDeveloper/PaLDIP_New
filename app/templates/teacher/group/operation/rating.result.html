@@ -1,0 +1,169 @@
+<div class="container" ng-init="init()">
+	<div class="answer-form " ng-if="$root.settings.loadingfinished">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 title-container">
+				<label class="qst-title" ng-if='question.title'>{{question.title}}</label>
+				<div class="title">{{question.question}} </div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="well">
+				<div class="mid-cell">
+					<div class="answer-div">
+						<div class="answer-list" ng-repeat="item in answers track by $index"
+							ng-class="($index == itemIndex)?'selected':'';" ng-click="changeItem($index)">
+							<div class="list-num">{{$index+1}}</div>
+							<div class="list-body">{{item.itemName}}</div>
+							<div class="list-rating">{{item.avRating}}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<label style="margin-left:50px;	color: #a2a2a2;">Item Data&emsp;({{answers[itemIndex].itemName}})</label>
+			</div>
+			<div class="col-md-12 center">
+				<label class="left-label">Total score&emsp;:</label>
+				<label class="right-label">{{answers[itemIndex].avRating}}</label>
+			</div>
+			<div class="col-md-12 center">
+				<label class="left-label">Feedbacks&emsp;:</label>
+				<label class="right-label">{{answers[itemIndex].student.length}}<span>(st)</span>&nbsp;/
+					&nbsp;{{answers[itemIndex].teacher.length}}<span>(te)</span></label>
+			</div>
+			<div class="col-md-12 center" ng-show="isAward">
+				<label class="left-label">Award Score&emsp;:</label>
+				<label class="right-label">{{answers[itemIndex].awardScore}}<span>(score)</span>&nbsp;/
+					&nbsp;{{answers[itemIndex].awardUsers}}<span>(users)</span>&nbsp;</label>
+			</div>
+		</div>
+		<div class="row center button-row">
+			<button class="btn btn-primary" myclick="decreaseItemIndex()">Prev Item</button>
+			<button class="btn btn-primary" myclick="increaseItemIndex()">Next Item</button>
+		</div>
+		<hr />
+		<div class="row">
+			<div class="col-md-12 center">
+				<label>All Feedbacks</label>
+			</div>
+		</div>
+		<div class="col-md-12 center">
+			<md-input-container flex>
+				<b style="margin-right:20px;">Feedback Type</b>
+				<md-radio-group ng-model="userType" ng-change="selectFeedback(userType)">
+					<md-radio-button value="student" class="md-primary">Student</md-radio-button>
+					<md-radio-button value="teacher" class="md-primary">Teacher</md-radio-button>
+				</md-radio-group>
+			</md-input-container>
+		</div>
+		<div class="row starfield-container" ng-show="type">
+			<div class="col-md-12 starfield">
+				<div class="row option-row" ng-repeat="option in options track by $index">
+					<div class="col-md-9 col-sm-9  col-xs-10  option">
+						{{option}}
+					</div>
+					<div class="col-md-3  col-sm-3 col-xs-2  value center">
+						<span>{{answers[itemIndex][userType][feedIndex].rating[$index]}}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row feedText" ng-if="type % 2 == 0">
+			<hr />
+			<md-input-container flex>
+				<label>Feedback Text</label>
+				<textarea class="feedback-text" ng-model="answers[itemIndex][userType][feedIndex].feedbacktext" rows="3"
+					ng-disabled="true" placeholder=""></textarea>
+			</md-input-container>
+		</div>
+
+		<div class="row center button-row">
+			<button class="btn btn-primary" myclick="$root.back()">Back</button>
+			<button class="btn btn-success" myclick="decreaseFeedIndex()">Prev Feedback</button>
+			<button class="btn btn-success" myclick="increaseFeedIndex()">Next Feedback</button>
+			<button class="btn btn-danger" myclick="deleteFeedback()">
+				<span class="glyphicon glyphicon-trash"></span> Delete
+			</button>
+		</div>
+	</div>
+</div>
+<style>
+	md-radio-button {
+		display: inline-block;
+		margin-right: 30px;
+	}
+
+	md-input-container {
+		margin-bottom: 0px;
+	}
+
+	textarea.feedback-text {
+		border-radius: 5px;
+		height: 150px !important;
+		font-size: 18px;
+		background-color: #effcfa;
+		border: solid 2px #c1ddf5;
+		border-bottom: solid 2px #c1ddf5 !important;
+		padding: 10px;
+		overflow-y: auto;
+		color: black !important;
+	}
+
+	.answer-form hr {
+		margin: 10px 5%;
+	}
+
+	.answer-form {
+		margin: 20px auto;
+	}
+
+	.title-container {
+		margin-top: 20px;
+		padding: 0px 50px;
+	}
+
+	.title {
+		color: green;
+		max-height: 200px;
+		overflow-y: auto;
+		padding: 0px !important;
+	}
+
+	.well {
+		padding: 20px 0px;
+		margin-left: 20px;
+		margin-right: 20px;
+	}
+
+	.mid-cell {
+		width: 95%;
+		margin: auto;
+	}
+
+	.answer-div {
+		padding: 10px;
+		display: block;
+		max-height: 300px;
+		overflow-y: auto;
+	}
+
+	.checked {
+		color: orange;
+	}
+
+	.navigation-row button {
+		width: 80%;
+		max-width: 100px;
+		color: green;
+		margin-bottom: 20px;
+	}
+
+	.checked {
+		color: orange;
+	}
+</style>

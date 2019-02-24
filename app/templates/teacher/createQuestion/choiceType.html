@@ -1,0 +1,42 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="answer-form center">
+		<h2 class="page-header">Question Type Choice</h2>
+		<div ng-repeat="item in createQuestionSettings track by $index">
+			<button class="btn btn-primary" myclick="createQuestion(item)" ng-class="{'inactive': !item.value}">{{item.type}}</button>
+		</div>
+		<hr>
+		<div class="button-row">
+			<a class="btn" myclick="goback()">Back</a>
+			<a class="btn" ui-sref="teacherQuestion" ui-sref-active="active">Question Sets</a>
+		</div>
+	</div>
+</div>
+<style>
+	.answer-form {
+		padding: 0px;
+	}
+
+	button {
+		width: 50%;
+		margin: 10px auto;
+		font-size: 1.5em !important;
+	}
+
+	button.inactive {
+		background-color: #86878a;
+	}
+
+	button.inactive:hover,
+	button.inactive:focus,
+	button.inactive:active {
+		background-color: #8e8e8f !important;
+		border-color: #707071 !important;
+		color: #dbdbdb !important;
+	}
+
+	.nav-row {
+		padding-top: 20px;
+		padding-bottom: 20px;
+		font-size: 1.2em;
+	}
+</style>

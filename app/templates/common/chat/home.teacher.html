@@ -1,0 +1,357 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="row">
+		<md-input-container>
+			<label>Select Group:</label>
+			<md-select ng-model="selectedGroupKey" class="teacher" ng-change="selectGroup(selectedGroupKey)">
+				<md-option ng-selected="selectedGroupKey == undefined" ng-value="undefined">All Users</md-option>
+				<md-option ng-repeat="group in myGroups" ng-selected="selectedGroupKey == group.group_id" ng-value="group.group_id">{{group.groupname}}</md-option>
+			</md-select>
+			<button class="btn btn-primary send-message" myclick="showModal()">Group Message</button>
+		</md-input-container>
+	</div>
+	<div class="row content-body" ng-cloak>
+		<div id="mySidenav" class="sidenav">
+			<div class="col-md-12 search-box">
+				<!-- Search form -->
+				<form class="form-inline ">
+					<input class="form-control form-control-sm mr-3 w-75" type="text" placeholder="Search User" aria-label="Search" ng-model="searchText">
+					<i class="fa fa-times" aria-hidden="true" myclick="clear()"></i>
+				</form>
+			</div>
+			<div class="col-md-12 user-list" ng-if="users">
+				<!-- users -->
+				<div class="row user-name" ng-repeat="user in users" ng-click="selectUser(user.Userkey)" ng-class="setClass(user)" ng-show="show(user)">
+					<img class="profile-img" ng-src="{{user.profile_image}}" err-src="{{defaultImage}}">
+					<span ng-bind-html="user.show_name | highlight:searchText"></span>
+					<div class="badge pull-right" ng-show="user.newMsgs">{{user.newMsgs}}</div>
+				</div>
+			</div>
+		</div>
+		<div id="closenav" ng-click="toggleNav()">
+			<i class="fa fa-angle-left" aria-hidden="true" ng-show="!sidebarHide"></i>
+			<i class="fa fa-angle-right" aria-hidden="true" ng-show="sidebarHide"></i>
+		</div>
+		<div id="main">
+			<div class="col-md-12 chat-body" ng-if="users">
+				<div class="row profile-row">
+					<img class="msg-img" ng-if="!msg.fromMe" ng-src="{{users[getUserIndex(selectedKey)].profile_image}}" err-src="{{defaultImage}}">
+					<span>{{users[getUserIndex(selectedKey)].show_name}}</span>
+				</div>
+				<div class="row chat-room">
+					<div class="msg-row" ng-class="fromMe(msg.fromMe)" ng-if="selectedKey" ng-repeat="msg in userMsg[selectedKey] track by $index"
+					 elem-ready="someMethod()">
+						<div class="msg">
+							<div ng-if="msg.groupName" class="groupMessage">Group Message&nbsp;(&nbsp;{{msg.groupName}}&nbsp;):
+								<br/>
+							</div>
+							<pre>{{msg.message}}</pre>
+							<div class="time bottom-time">{{msg.date.weekday}}&nbsp;{{msg.date.time}}</div>
+						</div>
+						<div class="time right-time">{{msg.date.weekday}}&nbsp;{{msg.date.time}}</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12 msg-input">
+				<div class="row">
+					<textarea ng-model="inputMsg" enter-submit="send()" placeholder="Type your message here."></textarea>
+					<button class="send-button" myclick="send()">
+						<i class="fa fa-paper-plane" aria-hidden="true"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="sendGroupMessage" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Send Group Message</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<md-input-container class="md-block">
+					<textarea md-no-asterisk ng-model="groupMessage" name="Name" placeholder='Group Message' aria-label="Group Message" rows="5"
+					 md-select-on-focus></textarea>
+				</md-input-container>
+				<md-input-container class="md-block">
+					<div class="col-md-12 description">
+						This message will be sent to all students in this group.
+					</div>
+				</md-input-container>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" myclick="sendGroupMessage()">Send</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	md-input-container {
+		width: 100%;
+		margin: 30px 0px 10px 0px;
+	}
+
+	md-select.teacher {
+		width: calc(100% - 130px);
+		display: inline-block;
+		margin-right: 10px;
+	}
+
+	.md-select-menu-container {
+		top: 110px !important;
+		border: solid 1px #c5c4c3;
+	}
+
+	.content-body {
+		height: calc(100vh - 130px);
+	}
+
+	textarea {
+		resize: none;
+	}
+
+	#main {
+		height: 100%;
+		width: calc(100% - 300px);
+		border: solid 1px #ada9a3;
+	}
+
+	.sidenav {
+		border: solid 1px #ada9a3;
+		background-color: white;
+	}
+
+
+
+
+	.search-box input.form-control {
+		display: inline-block;
+		border: none;
+		width: calc(100% - 30px);
+		height: 49px;
+	}
+
+	.user-list {
+		height: calc(100% - 49px);
+		overflow-y: auto;
+		overflow-x: hidden;
+		/* background-color: #F0F4F8; */
+		border-top: solid 1px #d2d2d2;
+	}
+
+	.user-name {
+		height: 56px;
+		margin-top: 3px;
+		padding: 3px 0px 3px 10px;
+		border-bottom: solid 1px antiquewhite;
+	}
+
+	.user-name:hover {
+		background-color: #d8d8d8;
+		cursor: pointer;
+	}
+
+	.user-name.active {
+		background-color: #aff9fc;
+	}
+
+	.user-name.teacher>.profile-img {
+		border: solid 3px #ff000080;
+	}
+
+	.profile-img {
+		vertical-align: middle;
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+		border: solid 2px #0000ff4d;
+	}
+
+	.msg-img {
+		vertical-align: top;
+		margin-top: 5px;
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		border: solid 2px #0000ff4d;
+	}
+
+	.user-name span {
+		padding-left: 10px;
+		overflow: hidden;
+	}
+
+	.user-name>.badge {
+		width: 20px;
+		height: 20px;
+		line-height: 20px;
+		padding: 0px;
+		margin-top: 10px;
+		margin-right: 10px;
+		color: #000c;
+		background-color: #f6fc2f;
+		border: solid 1px burlywood;
+	}
+
+
+	.chat-body {
+		height: calc(100% - 100px);
+	}
+
+	.profile-row {
+		height: 50px;
+		padding-left: 30px;
+		line-height: 50px;
+		border-bottom: solid 1px #c5c4c3;
+	}
+
+	.chat-room {
+		height: calc(100% - 50px);
+		padding-top: 20px;
+		padding-bottom: 20px;
+		overflow-y: scroll;
+	}
+
+	.msg-row {
+		padding: 0px 10px;
+	}
+
+	.msg-row .msg {
+		background-color: #ededed;
+		margin: 5px 0px;
+		display: inline-block;
+		width: calc(100% - 140px);
+		padding: 10px;
+		border-radius: 8px;
+		text-align: left;
+		word-wrap: break-word;
+	}
+
+	.fromMe {
+		text-align: right;
+	}
+
+	.msg-row .groupMessage {
+		color: blue;
+		font-weight: bold;
+	}
+
+	.fromMe .msg {
+		background-color: #cafafc;
+	}
+
+	.time {
+		width: 110px;
+		float: right;
+		text-align: right;
+		padding: 15px 0px 15px 0px;
+	}
+
+	.msg-input {
+		height: 100px;
+		border-top: solid 1px #c5c4c3;
+	}
+
+	.msg-input textarea {
+		width: calc(100% - 50px);
+		height: 100px;
+		padding: 10px;
+		border: none;
+		border-bottom: solid 1px #c5c4c3;
+		/* border-right: solid 1px #c5c4c3; */
+	}
+
+	.send-button {
+		height: 36px;
+		width: 36px;
+		border-radius: 18px;
+		margin-top: 32px;
+		border: none;
+		background-color: bisque;
+	}
+
+	pre {
+		padding: 0px;
+		margin: 0px;
+		font-size: 14px;
+		background-color: transparent;
+		border: none;
+		white-space: pre-wrap;
+	}
+
+	/* highlight */
+
+	span.highlighted {
+		background: #ffea00;
+		padding-left: 0px;
+	}
+
+	i.fa-times {
+		cursor: pointer;
+	}
+
+	@media screen and (min-width: 601px) {
+		.sidenav {
+			height: 100%;
+			width: 300px;
+			float: left;
+		}
+		#main {
+			float: left;
+			width: calc(100% - 300px);
+		}
+		#closenav {
+			display: none;
+		}
+		.bottom-time {
+			display: none;
+		}
+	}
+
+	@media screen and (max-width: 600px) {
+		.sidenav {
+			height: calc(100% - 130px);
+			width: 0;
+			position: fixed;
+			z-index: 2;
+			top: 124px;
+			left: -10px;
+			overflow-x: hidden;
+			transition: 0.5s;
+			border: solid 2px #7E8383;
+		}
+		#closenav {
+			position: fixed;
+			width: 30px;
+			height: 40px;
+			left: -5px;
+			top: 129px;
+			z-index: 1;
+			transition: 0.5s;
+			font-size: 30px;
+			background-color: #a3d2f9;
+			padding-left: 10px;
+			overflow: hidden;
+			border-radius: 5px;
+		}
+		#main {
+			width: 100%;
+		}
+		.msg-row .msg {
+			width: calc(100% - 20px);
+		}
+		.right-time {
+			display: none;
+		}
+		.time.bottom-time {
+			padding: 0px;
+		}
+	}
+</style>

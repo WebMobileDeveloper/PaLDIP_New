@@ -1,0 +1,753 @@
+<div ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="row title-div">
+		<div class="container">
+			<span>{{$root.settings.groupName}}</span>
+		</div>
+	</div>
+
+	<div class="main">
+		<div class="container">
+			<div class="panel-group" id="accordion">
+				<!-- groupSet -->
+				<div class="sub-title mb-4">Groupsets
+					<button class="btn btn-primary pull-right" myclick="showCreateModal()">+ Groupset</button>
+				</div>
+				<div class="panel panel-default" ng-repeat="(groupSetKey, groupSet) in groupsets">
+					<div class="panel-heading">
+						<h4 class="panel-title">
+							<a class="accordion-toggle collapsed level-0" data-toggle="collapse" data-parent="#accordion" href="#Collapse{{groupSetKey}}">
+								{{groupSet.name}}
+							</a>
+							<button type="button" class="close red-button" aria-label="Close" myclick="deleteGroupset(groupSetKey)">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<span class="btn-add-member pull-right" myclick="exportUsers(groupSetKey)">
+								<span class="glyphicon glyphicon-share"></span>
+								<md-tooltip class="custom-tooltip" md-direction="top">
+									Export Groupset Users
+								</md-tooltip>
+							</span>
+							<span class="btn-add-member pull-right" myclick="addUsers(groupSetKey)">
+								+<span class="glyphicon glyphicon-user"></span>
+								<md-tooltip class="custom-tooltip" md-direction="top">
+									Edit Members
+								</md-tooltip>
+							</span>
+						</h4>
+					</div>
+
+					<div id="Collapse{{groupSetKey}}" class="panel-collapse collapse">
+						<div class="panel-body">
+							<ul class="nav nav-tabs">
+								<li class="active">
+									<a data-toggle="tab" href="#paccordion{{groupSetKey}}">Properties</a>
+								</li>
+								<li>
+									<a data-toggle="tab" href="#gaccordion{{groupSetKey}}">Groups</a>
+								</li>
+								<li>
+									<a data-toggle="tab" href="#accordion{{groupSetKey}}">Sub Groupsets</a>
+								</li>
+								<li>
+									<a data-toggle="tab" href="#qaccordion{{groupSetKey}}">Question Sets</a>
+								</li>
+							</ul>
+							<div class="tab-content">
+								<div class="tab-pane fade in active center property-div" id="paccordion{{groupSetKey}}">
+									<div class="row">
+										<div class="col-md-6 col-sm-6">Groupset Name</div>
+										<div class="col-md-6 col-sm-6 ">
+											<input type="text" class="form-control groupset-name" ng-model="groupSet.name" ng-change="changeGroupsetName(groupSet)">
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-6 col-sm-6">Number of child groups</div>
+										<div class="col-md-6 col-sm-6">{{groupSet.count}}</div>
+									</div>
+
+									<div class="row">
+										<div class="col-md-6 col-sm-6">Maximum no. of students per group</div>
+										<div class="col-md-6 col-sm-6">{{groupSet.max_member}}</div>
+									</div>
+
+									<div class="row">
+										<div class="col-md-6 col-sm-6">Types of group generation</div>
+										<div class="col-md-6 col-sm-6">
+											{{groupSet.addRule.type}}
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-md-6 col-sm-6">Exclusive</div>
+										<div class="col-md-6 col-sm-6">
+											<span ng-if="groupSet.exclusive">Yes</span>
+											<span ng-if="!groupSet.exclusive">No</span>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-6 col-sm-6 center">
+											<md-switch class="md-primary" ng-model="groupSet.locked" name="locked" ng-change="changeLock(groupSetKey)" style="margin: 0px auto;display: inline-block;">
+												Lock Groupset
+											</md-switch>
+										</div>
+										<div class="col-md-6 col-sm-6">
+											<span ng-show="groupSet.locked">Yes</span>
+											<span ng-hide="groupSet.locked">No</span>
+										</div>
+									</div>
+								</div>
+
+								<div class="tab-pane fade" id="gaccordion{{groupSetKey}}">
+									<div class="row">
+										<div class="col-md-12">
+											<button class="btn btn-primary pull-right mt-3 mb-3 mr-4" myclick="addNewGroup(groupSet)">+ Group</button>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-12">
+											<div class="groups-row">
+												<div ng-repeat="group in groupSet.data.groups track by $index" ng-init="groupNum=$index+1">
+													<div class="input-group mb-3">
+														<span class="input-group-addon">{{groupNum}}</span>
+														<input type="text" class="form-control" ng-model="group.name" ng-change="changeGroupName(groupSet, $index)" placeholder="{{groupSet.name + ' ' + groupNum }}">
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="tab-pane fade panel-group " id="accordion{{groupSetKey}}">
+									<h4>
+										Sub Groupsets
+										<button class="btn btn-primary right-button" myclick="showCreateModal1(groupSetKey)">+ Sub Groupset</button>
+									</h4>
+									<div class="panel panel-default" ng-repeat="(subgroupSetKey,subGroupset) in groupSet.subgroupsets">
+										<div class="panel-heading">
+											<h4 class="panel-title">
+												<a class="accordion-toggle collapsed level-2" data-toggle="collapse" data-parent="#accordion{{groupSetKey}}" href="#Collapse{{groupSetKey}}_{{subgroupSetKey}}">
+													{{subGroupset.name}}
+												</a>
+												<button type="button" class="close red-button" aria-label="Close" myclick="deleteSubGroupset(groupSetKey,subgroupSetKey)">
+													<span aria-hidden="true">&times;</span>
+												</button>
+												<span class="btn-add-member pull-right" myclick="addUsers(groupSetKey,subgroupSetKey)">
+													+<span class="glyphicon glyphicon-user"></span>
+													<md-tooltip class="custom-tooltip" md-direction="top">
+														Edit Members
+													</md-tooltip>
+												</span>
+											</h4>
+										</div>
+
+										<div id="Collapse{{groupSetKey}}_{{subgroupSetKey}}" class="panel-collapse collapse">
+											<!-- 2nd subGroup -->
+											<div class="panel-body">
+												<ul class="nav nav-tabs">
+													<li class="active">
+														<a data-toggle="tab" href="#paccordion{{groupSetKey}}_{{subgroupSetKey}}">Properties</a>
+													</li>
+													<li>
+														<a data-toggle="tab" href="#gaccordion{{groupSetKey}}_{{subgroupSetKey}}">Groups</a>
+													</li>
+													<li>
+														<a data-toggle="tab" href="#qaccordion{{groupSetKey}}_{{subgroupSetKey}}">Question Sets</a>
+													</li>
+												</ul>
+												<div class="tab-content">
+													<div class="tab-pane fade in active center property-div" id="paccordion{{groupSetKey}}_{{subgroupSetKey}}">
+														<div class="row">
+															<div class="col-md-6 col-sm-6">Sub Groupset Name</div>
+															<div class="col-md-6 col-sm-6 ">
+																<input type="text" class="form-control groupset-name" ng-model="subGroupset.name" ng-change="changeTeamSetName(groupSetKey,subgroupSetKey,subGroupset.name)">
+															</div>
+														</div>
+														<div class="row">
+															<div class="col-md-6 col-sm-6">Number of child groups</div>
+															<div class="col-md-6 col-sm-6">{{subGroupset.count}}</div>
+														</div>
+
+														<div class="row">
+															<div class="col-md-6 col-sm-6">Maximum no. of students per child group</div>
+															<div class="col-md-6 col-sm-6">{{subGroupset.max_member}}</div>
+														</div>
+
+														<div class="row">
+															<div class="col-md-6 col-sm-6">Types of group generation</div>
+															<div class="col-md-6 col-sm-6">
+																{{groupSet.addRule.type}}
+															</div>
+														</div>
+
+														<div class="row">
+															<div class="col-md-6 col-sm-6">Exclusive</div>
+															<div class="col-md-6 col-sm-6">
+																<span ng-if="subGroupset.exclusive">Yes</span>
+																<span ng-if="!subGroupset.exclusive">No</span>
+															</div>
+														</div>
+
+														<div class="row">
+															<div class="col-md-6 col-sm-6 center">
+																<md-switch class="md-primary" ng-model="subGroupset.locked" name="locked" ng-change="changeLock1(groupSetKey, subgroupSetKey)" style="margin: 0px auto;display: inline-block;">
+																	Lock Sub Groupset
+																</md-switch>
+															</div>
+															<div class="col-md-6 col-sm-6">
+																<span ng-show="subGroupset.locked">Yes</span>
+																<span ng-hide="subGroupset.locked">No</span>
+															</div>
+														</div>
+													</div>
+
+													<div class="tab-pane fade" id="gaccordion{{groupSetKey}}_{{subgroupSetKey}}">
+														<div class="row">
+															<div class="col-md-12">
+																<button class="btn btn-primary pull-right mt-3 mb-3 mr-4" myclick="addNewSubGroup(groupSet,subGroupset)">+ Group</button>
+															</div>
+														</div>
+														<div class="row">
+															<div class="col-md-12">
+																<div class="groups-row">
+																	<div ng-repeat="group in groupSet.data.groups[0].subgroupsets[subgroupSetKey].groups track by $index" ng-init="subgroupNum=$index+1">
+																		<div class="input-group mb-3">
+																			<span class="input-group-addon">{{subgroupNum}}</span>
+																			<input type="text" class="form-control" ng-model="group.name" ng-change="changeTeamName(groupSet, subgroupSetKey, $index, group.name)" placeholder="{{subGroupset.name + ' ' + subgroupNum }}">
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+
+													<div class="tab-pane fade" id="qaccordion{{groupSetKey}}_{{subgroupSetKey}}">
+														<h4>
+															Question Sets
+															<button class="btn btn-primary right-button" myclick="editQuestionSets1(groupSetKey,subgroupSetKey)">Edit
+																Questionsets
+															</button>
+														</h4>
+														<div class="panel-group" id="qSubSetAccordion{{groupSetKey}}_{{subgroupSetKey}}">
+															<div class="panel panel-default" ng-repeat="qset in subGroupset.QuestionSets">
+																<div class="panel-heading">
+																	<h4 class="panel-title">
+																		<a class="accordion-toggle collapsed level-1" data-toggle="collapse" data-parent="#qSubSetAccordion{{groupSetKey}}_{{subgroupSetKey}}" ng-if="!qset.LikertType" href="#qSubSetCollapse{{groupSetKey}}_{{subgroupSetKey}}_{{qset.key}}">
+																			{{qset.setname}}
+																		</a>
+																		<span class="accordion-toggle collapsed level-1 likert-set" ng-if="qset.LikertType" myclick="likertResponse(qset,groupSetKey,subgroupSetKey)">
+																			{{qset.setname}}
+																		</span>
+																	</h4>
+																</div>
+																<div class="panel-collapse collapse" id="qSubSetCollapse{{groupSetKey}}_{{subgroupSetKey}}_{{qset.key}}">
+																	<div class="panel-body">
+																		<div ng-repeat="qst in subGroupset.questions[qset.key]" class="question" ng-click="exportQuestionDatas(qst,groupSetKey,subgroupSetKey)">
+																			&nbsp;{{$index+1}}&nbsp;-&nbsp;{{qst.questionType}}-
+																			<span class='qst-title' ng-if='qst.title'>&emsp;{{qst.title}}:&emsp;</span>
+																			{{qst.question}}
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+
+
+
+												<!-- end 2nd subGroup -->
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="tab-pane fade" id="qaccordion{{groupSetKey}}">
+									<h4>
+										Question Sets
+										<button class="btn btn-primary right-button" myclick="editQuestionSets(groupSetKey)">Import Questionsets</button>
+									</h4>
+									<div class="panel-group" id="qSetAccordion{{groupSetKey}}">
+										<div class="panel panel-default" ng-repeat="qset in groupSet.QuestionSets">
+											<div class="panel-heading">
+												<h4 class="panel-title">
+													<a class="accordion-toggle collapsed level-1" data-toggle="collapse" data-parent="#qSetAccordion{{groupSetKey}}" href="#qSetCollapse{{groupSetKey}}_{{qset.key}}" ng-if="!qset.LikertType">
+														{{qset.setname}}
+													</a>
+													<span class="accordion-toggle collapsed level-1 likert-set" ng-if="qset.LikertType" myclick="likertResponse(qset,groupSetKey)">
+														{{qset.setname}}
+													</span>
+												</h4>
+											</div>
+											<div class="panel-collapse collapse" id="qSetCollapse{{groupSetKey}}_{{qset.key}}">
+												<div class="panel-body">
+													<div ng-repeat="qst in groupSet.questions[qset.key]" class="question" ng-click="exportQuestionDatas(qst,groupSetKey)">
+														&nbsp;{{$index+1}}&nbsp;-&nbsp;{{qst.questionType}}-
+														<span class='qst-title' ng-if='qst.title'>&emsp;{{qst.title}}:&emsp;</span>
+														{{qst.question}}
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--end  groupSet -->
+
+			</div>
+
+		</div>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="createGroupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<span class="modal-title" id="exampleModalLongTitle">Create Groupset</span>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+
+					<md-input-container class="md-block">
+						<label> Groupset Name</label>
+						<input required md-no-asterisk ng-model="groupset.name" name="Name">
+					</md-input-container>
+
+					<md-input-container class="md-block">
+						<label> Maximum no. of students per child group: e.g. 5</label>
+						<input required md-no-asterisk ng-model="groupset.max_member" name="max_member" step="1" type="number">
+					</md-input-container>
+
+
+					<md-input-container class="md-block">
+						<label> Types of group generation</label>
+					</md-input-container>
+					<md-input-container class="md-block ">
+						<md-radio-group ng-model="groupset.addRule.type" layout="row">
+							<md-radio-button ng-value="'manually'" class="md-primary mr-5">Manually</md-radio-button>
+							<md-radio-button ng-value="'randomly'" class="md-primary mr-5">Randomly</md-radio-button>
+							<md-radio-button ng-value="'criteria'" class="md-primary">By Criteria</md-radio-button>
+						</md-radio-group>
+					</md-input-container>
+
+					<md-input-container class="md-block mt-5" ng-show="groupset.addRule.type=='manually'">
+						<label> Number of child groups in groupset: e.g. 4</label>
+						<input required md-no-asterisk ng-model="groupset.count" name="count" type="number" step="1">
+					</md-input-container>
+
+					<md-input-container class="md-block" ng-show="groupset.addRule.type=='criteria'">
+						<div class="col-md-4 col-sm-4"><label> Criteria Type</label></div>
+						<div class="col-md-8 col-sm-8">
+							<select class="form-control" ng-model="groupset.criteria.type" ng-options="x for x in criteria_types"></select>
+						</div>
+					</md-input-container>
+
+					<md-input-container class="md-block" ng-show="groupset.addRule.type=='criteria'">
+						<div class="col-md-4 col-sm-4"><label> Criteria Option</label></div>
+						<div class="col-md-8 col-sm-8">
+							<select class="form-control" ng-model="groupset.criteria.option" ng-options="x for x in criteria_options"></select>
+						</div>
+					</md-input-container>
+
+					<md-input-container class="md-block">
+						<md-switch class="md-primary" ng-model="groupset.exclusive" name="exclusive">
+							Exclusive &emsp;&emsp;
+							<span ng-show="groupset.exclusive">Yes</span>
+							<span ng-hide="groupset.exclusive">No</span>
+						</md-switch>
+						<div ng-message class="description">
+							<div ng-show="groupset.exclusive">
+								Yes means a student can only join one child group,
+								<br> and Yes is used for tutorial groups and activity groups within the groupset.
+							</div>
+							<div ng-hide="groupset.exclusive">
+								No means they can join multiple child groups (any and all),
+								<br>and No is used when creating weekly groups that do the same questions (for example presentation pitches)
+							</div>
+						</div>
+
+					</md-input-container>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" myclick="createGroupSet()">Create</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="createGroupModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<span class="modal-title" id="exampleModalLongTitle">Create Sub Groupset</span>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+
+					<md-input-container class="md-block">
+						<label>Sub Groupset Name:</label>
+						<input required md-no-asterisk ng-model="subset.name" name="Name">
+					</md-input-container>
+
+					<md-input-container class="md-block">
+						<label> Maximum no. of students per child group: e.g. 5</label>
+						<input required md-no-asterisk ng-model="subset.max_member" name="max_member" step="1" type="number">
+					</md-input-container>
+
+
+					<md-input-container class="md-block">
+						<label> Types of group generation</label>
+					</md-input-container>
+					<md-input-container class="md-block ">
+						<md-radio-group ng-model="subset.addRule.type" layout="row">
+							<md-radio-button ng-value="'manually'" class="md-primary mr-5">Manually</md-radio-button>
+							<md-radio-button ng-value="'randomly'" class="md-primary mr-5">Randomly</md-radio-button>
+							<md-radio-button ng-value="'criteria'" class="md-primary">By Criteria</md-radio-button>
+						</md-radio-group>
+					</md-input-container>
+
+					<md-input-container class="md-block mt-5" ng-show="subset.addRule.type=='manually'">
+						<label> Number of child groups in subgroupset: e.g. 4</label>
+						<input required md-no-asterisk ng-model="subset.count" name="count" type="number" step="1">
+					</md-input-container>
+
+					<md-input-container class="md-block" ng-show="subset.addRule.type=='criteria'">
+						<div class="col-md-4 col-sm-4"><label> Criteria Type</label></div>
+						<div class="col-md-8 col-sm-8">
+							<select class="form-control" ng-model="subset.criteria.type" ng-options="x for x in criteria_types"></select>
+						</div>
+					</md-input-container>
+
+					<md-input-container class="md-block" ng-show="subset.addRule.type=='criteria'">
+						<div class="col-md-4 col-sm-4"><label> Criteria Option</label></div>
+						<div class="col-md-8 col-sm-8">
+							<select class="form-control" ng-model="subset.criteria.option" ng-options="x for x in criteria_options"></select>
+						</div>
+					</md-input-container>
+
+					<md-input-container class="md-block">
+						<md-switch class="md-primary" ng-model="subset.exclusive" name="exclusive">
+							Exclusive &emsp;&emsp;
+							<span ng-show="subset.exclusive">Yes</span>
+							<span ng-hide="subset.exclusive">No</span>
+						</md-switch>
+						<div ng-message class="description">
+							<div ng-show="subset.exclusive">
+								Yes means a student can only join one child group,
+								<br> and Yes is used for tutorial groups and activity groups within the Sub Groupset
+							</div>
+							<div ng-hide="subset.exclusive">
+								No means they can join multiple child groups (any and all),
+								<br>and No is used when creating weekly groups that do the same questions (for example presentation pitches)
+							</div>
+						</div>
+					</md-input-container>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" myclick="createGroupSet1()">Create</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.group-title {
+		display: inline-block;
+		font-weight: bold;
+		padding-left: 30px;
+		width: 200px;
+	}
+
+	.group-name {
+		display: inline-block;
+		width: calc(100% - 250px);
+		margin-left: 16px;
+	}
+
+	.group-name select.form-control {
+		font-size: 20px;
+		padding: 0px 8px;
+		margin-left: -13px;
+	}
+
+	.item-panel {
+		border: solid 1px #b6b6b6;
+	}
+
+	.header-row {
+		text-align: center;
+		background-color: #6e70e9;
+		padding-top: 5px;
+		padding-bottom: 5px;
+		color: white;
+		border-bottom: solid 3px #694be3;
+	}
+
+	.footer-row {
+		text-align: center;
+		background-color: #e1e1e4;
+		padding-top: 3px;
+		padding-bottom: 2px;
+		border-top: solid 2px #b3b3b3;
+		font-size: 15px;
+		/* display: none; */
+	}
+
+	.user-list {
+		height: 500px;
+		overflow-y: auto;
+		overflow-x: hidden;
+		font-size: 14px;
+		padding: 0px 3px;
+	}
+
+	.user-row {
+		word-break: break-all;
+		background-color: #e9e9e9;
+		margin: 5px 0px;
+		padding: 5px 3px 2px 8px;
+		border: solid 1px #b7b7b7;
+		box-shadow: 1px 1px #8c8c8c;
+		border-radius: 3px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.user-row:hover {
+		border: solid 1px #0632b080;
+		font-weight: bold;
+		box-shadow: 1px 1px #8dedf5;
+	}
+
+	.user-row-left {
+		width: calc(100% - 24px);
+		display: inline-block;
+	}
+
+	.user-row-right {
+		/* position: absolute;
+			top: 50%;
+			height: 10em;
+			margin-top: -5em */
+	}
+
+	.user-row.available-user,
+	.user-row.temp-user {
+		cursor: pointer;
+	}
+
+	.search-list {}
+
+	.unjoined {
+		background-color: #0000001a;
+	}
+
+	.temp-joined {
+		background-color: #0000ff1a;
+	}
+
+	.joined {
+		background-color: #ff00001a;
+	}
+
+	.exist {
+		background-color: green;
+		color: white;
+	}
+
+	.not-exist {
+		background-color: #ff0000b3;
+		color: white;
+	}
+
+
+	.modal-dialog.add-user {
+		width: 1000px;
+	}
+
+	.add-user .modal-content {
+		width: 1000px;
+	}
+
+
+
+
+	.content-header {
+		font-size: 20px;
+		background-color: #3c68b4;
+		color: white;
+	}
+
+	.content-div {
+		height: calc(100vh - 220px);
+	}
+
+	h4 {
+		margin-bottom: 20px;
+		margin-top: 15px;
+	}
+
+	.right-button {
+		float: right;
+		margin-right: 20px;
+	}
+
+	/* .sub-title {
+		color: #0058ae;
+		font-size: 1.2em;
+	}
+
+	.groupset-detail {
+		font-size: 20px;
+	} */
+
+	.property-div {
+		font-size: 1.3em;
+	}
+
+	.property-div>.row {
+		margin-top: 20px;
+		padding: 0px 10%;
+	}
+
+	.sub-title {
+		color: #515153;
+		text-align: left;
+		font-size: 17px;
+		font-weight: bold;
+		margin: 8px 10px;
+	}
+
+	.glyphicon-ok {
+		color: seagreen;
+	}
+
+	.glyphicon-lock {
+		color: slategray;
+	}
+
+	.glyphicon-heart-empty {
+		color: #0625ce;
+	}
+
+	.glyphicon-ok,
+	.glyphicon-lock,
+	.glyphicon-heart-empty {
+		margin: 0px 5px;
+	}
+
+	/* accordion */
+
+	.panel-body {
+		padding: 3px 0px 3px 20px;
+	}
+
+	.panel-group {
+		margin-bottom: 0px;
+	}
+
+	.panel-heading .accordion-toggle {
+		margin-left: 20px;
+		font-weight: bold;
+		color: #2d46b4;
+	}
+
+	.panel-heading .accordion-toggle:after {
+		content: "\2212";
+		font-weight: bold;
+		float: left;
+		color: grey;
+	}
+
+	.panel-heading .accordion-toggle.collapsed::after {
+		content: "\002b";
+	}
+
+	.panel-title>a.join-btn {
+		cursor: pointer;
+		color: #0625ce;
+		font-weight: bold;
+	}
+
+	.question {
+		background-color: #F5F5F5;
+		border: solid 1px #d4cece;
+		margin: 7px 10px;
+		padding: 5px 10px 5px 25px;
+		border-radius: 3px;
+		color: #0c7cc3;
+		font-weight: bold;
+		font-size: 1.2em;
+		cursor: pointer;
+	}
+
+	.question:hover {
+		background-color: antiquewhite;
+	}
+
+	.nav-tabs>li.active>a,
+	.nav-tabs>li.active>a:focus,
+	.nav-tabs>li.active>a:hover {
+		font-weight: bold;
+		color: #333;
+	}
+
+	.right-arrow {
+		color: #000090;
+		font-weight: bold;
+		opacity: 1;
+		cursor: pointer;
+	}
+
+	.right-arrow.pull-left {
+		transform: rotate(180deg);
+	}
+
+	.white-button {
+		color: white;
+		font-weight: bold;
+		opacity: 1;
+		cursor: pointer;
+	}
+
+	.white-button.pull-left {
+		transform: rotate(180deg);
+	}
+
+	
+
+	.qst-title {
+		color: blue;
+	}
+
+
+
+	.groups-row {
+		max-height: 300px;
+		overflow-y: auto;
+		/* border: solid 1px #cbcbcb; */
+		padding: 16px;
+	}
+
+
+
+	span.likert-set {
+		cursor: pointer;
+	}
+
+	.btn-add-member {
+		margin-right: 20px;
+		cursor: pointer;
+	}
+</style>

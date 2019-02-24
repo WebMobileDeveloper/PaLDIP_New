@@ -1,0 +1,115 @@
+<div ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="row content-header">
+		<div class="container">
+			<div class="col-md-12 title texteffect ">{{$root.settings.groupName}}&nbsp;/&nbsp;{{subGroupName}}
+			</div>
+		</div>
+
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="content-div">
+				<div class="col-md-12 groupdetails" ng-repeat="set in  QuestionSets track by $index" ng-class="getQstClass(set)"
+					ng-click="questions(set)">
+					<div class="setname">{{set.setname}}</div>
+					<div class="pull-left left-button-div">
+						<span class="btn eye ml-1" myclick="changeHideState(set, $index)">
+							<i class="glyphicon glyphicon-eye-open" ng-hide="set.hidden">
+								<md-tooltip class="custom-tooltip" md-direction="top">Show in student side</md-tooltip>
+							</i>
+							<i class="glyphicon glyphicon-eye-close" ng-show="set.hidden">
+								<md-tooltip class="custom-tooltip" md-direction="top">Hide in student side</md-tooltip>
+							</i>
+						</span>
+					</div>
+					<div class="pull-right right-button-div">
+						<div ng-if="set.LikertType" style="display:inline-block;">
+							<button class="btn btn-primary" ng-if="!links[set.key]" myclick="addLink(set)">
+								<i class="glyphicon glyphicon-link"></i>
+								<md-tooltip class="custom-tooltip" md-direction="top">Add link</md-tooltip>
+							</button>
+							<div ng-if="links[set.key]">
+								<button class="btn btn-danger" myclick="deletelink(set.key)">
+									<i class="glyphicon glyphicon-trash"></i>
+									<md-tooltip class="custom-tooltip" md-direction="top">Remove link</md-tooltip>
+								</button>
+								<button class="btn btn-info" myclick="copyToClipboard(set.key)">
+									<i class="glyphicon glyphicon-copy"></i>
+									<md-tooltip class="custom-tooltip" md-direction="top">Copy link</md-tooltip>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	.content-header {
+		background-color: #34ba44;
+	}
+
+	.right-button-div {
+		width: 190px;
+		text-align: right;
+		padding-right: 10px;
+	}
+
+	.title {
+		color: yellow;
+	}
+
+	.groupdetails .setname {
+		display: inline;
+	}
+
+	.groupdetails.active {
+		background-color: #f8b7b7;
+		border: solid 1px #f9ff00;
+	}
+
+	.groupdetails.section .setname {
+		display: block;
+		width: 80%;
+		margin: 0px auto;
+		background-color: #04a243;
+		border-radius: 10px;
+	}
+
+	.section-detail {
+		position: absolute;
+		display: none;
+	}
+
+	.groupdetails.section:hover .section-detail {
+		display: block;
+		z-index: 1000;
+		background-color: #1476b4;
+		margin-top: 3px;
+		width: 80%;
+		margin: 3px 10%;
+		border: solid 2px #999;
+		border-top: none;
+		color: white;
+	}
+
+	.groupdetails.section:hover .section-detail:hover {
+		display: none;
+	}
+
+	.glyphicon-eye-open {
+		color: #09159b;
+	}
+
+	.glyphicon-eye-close {
+		color: #7e7e7e;
+	}
+
+	@media (max-width: 650px) {
+		.container {
+			padding-left: 0px;
+			padding-right: 0px;
+		}
+	}
+</style>

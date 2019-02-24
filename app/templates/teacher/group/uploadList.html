@@ -1,0 +1,137 @@
+<div class="container" ng-init="init()" ng-cloak style="margin-top:20px;" ng-show="$root.settings.loadingfinished">
+
+	<h3 class="center">Upload Student List</h3>
+	<div class="row center">
+		<div class="col-md-12">
+			<div class="form-group mb-0">
+				<div class="input-group">
+					<span class="input-group-btn">
+						<span class="btn btn-default btn-file">
+							Upload File
+							<input type="file" accept=".xls,.xlsx" onchange="angular.element(this).scope().file_changed(this)" ng-model="files"
+							 multiple="false">
+						</span>
+					</span>
+					<input type="text" ng-value="filename" class="form-control" readonly>
+				</div>
+				<progress value="0" max="100" id="uploader" style="width:100%; margin:5px 0px 10px; height: 4px;">0%</progress>
+			</div>
+		</div>
+
+		<div class="col-md-12 button-row">
+			<button class="btn btn-success" myclick="applyUpload()">
+				Apply to Platform
+			</button>
+			<a class="btn btn-link" href="{{$root.templateUploadListLink}}" download>
+				* Template XLXS File Download
+			</a>
+			<a class="btn btn-link" href="{{$root.sampleUploadListLink}}" download>
+				* Example XLXS File Download
+			</a>
+			<button class="btn btn-link" myclick="$root.exportToExcel('#table-1')">
+				<span class="glyphicon glyphicon-share"></span> Export Result to Excel
+			</button>
+		</div>
+	</div>
+	<div class="row">
+
+		<div ng-show="default_group">
+			<div class="col-md-12">
+				<h3 class="center">Default Setting</h3>
+			</div>
+			<div class="col-md-12 center">
+				<b>Default Group:</b>
+				<span>{{default_group.Group}}</span>
+			</div>
+			<div class="col-md-12 center">
+				<b>Default Tutorial Set:</b>
+				<span>{{default_group['Tutorial Set']}}</span>
+			</div>
+			<div class="col-md-12 center">
+				<b>Default Team Set:</b>
+				<span>{{default_group['Team Set']}}</span>
+			</div>
+		</div>
+
+		<div class="col-md-12">
+			<table class="table table-bordered datatable" style="margin-top:10px;">
+				<thead>
+					<tr>
+						<th ng-repeat="field in fields track by $index">{{field}}</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-if="false" ng-repeat-start="user in list track by $index"></tr>
+					<tr ng-class="user.Result" ng-init="row_index = $index">
+						<td ng-repeat="field in fields track by $index" rowspan="{{getRowSpan($index)}}" ng-class="getClass(field,user)">
+							{{user[field]}}
+						</td>
+					</tr>
+					<tr ng-class="user.Result" class="result-row" ng-if="resultList">
+						<td ng-repeat="field in fields track by $index" ng-class="resultList[row_index][field].class" ng-if="$index && $index!=(fields.length-1)">
+							{{resultList[row_index][field].result}}
+						</td>
+					</tr>
+					<tr ng-if="false" ng-repeat-end></tr>
+				</tbody>
+			</table>
+			<table class="table table-bordered datatable" id="table-1" style="display: none;">
+				<thead>
+					<tr>
+						<th ng-if="false" ng-repeat-start="field in fields track by $index">{{field}}</th>
+						<th>{{field}}</th>
+						<th ng-if="resultFields.indexOf(field)>-1">result({{field}})</th>
+						<th ng-if="false" ng-repeat-end>{{field}}</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-if="false" ng-repeat-start="user in list track by $index"></tr>
+					<tr ng-class="user.Result" ng-init="row_index = $index">
+						<td ng-if="false" ng-repeat-start="field in fields track by $index"></td>
+						<td>{{user[field]}}</td>
+						<td ng-if="resultFields.indexOf(field)>-1">{{resultList[row_index][field].result}}</td>
+						<td ng-if="false" ng-repeat-end></td>
+					</tr>
+					<tr ng-if="false" ng-repeat-end></tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<style>
+	.btn-file input[type="file"] {
+		position: absolute;
+		top: 0;
+		right: 0;
+		min-width: 100%;
+		min-height: 100%;
+		font-size: 100px;
+		text-align: right;
+		filter: alpha(opacity=0);
+		opacity: 0;
+		outline: none;
+		background: white;
+		cursor: inherit;
+		display: block;
+	}
+
+	tbody tr.result-row {
+		border-bottom: solid 2px #05b3564d;
+	}
+
+	tbody tr.Failed {
+		background-color: #d708081a;
+	}
+
+	td.Success {
+		color: green;
+	}
+
+	td.Failed {
+		color: red;
+	}
+
+	td.New {
+		color: blue;
+	}
+</style>

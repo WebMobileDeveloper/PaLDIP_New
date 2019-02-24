@@ -1,0 +1,123 @@
+<div ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="row content-header">
+		<div class="container">
+			<div class="col-md-12 title texteffect ">{{$root.settings.groupName}}&nbsp;/&nbsp;{{subGroupName}}
+			</div>
+		</div>
+
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="content-div">
+				<div class="col-md-12 groupdetails" ng-repeat="obj in  QuestionSets track by $index" ng-class="getQstClass(obj)" ng-click="questions(obj)">
+					<div class="setname">{{obj.setname}}</div>
+					<div class="center section-detail" ng-if="obj.isSection && obj.details">
+						{{obj.details}}
+					</div>
+					<div class="pull-right center" style="width:40px;	height: 100%;" ng-if="!obj.isSection">
+						<span ng-if="obj.completed" class="glyphicon glyphicon-ok completed" title="Completed Questionset"></span>
+						<div ng-if="obj.completed==undefined" class="waiting" title="waiting"></div>
+						<span ng-if="obj.completed==false" title="waiting">&nbsp;</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	.content-header {
+		background-color: #34ba44;
+	}
+
+	.title {
+		color: yellow;
+	}
+
+	.groupdetails .setname {
+		display: inline;
+	}
+
+	.groupdetails.active {
+		background-color: #f8b7b7;
+		border: solid 1px #f9ff00;
+	}
+
+	.groupdetails.section .setname {
+		display: block;
+		width: 80%;
+		margin: 0px auto;
+		background-color: #04a243;
+		border-radius: 10px;
+	}
+
+	.section-detail {
+		position: absolute;
+		display: none;
+	}
+
+	.groupdetails.section:hover .section-detail {
+		display: block;
+		z-index: 1000;
+		background-color: #1476b4;
+		margin-top: 3px;
+		width: 80%;
+		margin: 3px 10%;
+		border: solid 2px #999;
+		border-top: none;
+		color: white;
+	}
+
+	.groupdetails.section:hover .section-detail:hover {
+		display: none;
+	}
+
+	div.groupsets {
+		border: solid 1px #355086;
+		height: 50vh;
+		background-color: #e0edf9;
+		margin-top: 20px;
+		padding: 20px 10%;
+		overflow-y: auto;
+	}
+
+	div.box-title {
+		font-size: 2em;
+		text-align: center;
+		margin: 10px 0px;
+		color: #0716ba;
+	}
+
+	div.groupset {
+		background: #0576d5;
+		color: white;
+		margin: 10px auto;
+		font-size: 1.8em;
+		text-align: center;
+		line-height: 1.8em;
+		border-radius: 15px;
+		border: solid 1px #092084;
+	}
+
+	div.groupset span {
+		font-size: 0.8em;
+		cursor: pointer;
+		color: yellow;
+	}
+
+	@media (max-width: 650px) {
+		div.groupsets {
+			padding: 20px 10px;
+		}
+
+		div.groupset {
+			font-size: 1.3em;
+			line-height: 1.8em;
+			border-radius: 15px;
+		}
+
+		.container {
+			padding-left: 0px;
+			padding-right: 0px;
+		}
+	}
+</style>

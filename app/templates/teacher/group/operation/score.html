@@ -1,0 +1,111 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+
+	<div class="title-div">
+		<div class="content">
+			{{$root.settings.groupName}} / {{$root.settings.questionSetName}}
+			<div class="question-div">
+				<span ng-show="question.title" class="qst-title">{{question.title}}</span>
+				{{question.question}}
+			</div>
+		</div>
+
+		<div class="option-div">
+			<md-switch class="md-primary" ng-model="showScore" md-no-ink aria-label="Show Score" ng-change="changeShowScore(showScore)">
+				{{showScore?'Show Score':'Hide Score'}}
+			</md-switch>
+			<md-switch class="md-primary" ng-model="showFeedback" md-no-ink aria-label="Show Feedback" ng-change="changeShowFeedback(showFeedback)">
+				{{showFeedback?'Show Feedback':'Hide Feedback'}}
+			</md-switch>
+		</div>
+	</div>
+
+	<table class="table table-condensed table-hover table-striped table-bordered center">
+		<thead class="black white-text">
+			<tr>
+				<th scope="col" width="40px">#</th>
+				<th scope="col">Answer</th>
+				<th scope="col" width="100px">Score</th>
+				<th scope="col" width="300px">Feedback</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="(key,answer) in answers track by $index">
+				<th scope="row" width="40px">{{$index+1}}</th>
+				<td>{{answer.answer}}</td>
+				<td width="100px" class="score-td"><input type="text" class="form-control score-input" ng-model="answer.score" ng-change="scoreChanged(key)" /></td>
+				<td width="300px"><textarea class="form-control" ng-model="answer.feedback" ng-change="feedbackChanged(key)" style="height:40px;"></textarea></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<style>
+	.table-bordered>tbody>tr>td,
+	.table-bordered>tbody>tr>th,
+	.table-bordered>tfoot>tr>td,
+	.table-bordered>tfoot>tr>th,
+	.table-bordered>thead>tr>td,
+	.table-bordered>thead>tr>th {
+		border: 2px solid white;
+	}
+
+	thead {
+		background-color: #4371C4;
+		color: white;
+	}
+
+	td {
+		padding: 0px !important;
+	}
+
+	th {
+		padding: 10px 0px !important;
+		text-align: center;
+	}
+
+	.table-striped>tbody>tr:nth-of-type(2n+1) {
+		background-color: #CFD5E9;
+	}
+
+	.table-striped>tbody>tr:nth-of-type(2n) {
+		background-color: #E9EBF5;
+	}
+
+	.title-div {
+		color: #0505aa;
+		margin-bottom: 20px;
+	}
+
+	.content {
+		width: calc(100% - 200px);
+		display: inline-block;
+	}
+
+	.option-div {
+		width: 190px;
+		display: inline-block;
+		font-size: 16px;
+		color: #5f5d5d;
+		text-shadow: none;
+	}
+
+	.option-div md-switch {
+		margin: 0px;
+	}
+
+	.question-div {
+		color: #4d4d4d;
+		text-shadow: none;
+		font-size: 0.6em;
+	}
+
+	.score-input {
+		height: 40px;
+		text-align: center;
+	}
+
+	.score-td {
+		vertical-align: middle !important;
+		background-color: whitesmoke;
+	}
+</style>

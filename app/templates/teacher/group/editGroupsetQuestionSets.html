@@ -1,0 +1,210 @@
+<div ng-init="init()">
+	<div class="row content-header title texteffect">{{TitleString}}</div>
+	<div class="main row">
+		<div class="col-md-6">
+			<div class="row button-bar">
+				<button class="btn save-btn" myclick="saveGroupSet()">Save</button>
+				<button class="btn cancel-btn" myclick="init()">Cancel</button>
+			</div>
+			<hr />
+			<div class="col-md-12 center div-title">
+				Question Sets In Group
+			</div>
+			<div class="col-md-12 set-box left-box" dragula='"drag-div"' dragula-model="dragArray">
+				<!-- <div class="setlists" ng-repeat="set in dragArray | orderObjectBy:'order':false" style="background-color:#167aff" myclick="removefromgroup(set)">{{set.setname}}-{{set.order}}</div> -->
+				<div class="setlists noselect" ng-repeat="set in dragArray" style="background-color:#167aff"
+					ng-click="showQuestionsInSet(set)">
+					<button type="button" class="close red-button" myclick="removefromgroup($event,set)">
+						<span aria-hidden="true">&times;</span>
+						<md-tooltip class="custom-tooltip" md-direction="top">Remove from group</md-tooltip>
+					</button>
+					<span class="setname-span">{{set.setname}}</span>
+					<span class="btn eye" myclick="hideSet(set)">
+						<i class="glyphicon glyphicon-eye-open" ng-hide="set.hidden">
+							<md-tooltip class="custom-tooltip" md-direction="top">Show in student side</md-tooltip>
+						</i>
+						<i class="glyphicon glyphicon-eye-close" ng-show="set.hidden">
+							<md-tooltip class="custom-tooltip" md-direction="top">Hide in student side</md-tooltip>
+						</i>
+					</span>
+				</div>
+			</div>
+			<div class="col-md-12" ng-init="$root.loadTags()">
+				<div class="search-box">
+					<h4 class="center">Search Box</h4>
+					<md-input-container flex>
+						<md-chips ng-model="$root.selectedTags" md-autocomplete-snap=""
+							md-transform-chip="$root.transformChip($chip)" md-require-match="false" md-on-add="chipChanged()"
+							md-on-remove="chipChanged()">
+							<md-autocomplete md-search-text="searchText" md-items="item in $root.querySearch(searchText)"
+								md-item-text="item.name" placeholder="Search by tags or name...">
+								<span md-highlight-text="searchText">{{item.name}}</span>
+							</md-autocomplete>
+							<md-chip-template>
+								<span>
+									<strong>{{$chip.name}}</strong>
+								</span>
+							</md-chip-template>
+						</md-chips>
+					</md-input-container>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="row button-bar">
+				<div>
+					<button class="btn" ng-class="showInactive('Used')" myclick="changeShow('Used')">Question Sets Used</button>
+					<button class="btn" ng-class="showInactive('ByMe')" myclick="changeShow('ByMe')">My Question Sets</button>
+					<button class="btn" ng-class="showInactive('ByOther')" myclick="changeShow('ByOther')">Question Set
+						Pool</button>
+				</div>
+			</div>
+			<hr />
+
+			<div class="col-md-12 center div-title">
+				Question Sets Out of Group
+			</div>
+			<div class="col-md-12">
+				<div class="set-box">
+					<div class="setlists noselect"
+						ng-repeat="set in questionSetLists | orderObjectBy :'setname':false track by $index"
+						ng-click="showQuestionsInSet(set)" ng-show="getShowState(set.key)">
+						<button type="button" class="close red-button import" myclick="addtogroup(set)">
+							<span aria-hidden="true">&laquo;</span>
+							<md-tooltip class="custom-tooltip" md-direction="top">Import to group</md-tooltip>
+						</button>
+						{{set.setname}}
+						<span ng-show="set.shared" class="shared pull-right">(Shared)
+							<md-tooltip class="custom-tooltip height-50" md-direction="top">
+								Shared QuestionSet
+							</md-tooltip>
+						</span></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+<style>
+	.content-header {
+		background-color: #029556;
+	}
+
+	.div-title {
+		font-size: 20px;
+		font-weight: 600;
+	}
+
+	hr {
+		margin: 10px 0px;
+		border-color: #abaea9;
+	}
+
+	.button-bar {
+		margin: 5px;
+		text-align: center;
+	}
+
+	.button-bar button {
+		color: white;
+		font-weight: 600;
+		font-size: 1.2em;
+		min-width: 130px;
+		border-radius: 1em;
+		margin: 10px 10px;
+		background-color: #167aff;
+	}
+
+	.button-bar button.save-btn {
+		box-shadow: 1px 1px gray;
+		background-color: rgb(255, 44, 0);
+		margin-left: 5%;
+	}
+
+	.button-bar button.cancel-btn {
+		box-shadow: 1px 1px gray;
+		background-color: forestgreen;
+	}
+
+	.button-bar button.inactive {
+		background-color: #8d94c5cc;
+	}
+
+	.set-box {
+		text-align: center;
+		max-height: calc(100vh - 350px);
+		overflow-x: hidden;
+		padding: 0px 10px;
+	}
+
+	.setlists {
+		background-color: #07697c;
+		border-radius: 5px;
+		color: white;
+		margin: 5px auto;
+		width: 80%;
+		cursor: pointer;
+		font-weight: bold;
+		font-size: 20px;
+		box-shadow: 1px 2px gray;
+		font-weight: bold;
+	}
+
+
+	.setlists:hover {
+		background-color: #bcb7b3;
+		color: black;
+	}
+
+	span.setname-span {
+		width: calc(100% - 80px);
+		display: inline-block;
+	}
+
+	span.eye {
+		float: right;
+		height: 30px;
+		background-color: transparent;
+	}
+
+	.glyphicon-eye-open {
+		color: white;
+	}
+
+	.glyphicon-eye-close {
+		color: black;
+	}
+
+	.set-box.left-box {
+		height: calc(60vh - 150px);
+		/* background-color: blue; */
+	}
+
+	.search-box {
+		width: 90%;
+		height: 280px;
+		margin: 10px auto;
+		border: dotted 2px #e1e1e1;
+	}
+
+	.search-box md-input-container {
+		margin: 10px 20px;
+		width: calc(100% - 40px);
+	}
+
+	.md-chips .md-chip-input-container {
+		width: 100%;
+	}
+
+	.shared {
+		margin-top: 4px;
+		margin-right: 10px;
+		font-size: 15px;
+		color: #f5f500;
+	}
+
+	button.close {
+		float: left;
+		padding: 4px;
+	}
+</style>

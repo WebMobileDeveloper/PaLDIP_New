@@ -1,0 +1,17 @@
+
+	<div class="main-div" ng-init="getGroups()" ng-show="$root.settings.loadingfinished">
+
+		<div class="row qst">
+			<md-input-container flex>
+				<label>Type GroupCode (e.g. XXX?)</label>
+				<input ng-model="groupcode" style="border-radius:5px;" />
+			</md-input-container>
+		</div>
+
+		<hr />
+		<div class="row" style="text-align:center;">
+			<button class="btn btn-primary" style="margin-right:15%" myclick="JoinGroup()">Join Group</button>
+			<a class="btn btn-link" myclick="$root.back()">Back</a>
+		</div>
+
+	</div>

@@ -1,0 +1,96 @@
+<div ng-init="initExportAll()" style="margin-top:20px;">
+	<div ng-show="$root.settings.loadingfinished && noAnswerMessage" class="no-data">
+		{{noAnswerMessage}}
+	</div>
+	<div ng-show="$root.settings.loadingfinished && !noAnswerMessage">
+		<button class="btn btn-link" myclick="$root.exportToExcel('#table-1')">
+			<span class="glyphicon glyphicon-share"></span> Export to Excel
+		</button>
+		<button class="btn btn-primary pull-right" ng-if="!anonymous" myclick="change_show_user()" ng-disabled="!anonym_enabled">
+			<span ng-show="show_email">Anonymous</span>
+			<span ng-hide="show_email">Non-Anonymous</span>
+		</button>
+		<table class="table table-bordered datatable" id="table-1" style="margin-top:10px;">
+			<thead>
+				<tr>
+					<th colspan="12">
+						<b style="font-size:1.5em;">{{groupName}}</b>
+						<br/>
+					</th>
+				</tr>
+				<tr>
+					<th rowspan="2">Questions</th>
+					<th rowspan="2">Teams / Items</th>
+					<th rowspan="2">User</th>
+					<th rowspan="2">Gender</th>
+					<th rowspan="2">Age</th>
+					<th rowspan="2">Profession</th>
+					<th rowspan="2">Mother tongue</th>
+					<th rowspan="2">Date/Time</th>
+					<th colspan="3">Option Data</th>
+					<th rowspan="2">Feedback</th>
+					<th rowspan="2"> Team /Item  Average</th>
+				</tr>
+				<tr>
+					<th>Options</th>
+					<th>Score</th>
+					<th>Average</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-if="false" ng-repeat-start="question in answers"></tr>
+				<tr ng-if="false" ng-repeat-start="answer in question.answers track by $index"></tr>
+				<tr ng-if="false" ng-repeat-start="user in answer.userDatas track by $index"></tr>
+
+				<tr ng-repeat="score in user.scores track by $index" ng-init="optionIndex=$index">
+					<td ng-if="($parent.$parent.$index+$parent.$index+optionIndex)==0" rowspan="{{question.items.length*question.userCount*question.options.length}}">{{question.question}}</td>
+					<td ng-if="($parent.$index+optionIndex)==0" rowspan="{{question.userCount*question.options.length}}">{{answer.item}}</td>
+					<td ng-if="optionIndex==0" rowspan="{{question.options.length}}">
+						<span ng-if="!show_email">{{user.show_id}}</span>
+						<span ng-if="show_email">{{user.mail}}</span>
+					</td>
+					<td ng-if="optionIndex==0" rowspan="{{question.options.length}}">{{user.Gender}}</td>
+					<td ng-if="optionIndex==0" rowspan="{{question.options.length}}">{{user.Age}}</td>
+					<td ng-if="optionIndex==0" rowspan="{{question.options.length}}">{{user.Profession}}</td>
+					<td ng-if="optionIndex==0" rowspan="{{question.options.length}}">{{user.Mothertongue}}</td>
+					<td ng-if="optionIndex==0" rowspan="{{question.options.length}}">{{user.datetime}}</td>
+
+					<td>{{question.options[$index]}}</td>
+					<td>{{score}}</td>
+
+					<td ng-if="optionIndex==0" rowspan="{{question.options.length}}">{{user.avScore}}</td>
+					<td ng-if="optionIndex==0" rowspan="{{question.options.length}}">{{user.feedText}}</td>
+					<td ng-if="($parent.$index+optionIndex)==0" rowspan="{{question.userCount*question.options.length}}">{{answer.avScore}}</td>
+				</tr>
+				<tr ng-if="false" ng-repeat-end></tr>
+				<tr ng-if="false" ng-repeat-end></tr>
+				<tr ng-if="false" ng-repeat-end></tr>
+			</tbody>
+		</table>
+	</div>
+	<style>
+		.main-div {
+			width: 100%;
+			padding: 2%;
+		}
+
+		.no-data {
+			margin: 100px auto;
+			width: 500px;
+			text-align: center;
+			font-size: 3em;
+			color: #fd6167;
+			font-style: italic;
+			font-weight: bold;
+		}
+
+		td>p {
+			margin: 0px;
+		}
+
+		.table>thead>tr>th,
+		.table>tbody>tr>td {
+			text-align: center;
+			vertical-align: middle;
+		}
+	</style>

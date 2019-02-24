@@ -1,0 +1,153 @@
+<div class="container" ng-init="init()">
+	<div class="answer-form" ng-if="$root.settings.loadingfinished">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 title">{{$root.settings.questionString}}</div>
+		</div>
+		<hr />
+		<div class="row">
+			<div class="col-md-12">
+				<div class="well">
+					<label
+						style="margin-left: 20px; color: #a2a2a2;">{{top_answers?'Top ' + top_answers + ' Answers':'All Answers'}}
+					</label>
+					<md-radio-group ng-model="orderBy" ng-change="orderChanged(orderBy)" class="order-radio">
+						<md-radio-button value="rating" class="md-primary">Rating</md-radio-button>
+						<md-radio-button value="awardScore" class="md-primary">Award Score</md-radio-button>
+					</md-radio-group>
+					<label class="order-radio-label">Order By</label>
+					<div class="mid-cell">
+						<div class="answer-div">
+							<div class="answer-list" ng-repeat="item in answers track by $index"
+								ng-class="($index == answerIndex)?'selected':'';" ng-click="changeIndex($index)">
+								{{$index+1}}.&emsp;{{item.answer}}
+								<span class="pull-right">{{orderBy=='rating'?item.totalScore:item.totalAwardScore}}&emsp;</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row starfield-container" ng-show="type">
+			<hr />
+			<label style="color: #a2a2a2;">Total Scores(&nbsp;{{answers[answerIndex].userCount}}&nbsp;Feedbacks)</label>
+			<div class="col-md-12 starfield">
+				<div class="row option-row" ng-repeat="option in feedqts track by $index">
+					<div class="col-xs-9  option">
+						{{option}}
+					</div>
+					<div class="col-xs-3  value center">
+						<span>{{answers[answerIndex].resultScore[$index]}}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- <hr ng-if="type % 2 == 0" />​ -->
+		<div class="row feedText" ng-show="type % 2 == 0">
+			<div class="col-md-12">
+				<div class="well ">
+					<label style="margin-left: 20px; color: #a2a2a2;">Feedbacks</label>
+					<div class="mid-cell">
+						<div class="answer-div">
+							<div ng-repeat="feed in answers[answerIndex].feedbacktext track by $index">
+								{{$index+1}}.&emsp;{{feed}}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- <hr /> -->
+		<div class="row center navigation-row">
+			<div class="col-md-6 col-sm-6 col-xs-6">
+				<button class="btn btn-default" myclick="decreaseindex()">&#9664;</button>
+			</div>
+			<div class="col-md-6 col-sm-6 col-xs-6">
+				<button class="btn btn-default" myclick="increaseindex()">&#9654;</button>
+			</div>
+		</div>
+		<div class="row"
+			ng-init="$root.getInstFeedback($root.settings.groupKey, $root.settings.questionSetKey, $root.settings.questionKey)"
+			ng-show="$root.settings.instructor_feedback">
+			<md-input-container>
+				<h4>Instructor Feedback</h4>
+				<textarea ng-disabled='true' class="Instructor_view_area">{{$root.settings.instructor_feedback}}</textarea>
+			</md-input-container>
+		</div>
+		<div class="row">
+			<!-- Result String -->
+			<md-input-container flex ng-show="question.result_string">
+				<textarea ng-disabled="true" ng-model="question.result_string" style="min-height: 100px;	max-height: 200px; overflow-y: auto; color: black;	
+				height: 0px;	border: solid 1px #b8f2f9;	background-color: aliceblue; border-radius: 7px; padding: 10px;"></textarea>
+			</md-input-container>
+			<!-- upload result image -->
+			<md-input-container flex class="center img-row" ng-init="$root.load_result_image()" ng-show="$root.result_imgSrc">
+				<img ng-src="{{$root.result_imgSrc}}">
+			</md-input-container>
+			<!-- result video url -->
+			<md-input-container flex ng-show="question.result_videoURL" class="center">
+				<div id="playerWrapOuter">
+					<div id="playerWrap">
+						<iframe id="video-iframe" width="420" height="315" src="{{question.result_videoURL}}"
+							frameborder="0"></iframe>
+					</div>
+				</div>
+			</md-input-container>
+		</div>
+		<div class="row button-row">
+			<a class="btn btn-link" myclick="$root.back()">Back</a>
+			<a class="btn btn-link" myclick="$root.go('subQuestions')">Select Question</a>
+			<a class="btn btn-link" myclick="$root.goSubmitNextGroupAnswer()" ng-if="!$root.checkLast()">Next Question</a>
+			<a class="btn btn-link" myclick="$root.go('studentSubGroupDetail')"
+				ng-if="$root.checkLast() && $root.settings.groupType=='sub'">Question
+				Sets</a>
+			<a class="btn btn-link" myclick="$root.go('studentSecondGroupDetail')"
+				ng-if="$root.checkLast() && $root.settings.groupType=='second'">Question
+				Sets</a>
+		</div>
+
+	</div>
+</div>
+<style>
+	.answer-form {
+		margin: 20px auto;
+	}
+
+	.title {
+		margin-top: 20px;
+		color: green;
+		padding: 0px 20px;
+	}
+
+	.well {
+		padding: 20px 0px;
+		margin-left: 20px;
+		margin-right: 20px;
+	}
+
+	.mid-cell {
+		width: 95%;
+		margin: auto;
+	}
+
+	.answer-div {
+		padding: 10px;
+		display: block;
+		max-height: 300px;
+		overflow-y: auto;
+	}
+
+	.checked {
+		color: orange;
+	}
+
+	.navigation-row button {
+		width: 80%;
+		max-width: 100px;
+		color: green;
+		margin-bottom: 20px;
+	}	
+
+</style>

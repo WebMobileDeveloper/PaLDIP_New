@@ -1,0 +1,49 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="row center">
+		<div class="col-md-12">
+			<h2>{{$root.settings.questionSet.setname}}</h2>
+		</div>
+		<div class="col-md-12">
+			<h4>{{question.question}}</h4>
+		</div>
+	</div>
+	<div class="row center">
+		<div class="col-md-12 center">
+			<div class="chart-container" ng-if="graphData">
+				<canvas id="mychart" basechart="" width="1000px" height="500px" style="display: block; width: 1000px; height: 500px;" ng-init="paintgraph()"></canvas>
+			</div>
+			<hr style="width:80%;" />
+		</div>
+	</div>
+	
+	<div class="row">
+		<md-input-container flex style="text-align:center;">
+			<a class="btn btn-link" myclick="$root.back()" style="width:150px;font-size: 20px">Back</a>
+			<a class="btn btn-link" myclick="$root.go('studentGroupDetail')">Question Sets</a>
+		</md-input-container>
+	</div>
+</div>
+<style>
+	.chart-container {
+		max-width: 1000px;
+		margin: 20px auto;
+	}
+
+	.feedback-title {
+		font-size: 20px;
+		font-weight: bold;
+		text-align: center;
+		color: #4a4ab6;
+	}
+
+	.sibling-setname-div {
+		display: inline-block;
+		text-align: left;
+	}
+
+	.sibling-setname {
+		display: block;
+		color: #0a0ab4;
+		font-weight: bold;
+	}
+</style>

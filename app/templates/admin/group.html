@@ -1,0 +1,36 @@
+<div class="container center" ng-init="getGroups()">
+	<div class="row content-header center">
+		<span class="title texteffect">
+			Groups&emsp;({{teacherEmail}})
+		</span>
+		<div class="pull-right">
+			<a class="btn btn-primary" myclick="$state.go('editOptions');">Edit Options</a>
+			<a class="btn btn-success" myclick="$state.go('adminExportAllGroups');">Export All</a>
+		</div>
+	</div>
+	<div class="row" ng-show="groups">
+		<div class="container content-div">
+			<div class="row groupdetails" ng-repeat="obj in groups track by $index" ng-class="setActive(obj)" ng-click="showQuestionSets(obj)">
+				<div class="col-md-12">
+					{{obj.groupName}}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.content-header {
+		background-color: palevioletred;
+		height: 50px;
+		line-height: 50px;
+	}
+
+	.groupdetails.active {
+		background-color: #77d1e0;
+	}
+
+	.btn {
+		margin-right: 50px;
+	}
+</style>

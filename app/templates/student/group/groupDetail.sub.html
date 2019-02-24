@@ -1,0 +1,167 @@
+<div ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="row content-header">
+		<div class="container">
+			<div class="col-md-12 title texteffect ">{{$root.settings.groupName}}&nbsp;/&nbsp;{{subGroupName}}
+			</div>
+		</div>
+
+	</div>
+	<div class="container">
+		<br>
+		<div class="row tab-row">
+			<div class="col-md-6 col-sm-6" ng-class="getClass('QuestionSet')" ng-click="setActive('QuestionSet')">Question Sets</div>
+			<div class="col-md-6 col-sm-6" ng-class="getClass('GroupSet')" ng-click="setActive('GroupSet')">Sub Groupsets</div>
+		</div>
+		<div class="row">
+			<div class="content-div" ng-show="selectedTab=='QuestionSet'">
+				<div class="col-md-12 groupdetails" ng-repeat="obj in  groupData.QuestionSets track by $index" ng-class="getQstClass(obj)" ng-click="questions(obj)">
+					<div class="setname">{{obj.setname}}</div>
+					<div class="center section-detail" ng-if="obj.isSection && obj.details">
+						{{obj.details}}
+					</div>
+					<div class="pull-right center" style="width:40px;	height: 100%;" ng-if="!obj.isSection">
+						<span ng-if="obj.completed" class="glyphicon glyphicon-ok completed" title="Completed Questionset"></span>
+						<div ng-if="obj.completed==undefined" class="waiting" title="waiting"></div>
+						<span ng-if="obj.completed==false" title="waiting">&nbsp;</span>
+					</div>
+				</div>
+			</div>
+			<div class="content-div" ng-show="selectedTab=='GroupSet'">
+				<div class="col-md-6 col-sm-6 ">
+					<div class="groupsets">
+						<div class="box-title">Subgroup Set</div>
+						<div class="col-md-12 groupset" ng-repeat="obj in  groupData.subgroupsets track by $index" ng-class="getGroupClass(obj)" ng-click="selectGroup(obj.key)">
+							{{obj.name}}
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6 col-sm-6 ">
+					<div class="groupsets">
+						<div class="box-title">{{selectedGroup.name}}</div>
+
+						<div class="col-md-12 groupset" ng-repeat="obj in selectedGroup.data.groups" ng-class="getSubGroupClass($index)" ng-click="secondGroup(obj,$index)">
+							<span ng-if="obj.name">{{obj.name}}</span>
+							<span ng-if="!obj.name">{{selectedGroup.name}}&nbsp;{{$index+1}}</span>
+							&emsp;({{obj.member_count}})
+							<span ng-if="obj.locked" class="pull-right glyphicon glyphicon-lock" title="Locked"></span>
+							<span ng-if="obj.joinable" class="pull-right join-btn" myclick="$event.stopPropagation();join_group(selectedGroup.key, $index);">Join</span>
+							<span ng-if="obj.joined" class="pull-right join-btn" myclick="$event.stopPropagation();unjoin_group(selectedGroup.key, $index);">Unjoin</span>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+</div>
+<style>
+	.content-header {
+		background-color: #42b3f4;
+	}
+
+	.title {
+		color: yellow;
+	}
+
+	.groupdetails .setname {
+		display: inline;
+	}
+
+	.groupdetails.active {
+		background-color: #f8b7b7;
+		border: solid 1px #f9ff00;
+	}
+
+	.groupdetails.section .setname {
+		display: block;
+		width: 80%;
+		margin: 0px auto;
+		background-color: #04a243;
+		border-radius: 10px;
+	}
+
+	.section-detail {
+		position: absolute;
+		display: none;
+	}
+
+	.groupdetails.section:hover .section-detail {
+		display: block;
+		z-index: 1000;
+		background-color: #1476b4;
+		margin-top: 3px;
+		width: 80%;
+		margin: 3px 10%;
+		border: solid 2px #999;
+		border-top: none;
+		color: white;
+	}
+
+	.groupdetails.section:hover .section-detail:hover {
+		display: none;
+	}
+
+	div.groupsets {
+		border: solid 1px #355086;
+		height: 50vh;
+		background-color: #e0edf9;
+		margin-top: 20px;
+		padding: 20px 20px;
+		overflow-y: auto;
+	}
+
+	div.box-title {
+		font-size: 2em;
+		text-align: center;
+		margin: 10px 0px;
+		color: #0716ba;
+	}
+
+	div.groupset {
+		background: #0576d5;
+		color: white;
+		margin: 10px auto;
+		font-size: 1.8em;
+		text-align: center;
+		line-height: 1.8em;
+		border-radius: 15px;
+		cursor: pointer;
+		border: solid 2px transparent;
+	}
+
+	.groupset.active {
+		border: solid 2px #17e320;
+	}
+
+	div.groupset span {
+		font-size: 0.8em;
+		cursor: pointer;
+		line-height: 2.3em;
+		color: yellow;
+	}
+
+	div.groupset span {
+		font-size: 0.8em;
+		cursor: pointer;
+		/* margin-top: 0px; */
+		color: yellow;
+	}
+
+	@media (max-width: 650px) {
+		div.groupsets {
+			padding: 20px 10px;
+		}
+
+		div.groupset {
+			font-size: 1.3em;
+			line-height: 1.8em;
+			border-radius: 15px;
+		}
+	}
+
+	.container {
+		padding-left: 0px;
+		padding-right: 0px;
+	}
+</style>

@@ -1,0 +1,82 @@
+<div ng-init="initExport();$root.getTeacherNote(exportSetKey);" ng-cloak style="margin-top:20px;" ng-show="$root.settings.loadingfinished">
+
+	<div ng-show="noAnswerMessage" class="no-data">
+		{{noAnswerMessage}}
+	</div>
+	<div ng-show="!noAnswerMessage">
+		<button class="btn btn-link" myclick="$root.exportToExcel('#table-1')">
+			<span class="glyphicon glyphicon-share"></span> Export to Excel
+		</button>
+		<button class="btn btn-primary pull-right" ng-if="!anonymous" myclick="change_show_user()" ng-disabled="!anonym_enabled">
+			<span ng-show="show_email">Anonymous</span>
+			<span ng-hide="show_email">Non-Anonymous</span>
+		</button>
+		<table class="table table-bordered datatable" id="table-1" style="margin-top:10px;">
+			<thead>
+				<tr>
+					<th colspan="{{subscales.length+9}}">
+						<b style="font-size:1.5em;">{{$root.settings.groupName}}&emsp;/&emsp;{{setData.setname}}</b>
+						<br />
+					</th>
+				</tr>				
+				<tr>
+					<th>User</th>
+					<th>Gender</th>
+					<th>Age</th>
+					<th>Profession</th>
+					<th>Mother tongue</th>
+					<th ng-repeat="item in subscales  track by $index">{{item.title}}
+						<br style="mso-data-placement:same-cell;" />score</th>
+					<th>Date/Time</th>
+					<th>Private Note</th>
+					<th>Public Note</th>
+					<th>Feedback to Teacher</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="obj in answers track by $index">
+					<td>
+						<span ng-if="!show_email">{{obj.show_id}}</span>
+						<span ng-if="show_email">{{obj.mail}}</span>
+					</td>
+					<td>{{obj.Gender}}</td>
+					<td>{{obj.Age}}</td>
+					<td>{{obj.Profession}}</td>
+					<td>{{obj.Mothertongue}}</td>
+					<td ng-repeat="score in obj.answer  track by $index">{{score}}</td>
+					<td>{{obj.datetime}}</td>
+					<td>{{$root.allPrivateNotes?$root.allPrivateNotes[obj.Userkey]:''}}</td>
+					<td>{{$root.allPublicNotes?$root.allPublicNotes[obj.Userkey]:''}}</td>
+					<td>{{$root.allTeacherNotes?$root.allTeacherNotes[obj.Userkey]:''}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+</div>
+<style>
+	.main-div {
+		width: 100%;
+		padding: 2%;
+	}
+
+	.no-data {
+		margin: 100px auto;
+		width: 500px;
+		text-align: center;
+		font-size: 3em;
+		color: #fd6167;
+		font-style: italic;
+		font-weight: bold;
+	}
+
+	td>p {
+		margin: 0px;
+	}
+
+	.table>thead>tr>th,
+	.table>tbody>tr>td {
+		text-align: center;
+		vertical-align: middle;
+	}
+</style>

@@ -1,0 +1,202 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="row title-div">
+		{{groupName}}
+		<a class="btn btn-primary pull-right copy-class ml-3" myclick="showCopyClassModal()">Copy Class</a>
+		<a ng-show="$root.teacherSettings.editGroupName_enabled" class="btn btn-info pull-right"
+			myclick="showEditTitleModal()"><i class="glyphicon glyphicon-pencil"></i></a>
+	</div>
+	<div class="row">
+		<div class="button-div">
+
+			<div class="col-md-6 col-sm-6 col-xs-12">
+				<a class="btn btn-primary" ui-sref="editGroup" ui-sref-active="active">Import Question Sets</a>
+			</div>
+			<div class="col-md-6 col-sm-6 col-xs-12">
+				<a class="btn btn-primary" myclick="gotoResponse()">View Question Responses</a>
+			</div>
+			<div class="col-md-6 col-sm-6 col-xs-12">
+				<a class="btn btn-primary" ui-sref="groupsets" ui-sref-active="active">Groupsets</a>
+			</div>
+			<div class="col-md-6 col-sm-6 col-xs-12">
+				<a class="btn btn-primary" myclick="showAddModal()">Shared Teachers</a>
+			</div>
+			<div class="col-md-6  col-sm-6 col-xs-12">
+				<a class="btn btn-primary" myclick="gotoGroupExport()">Export Data</a>
+			</div>
+			<div class="col-md-6  col-sm-6 col-xs-12">
+				<a class="btn btn-primary" myclick="gotoOperation()">Operations</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModal" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Confirm Privacy Policy&emsp;&&emsp;Add
+					Teacher</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div ng-show="$root.settings.userId == $root.settings.teacherId">
+					<div class="row center">
+						<div class="col-md-12 center">Privacy Policy</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12 privacy">
+							I confirm that the teaching assistant or academic that is being added is authorised to have
+							the same level of access to data
+							as I do.
+							<br /> Students have also been informed of party that will be added to the group. I take
+							responsibility of any breach
+							of privacy.
+						</div>
+					</div>
+					<hr />
+				</div>
+
+
+
+				<div class="row">
+					<div class="col-md-12 center">Shared Teachers</div>
+					<div class="col-md-12 teachers" ng-repeat="teacher in sharedList">
+						{{teacher.email}}
+						<button class="btn btn-danger pull-right" myclick="deleteTeacher(teacher)">
+							<span class="glyphicon glyphicon-trash"></span> Delete
+						</button>
+					</div>
+
+				</div>
+				<hr />
+				<div ng-show="$root.settings.userId == $root.settings.teacherId">
+					<div class="row">
+						<div class="col-md-12 description">
+							Please enter the email of the registered teacher below. Note the teacher must have a
+							registered account to be added.
+						</div>
+					</div>
+					<md-input-container class="md-block">
+						<label> Type Email Address </label>
+						<input required md-no-asterisk ng-model="email" name="email">
+					</md-input-container>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" myclick="addTeacher()"
+					ng-show="$root.settings.userId == $root.settings.teacherId">Add
+					Teacher
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- edit set title modal -->
+<div class="modal fade" id="editTitleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+	aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Edit Group Name</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<md-input-container>
+					<label for="group-name">Group Name:</label>
+					<textarea required ng-model="newGroupName" name="Name" id="group-name" placeholder="Group Name:"
+						class="groupName" msd-elastic></textarea>
+					<!-- mdInput mdTextareaAutosize minRows="6" -->
+				</md-input-container>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" myclick="updateGroupName()">Save</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- copy class modal -->
+<div class="modal fade" id="copyClassModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+	aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Copy Class</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<md-input-container>
+					<label for="group-name">Group Name:</label>
+					<textarea required ng-model="newGroupName" name="Name" id="group-name" placeholder="New Group Name:"
+						class="groupName" msd-elastic></textarea>
+					<!-- mdInput mdTextareaAutosize minRows="6" -->
+				</md-input-container>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" myclick="copyGroup()">O K</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	.groupName {
+		min-height: 100px !important;
+	}
+
+	.button-div {
+		/* background-color: #656565; */
+		margin-top: 100px;
+		max-height: calc(100vh - 150px);
+	}
+
+	.button-div>div {
+		display: table;
+		padding: 5vh 10%;
+	}
+
+	.button-div a {
+		padding: 20px;
+		display: table-cell;
+		font-size: 1.5em;
+		white-space: normal;
+		line-height: 1.5em;
+		border-radius: 14px;
+		font-weight: 600;
+	}
+
+	.privacy {
+		color: #656565;
+		padding: 10px 30px;
+	}
+
+	.description {
+		padding: 10px 30px;
+	}
+
+	.teachers {
+		color: #050d69;
+		padding: 15px 10% 0px;
+	}
+
+	.copy-class {
+		text-shadow: none;
+	}
+
+	@media screen and (max-width: 650px) {
+		.button-div {
+			margin-top: 0px;
+			overflow-x: hidden;
+			overflow: auto;
+		}
+	}
+</style>

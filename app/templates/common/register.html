@@ -1,0 +1,130 @@
+<div class="registerform" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<h2 class="text-center ">Sign Up</h2>
+	<div class="row">
+		<md-input-container flex>
+			<label>You are...</label>
+			<md-select data-ng-model="authtype" placeholder="You are...">
+				<md-option data-ng-value="obj" data-ng-repeat="obj in categories">{{obj}}</md-option>
+			</md-select>
+		</md-input-container>
+	</div>
+	<div class="row" ng-show="authtype == 'Student'">
+		<md-input-container flex>
+			<label>Select Institution</label>
+			<md-select ng-model="instKey" placeholder="Select Institution">
+				<md-option ng-value="key" ng-repeat="(key,item) in institutions track by $index" ng-selected="instKey==key">{{item.name}} ( {{item.domain}} )</md-option>
+			</md-select>
+		</md-input-container>
+	</div>
+	<div class="row">
+		<md-input-container flex>
+			<label for="username">Email</label>
+			<input id="signmail" ng-model="username" name="username" required="true" type="text">
+		</md-input-container>
+	</div>
+	<div class="row">
+		<md-input-container flex>
+			<label for="password">Password</label>
+			<input id="password" ng-model="basicpassword" name="password" required="true" type="password">
+		</md-input-container>
+	</div>
+	<div class="row">
+		<md-input-container flex>
+			<label for="confpassword">Confirm Password</label>
+			<input id="confpassword" ng-model="confpassword" name="confpassword" required="true" type="password">
+		</md-input-container>
+	</div>
+	<div class="row" ng-show="authtype == 'Student' && registerSettings.Country[0]">
+		<md-input-container flex>
+			<label>Country</label>
+			<md-select ng-model="country" aria-required="registerSettings.Country[1]">
+				<md-option ng-repeat="cnt in countries" value="{{cnt.name}}">
+					{{cnt.name}}
+				</md-option>
+			</md-select>
+		</md-input-container>
+	</div>
+	<div class="row" ng-show="authtype == 'Student' && registerSettings.Age[0]">
+		<md-input-container flex>
+			<label for="age">Age</label>
+			<input id="age" ng-model="age" name="age" aria-required="registerSettings.Age[1]" type="number">
+		</md-input-container>
+	</div>
+	<div class="row" ng-show="authtype == 'Student' && registerSettings.Gender[0]">
+		<md-input-container flex>
+			<label>Gender</label>
+			<md-select ng-model="gender" placeholder="Gender" aria-required="registerSettings.Gender[1]">
+				<md-option value="Male">Male</md-option>
+				<md-option value="Female">Female</md-option>
+				<md-option value="LGBTQIA">LGBTQIA</md-option>
+				<md-option value="prefer not to say">prefer not to say</md-option>
+			</md-select>
+		</md-input-container>
+	</div>
+	<div class="row" ng-show="authtype == 'Student' && registerSettings.Profession[0]">
+		<md-input-container flex>
+			<label for="profession">Profession</label>
+			<input id="profession" ng-model="profession" name="profession" aria-required="registerSettings.Profession[1]" type="text">
+		</md-input-container>
+	</div>
+	<div class="row" ng-show="authtype == 'Student' && registerSettings['Mother Tongue'][0]">
+		<md-input-container flex>
+			<label>Mother Tongue</label>
+			<md-select ng-model="countrylanguage" placeholder="Mother Tongue" aria-required="registerSettings['Mother Tongue'][1]">
+				<md-option ng-repeat="lang in countrylanguages track by $index" value="{{lang}}">{{lang}}</md-option>
+			</md-select>
+		</md-input-container>
+	</div>
+	<div class="row" ng-show="showGroupCode()">
+		<md-input-container flex>
+			<label for="groupcode">Group Code</label>
+			<input id="groupcode" ng-model="groupcode" name="groupcode" aria-required="true" type="text">
+		</md-input-container>
+	</div>
+
+	<div class="row">
+		<md-input-container flex class="center">
+			<button class="btn btn-primary" myclick="register()">Register</button>
+			<button class="btn btn-link" myclick="$root.go('login')">Log in</button>
+		</md-input-container>
+	</div>
+</div>
+
+<style>
+	.registerform {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: calc(100% - 30px);
+		max-width: 550px;
+		padding: 50px 20px 30px 20px;
+		-webkit-transform: translate(-50%, -50%);
+		transform: translate(-50%, -50%);
+		border-radius: 5px;
+		box-shadow: 0 0 5px hsla(0, 0%, 59%, .8);
+		background: #ffffff;
+	}
+
+	.row {
+		height: 60px;
+	}
+
+	body {
+		background: url("./assets/img/coverimage.jpg");
+		background-repeat: no-repeat;
+		background-attachment: fixed;
+		background-size: 100% auto;
+		background-size: 100% 100%;
+		background-repeat: no-repeat;
+	}
+
+	input {
+		height: 155px;
+		font-size: 25px
+	}
+
+	button {
+		margin-left: 5%;
+		margin-right: 5%;
+	}
+</style>

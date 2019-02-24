@@ -1,0 +1,107 @@
+<div ng-init="initExportAll()" style="margin-top:20px;">
+	<div ng-show="$root.settings.loadingfinished && noAnswerMessage" class="no-data">
+		{{noAnswerMessage}}
+	</div>
+	<div ng-show="$root.settings.loadingfinished && !noAnswerMessage">
+		<button class="btn btn-link" myclick="$root.exportToExcel('#table-1')">
+			<span class="glyphicon glyphicon-share"></span> Export to Excel
+		</button>
+		<button class="btn btn-primary pull-right" ng-if="!anonymous" myclick="change_show_user()" ng-disabled="!anonym_enabled">
+			<span ng-show="show_email">Anonymous</span>
+			<span ng-hide="show_email">Non-Anonymous</span>
+		</button>
+		<table class="table table-bordered datatable" id="table-1" style="margin-top:10px;">
+			<thead>
+				<tr>
+					<th colspan="{{feedtextlimit+8}}">
+						<b style="font-size:1.5em;">{{groupName}}</b>
+						<br/>
+					</th>
+				</tr>
+				<tr>
+					<th>User</th>
+					<th>Gender</th>
+					<th>Age</th>
+					<th>Profession</th>
+					<th>Mother tongue</th>
+					<th>Question</th>
+					<th>Answer</th>
+					<th>Date/Time</th>
+					<th class="detachingfield" ng-if="!hidefeedfield">Feedback</th>
+					<th class="detachingfield" ng-if="!hidefeedfield">Score</th>
+					<th class="detachingfield" ng-if="!hidefeedfield">Award</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="obj in answers track by $index">
+					<td>
+						<span ng-if="!show_email">{{obj.show_id}}</span>
+						<span ng-if="show_email">{{obj.mail}}</span>
+					</td>
+					<td>{{obj.Gender}}</td>
+					<td>{{obj.Age}}</td>
+					<td>{{obj.Profession}}</td>
+					<td>{{obj.Mothertongue}}</td>
+					<td>
+						{{obj.question.question}}
+						<br style="mso-data-placement:same-cell;" ng-if="ratingType" />
+						<span ng-if="ratingType">Items:&emsp;{{obj.question.ratingItems}}</span>
+						<br style="mso-data-placement:same-cell;" ng-if="ratingType" />
+						<span ng-if="ratingType">Options:&emsp;{{obj.question.ratingOptions}}</span>
+					</td>
+					<td ng-if="!ratingType">{{obj.answer}}</td>
+					<td style="text-align:left; padding-left:20px;" ng-if="ratingType">
+						<div ng-if="false" ng-repeat-start="item in obj.answer track by $index"></div>
+						<b>Item{{$index+1}}.&emsp;</b>
+						<b ng-if="item.rating">&emsp;Ratings: &emsp;</b>{{item.rating}}
+						<b ng-if="item.feedbacktext">&emsp;Feedback: &emsp;</b>{{item.feedbacktext}}
+						<br style="mso-data-placement:same-cell;" />
+						<div ng-if="false" ng-repeat-end></div>
+					</td>
+					<td>{{obj.datetime}}</td>
+					<td style="text-align:left" class="detachingfield" ng-if="!hidefeedfield">
+						<div ng-if="false" ng-repeat-start="feed in obj.feedtxt track by $index"></div>
+						<b>{{$index+1}}.&emsp;
+							<span ng-if="!show_email">{{feed.show_id}}</span>
+							<span ng-if="show_email">{{feed.mail}}</span>
+						</b>
+						<br style="mso-data-placement:same-cell;" />
+						<b ng-if="feed.text">&emsp;Feedback:&emsp;</b>{{feed.text}}
+						<br ng-if="feed.text" style="mso-data-placement:same-cell;" />
+						<b ng-if="feed.score">&emsp;Scores:&emsp;</b>{{feed.score}}
+						<br ng-if="feed.score" style="mso-data-placement:same-cell;" />
+						<br ng-if="feed.score" style="mso-data-placement:same-cell;" />
+						<div ng-if="false" ng-repeat-end></div>
+					</td>
+					<td class="detachingfield" ng-if="!hidefeedfield">{{obj.averagescore}}</td>
+					<td class="detachingfield" ng-if="!hidefeedfield">{{obj.awardScore}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<style>
+		.main-div {
+			width: 100%;
+			padding: 2%;
+		}
+
+		.no-data {
+			margin: 100px auto;
+			width: 500px;
+			text-align: center;
+			font-size: 3em;
+			color: #fd6167;
+			font-style: italic;
+			font-weight: bold;
+		}
+
+		td>p {
+			margin: 0px;
+		}
+
+		.table>thead>tr>th,
+		.table>tbody>tr>td {
+			text-align: center;
+			vertical-align: middle;
+		}
+	</style>

@@ -1,0 +1,235 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="title-div">
+		<div class="content">
+			{{$root.settings.groupName}} / {{$root.settings.questionSetName}}
+			<div class="question-div">
+				<span ng-show="question.title" class="qst-title">{{question.title}}</span>
+				{{question.question}}
+			</div>
+		</div>
+	</div>
+
+	<div class="row" ng-show="answers">
+		<div style="width:80%; margin:0px auto;">
+			<h4 class="center">Origin Results in Group<button class="btn btn-danger mb-3 pull-right" myclick="clearResult()">Clear Group Results</button></h4>
+			<table class="table table-striped table-bordered table-hover external">
+				<thead>
+					<th>No</th>
+					<th>Show ID</th>
+					<th>Email</th>
+					<th>Result</th>
+					<th>Valid</th>
+				</thead>
+				<tbody>
+					<tr ng-repeat="user in answers track by $index">
+						<td>{{$index+1}}</td>
+						<td>{{user['Show ID']}}</td>
+						<td>{{user.email}}</td>
+						<td>{{user.Result}}</td>
+						<td>
+							<span class="glyphicon glyphicon-ok"></span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<hr />
+	<div class="row">
+		<div style="max-width:600px; margin:0px auto;">
+			<div class="form-group">
+				<div class="input-group">
+					<span class="input-group-btn">
+						<span class="btn btn-default btn-file">
+							Upload Result File
+							<input type="file" accept=".xls,.xlsx" onchange="angular.element(this).scope().file_changed(this)" ng-model="files" multiple="false">
+						</span>
+					</span>
+					<input type="text" ng-value="filename" class="form-control" readonly>
+				</div>
+				<progress value="0" max="100" id="uploader" style="width:100%; margin:5px 0px 10px; height: 4px;">0%</progress>
+			</div>
+		</div>
+		<!-- download template Link -->
+		<div class="col-md-12 center">
+			<a href="{{$root.templateExternalLink}}" download>
+				* &emsp;Please download template XLXS file from here
+			</a>
+		</div>
+	</div>
+
+	<div class="row" ng-show="results && results.length>0">
+		<div style="width:80%; margin:0px auto;">
+			<h4 class="center">Results for Upload<button class="btn btn-success mb-3 pull-right" myclick="uploadResult()">Add New Results</button></h4>
+			<table class="table table-striped table-bordered table-hover external">
+				<thead>
+					<th>No</th>
+					<th>Show ID</th>
+					<th>Email</th>
+					<th>Result</th>
+					<th>Valid</th>
+				</thead>
+				<tbody>
+					<tr ng-repeat="user in results track by $index">
+						<td>{{$index+1}}</td>
+						<td>{{user['Show ID']}}</td>
+						<td>{{user.email}}</td>
+						<td>{{user.Result}}</td>
+						<td>
+							<span ng-if="user.checkValid" class="glyphicon glyphicon-ok"></span>
+							<span ng-if="!user.checkValid" class="glyphicon glyphicon-remove"></span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<style>
+	/*================= external type styels =================================*/
+
+	/* Table Style */
+
+	.table-bordered>tbody>tr>td,
+	.table-bordered>tbody>tr>th,
+	.table-bordered>tfoot>tr>td,
+	.table-bordered>tfoot>tr>th,
+	.table-bordered>thead>tr>td,
+	.table-bordered>thead>tr>th {
+		border: 1px solid white;
+	}
+
+	thead {
+		background-color: #4371C4;
+		color: white;
+	}
+
+	.table-striped>tbody>tr:nth-of-type(2n+1) {
+		background-color: #CFD5E9;
+	}
+
+	.table-striped>tbody>tr:nth-of-type(2n) {
+		background-color: #E9EBF5;
+	}
+
+
+	table.external {
+		width: 100%;
+		border-spacing: 0;
+		font-size: 14px;
+	}
+
+	table.external thead,
+	table.external tbody,
+	table.external tr,
+	table.external th,
+	table.external td {
+		display: block;
+	}
+
+	table.external thead tr {
+		/* fallback */
+		width: 97%;
+		/* minus scroll bar width */
+		width: -webkit-calc(100% - 17px);
+		width: -moz-calc(100% - 17px);
+		width: calc(100% - 17px);
+	}
+
+	table.external tr:after {
+		/* clearing float */
+		content: ' ';
+		display: block;
+		visibility: hidden;
+		clear: both;
+	}
+
+	table.external tbody {
+		max-height: 200px;
+		overflow-y: scroll;
+		overflow-x: hidden;
+	}
+
+	table.external tbody td,
+	table.external thead th {
+		float: left;
+		text-align: center;
+		height: 30px;
+	}
+
+	table.external td:nth-child(1),
+	table.external th:nth-child(1) {
+		width: 10%;
+	}
+
+	table.external td:nth-child(2),
+	table.external th:nth-child(2) {
+		width: 20%;
+	}
+
+	table.external td:nth-child(3),
+	table.external th:nth-child(3) {
+		width: 50%;
+	}
+
+	table.external td:nth-child(4),
+	table.external th:nth-child(4) {
+		width: 10%;
+	}
+
+	table.external td:nth-child(5),
+	table.external th:nth-child(5) {
+		width: 10%;
+	}
+
+	.btn-file input[type="file"] {
+		position: absolute;
+		top: 0;
+		right: 0;
+		min-width: 100%;
+		min-height: 100%;
+		font-size: 100px;
+		text-align: right;
+		filter: alpha(opacity=0);
+		opacity: 0;
+		outline: none;
+		background: white;
+		cursor: inherit;
+		display: block;
+	}
+
+	.glyphicon-ok {
+		color: green;
+	}
+
+	.glyphicon-remove {
+		color: red;
+	}
+
+	@media screen and (max-width: 1024px) {
+		.container-fluid {
+			padding: 0px;
+		}
+
+		.table-container {
+			width: 100%;
+		}
+
+		.md-resize-wrapper {
+			width: 100%;
+		}
+
+		md-input-container {
+			width: 100%;
+			margin: 20px 0;
+		}
+
+		md-input-container .md-input,
+		md-input-container md-radio-group,
+		md-input-container progress,
+		.float-div,
+		.additional {
+			width: 100%;
+		}
+	}
+</style>

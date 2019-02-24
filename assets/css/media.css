@@ -1,0 +1,42 @@
+@media screen and (min-width: 1200px) {
+    .title {
+        font-size: 25px;
+    }
+    .title .title .teacher-email {
+        font-size: 20px;
+    }
+    .well {
+        margin: 20px;
+    }
+}
+
+@media (max-width: 1024px) {
+    #exportAllbtn {
+        float: right;
+    }
+    .hide-in-small {
+        display: none;
+    }
+}
+
+@media (max-width: 650px) {
+    html, body {
+        overflow: scroll;
+    }
+    .answer-form {
+        margin: 30px -15px !important;
+        padding: 50px 0px !important;
+    }
+    .main-div {
+        width: calc(100% - 20px);
+        padding: 10px;
+    }
+    .chart-row>.chart-container, .chart-row>.chart-container canvas {
+        width: 90vw;
+        height: calc(100vw * 0.6);
+    }
+    .absolute-center {      
+        position: relative;
+        width: 100%;
+    }
+}

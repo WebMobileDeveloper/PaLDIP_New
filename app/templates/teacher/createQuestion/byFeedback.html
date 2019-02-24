@@ -1,0 +1,271 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="answer-form">
+		<div class="row">
+			<div class="col-md-12" style="text-align:center;font-size:1.3em;">
+				<label style="border-bottom: ridge 5px #8f8f8f; padding: 12px 40px;">{{$root.settings.questionSetName}}</label>
+			</div>
+		</div>
+		<!-- Question Title -->
+		<div class="row">
+			<md-input-container flex>
+				<label>Question Title</label>
+				<input ng-model="title" style="border-radius:5px;" />
+			</md-input-container>
+		</div>
+		<!-- Question String -->
+		<div class="row">
+			<md-input-container flex>
+				<label>Question String</label>
+				<textarea ng-model="mainQuestion" style="border-radius:5px;"></textarea>
+			</md-input-container>
+		</div>
+		<!-- Question Links -->
+		<div class="row" ng-show="$root.teacherSettings.link_enabled">
+			<md-input-container flex>
+				<label style="color: #4d4c4c;">Extra Links</label>
+			</md-input-container>
+
+			<div class="table-container  extra-link">
+				<div class="table-responsive">
+					<table class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th scope="col">#</th>
+								<th scope="col">Title</th>
+								<th scope="col">Url</th>
+								<th scope="col">Test Link</th>
+								<th scope="col"></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="link in $root.links track by $index">
+								<th scope="row">{{$index+1}}</th>
+								<td>
+									<textarea ng-model="link.title" class="table-input" autofocus placeholder="link title..."></textarea>
+								</td>
+								<td>
+									<textarea ng-model="link.url" class="table-input" autofocus placeholder="link url..."></textarea>
+								</td>
+								<td>
+									<a href={{link.url}} target="_blank">{{link.title}}</a>
+								</td>
+								<td class="button-cell">
+									<button class="btn btn-primary cell-button" myclick="$root.addLink($index)">append</button>
+									<br />
+									<button class="btn btn-danger cell-button" myclick="$root.removeLink($index)">delete</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="row" ng-show="$root.teacherSettings.image_enabled">
+			<md-input-container flex>
+				<label for="uploadfile" ng-hide="true">choose file</label>
+				<progress value="0" max="100" id="uploader" style="width:100%">0%</progress>
+				<input type="file" value="upload" id="fileButton" class="md-input" />
+			</md-input-container>
+		</div>
+		<div class="row" ng-show="$root.teacherSettings.video_enabled">
+			<md-input-container flex>
+				<label>Youtube video ID ( e.g. tgbNymZ7vqY )</label>
+				<input ng-model="videoID" style="border-radius:5px;" />
+			</md-input-container>
+		</div>
+		<div class="row">
+			<md-input-container flex>
+				<label style="color: #4d4c4c;">List Type</label>
+				<md-switch class="md-primary" md-no-ink aria-label="Switch listType" ng-model="listType" style="margin-left: 240px;	margin-top: -7px;">
+					{{listType?'Yes':'No'}}
+				</md-switch>
+			</md-input-container>
+		</div>
+		<div class="row">
+			<md-input-container flex>
+				<label style="color: #4d4c4c;">Self Rate</label>
+				<md-switch class="md-primary" md-no-ink aria-label="Switch selfRate" ng-model="selfRate" style="margin-left: 240px;	margin-top: -7px;">
+					{{selfRate?'Yes':'No'}}
+				</md-switch>
+			</md-input-container>
+		</div>
+		<div class="row">
+			<md-input-container flex>
+				<label style="color: #4d4c4c;">Answer Required</label>
+				<md-switch class="md-primary" md-no-ink aria-label="Switch selfRate" ng-model="unRequired" style="margin-left: 240px;	margin-top: -7px;">
+					{{unRequired?'Yes':'No'}}
+				</md-switch>
+			</md-input-container>
+		</div>
+
+		<!-- Instructions for Input Text: -->
+		<div class="row">
+			<md-input-container flex>
+				<label>Instructions for Input Text:</label>
+				<textarea ng-model="instruction" style="border-radius:5px;"></textarea>
+			</md-input-container>
+		</div>
+
+		<!-- Team Feedback -->
+		<div class="row">
+			<fieldset class="standard">
+				<legend>Team Feedback Type</legend>
+				<div class="row">
+					<md-radio-group ng-model="groupFeedback">
+						<md-radio-button ng-value="'team'" class="md-primary">Team Feedback</md-radio-button>
+						<md-radio-button ng-value="'group'" class="md-primary">Group Feedback</md-radio-button>
+						<md-radio-button ng-value="'other'" class="md-primary">Not In Team Feedback</md-radio-button>
+					</md-radio-group>
+				</div>
+			</fieldset>
+		</div>
+		<!-- Award type -->
+		<div class="row">
+			<md-input-container flex>
+				<label style="color: #4d4c4c;">Award Type</label>
+				<md-switch class="md-primary" md-no-ink aria-label="Switch AwardType" ng-model="isInvestment" style="margin-left: 240px;	margin-top: -7px;">
+					{{isInvestment?'Investment':'Award'}}
+				</md-switch>
+			</md-input-container>
+		</div>
+
+		<div class="row">
+			<md-input-container flex>
+				<label style="color: #4d4c4c;">
+					{{isInvestment?'Max Investment Amount:':'Max Award Score:'}}
+				</label>
+				<input type="number" ng-model="awardScore" ng-change="awardScoreChanged()" />
+			</md-input-container>
+		</div>
+		<div class="row">
+			<md-input-container flex>
+				<label style="color: #4d4c4c;">
+					{{isInvestment?'Max Investment Users:':'Max Award Users:'}}
+				</label>
+				<input type="number" ng-model="awardPeoples" ng-change="awardPeopleChanged()" />
+			</md-input-container>
+		</div>
+		<div class="row">
+			<md-input-container flex>
+				<label style="color: #4d4c4c;">Anonymous</label>
+				<md-switch class="md-primary" md-no-ink aria-label="Switch anonymous" ng-model="anonymous" style="margin-left: 240px;	margin-top: -7px;">
+					{{anonymous?'Anonymous':'Non-Anonymous'}}
+				</md-switch>
+			</md-input-container>
+		</div>
+		<div class="row">
+			<md-input-container flex>
+				<label>Top Answers Count(e.g. 0, 2, 5, &emsp; * 0 means show all) </label>
+				<input ng-model="top_answers" type="number" style="border-radius:5px;" />
+			</md-input-container>
+		</div>
+		<hr />​
+		<div class="row">
+			<md-input-container flex>
+				<label for="username">Feedback Type</label>
+				<md-select data-ng-model="feedbacktype" class="md-block flex-gt-sm" name="authType" placeholder="Feedback Type" required="" role="listbox" tabindex="0" aria-label="You are..." aria-labelledby=""
+				 aria-required="true" aria-disabled="false" aria-invalid="false" aria-multiselectable="false">
+					<md-option data-ng-value="obj.value" data-ng-repeat="obj in $root.settings.feeds">{{ obj.type }}</md-option>
+				</md-select>
+				<div class="errors" ng-messages="myForm.favoriteColor.$error">
+					<div ng-message="required"></div>
+				</div>
+			</md-input-container>
+		</div>
+
+		<hr />​
+		<div class="row" ng-show="feedbacktype">
+			<div class="row">
+				<md-input-container flex>
+					<label>Feedback Question1</label>
+					<input ng-model="feedqt1" style="border-radius:5px;" />
+				</md-input-container>
+			</div>
+			<div class="row">
+				<md-input-container flex>
+					<label>Feedback Question2</label>
+					<input ng-model="feedqt2" style="border-radius:5px;" />
+				</md-input-container>
+			</div>
+			<div class="row">
+				<md-input-container flex>
+					<label>Feedback Question3</label>
+					<input ng-model="feedqt3" style="border-radius:5px;" />
+				</md-input-container>
+			</div>
+			<div class="row">
+				<md-input-container flex>
+					<label>Feedback Question4</label>
+					<input ng-model="feedqt4" style="border-radius:5px;" />
+				</md-input-container>
+			</div>
+			<div class="row">
+				<md-input-container flex>
+					<label>Feedback Question5</label>
+					<input ng-model="feedqt5" style="border-radius:5px;" />
+				</md-input-container>
+			</div>
+			<div class="row">
+				<md-input-container flex>
+					<label>Feedback Question6</label>
+					<input ng-model="feedqt6" style="border-radius:5px;" />
+				</md-input-container>
+			</div>
+			<div class="row">
+				<md-input-container flex>
+					<label>Feedback Question7</label>
+					<input ng-model="feedqt7" style="border-radius:5px;" />
+				</md-input-container>
+			</div>
+			<div class="row">
+				<md-input-container flex>
+					<label>Feedback Question8</label>
+					<input ng-model="feedqt8" style="border-radius:5px;" />
+				</md-input-container>
+			</div>
+			<div class="row">
+				<md-input-container flex>
+					<label>Feedback Question9</label>
+					<input ng-model="feedqt9" style="border-radius:5px;" />
+				</md-input-container>
+			</div>
+			<div class="row">
+				<md-input-container flex>
+					<label>Feedback Question10</label>
+					<input ng-model="feedqt10" style="border-radius:5px;" />
+				</md-input-container>
+			</div>
+		</div>
+
+
+		<!-- result data -->
+		<div ng-show="$root.teacherSettings.result_video_enabled">
+			<div class="row">
+				<md-input-container flex>
+					<label>Result String</label>
+					<textarea ng-model="result_string" style="border-radius:5px;"></textarea>
+				</md-input-container>
+			</div>
+			<div class="row">
+				<md-input-container flex>
+					<p>Upload result image</p>
+					<input type="file" id="fileButton1" />
+					<progress value="0" max="100" id="uploader1" style="width:100%">0%</progress>
+				</md-input-container>
+			</div>
+			<div class="row">
+				<md-input-container flex>
+					<label>Youtube result video ID ( e.g. tgbNymZ7vqY )</label>
+					<input ng-model="result_videoID" style="border-radius:5px;" />
+				</md-input-container>
+			</div>
+		</div>
+		<div class="button-row">
+			<button class="btn btn-primary" myclick="$state.go('questionsInSet')">Question Set</button>
+			<button class="btn btn-primary" myclick="creatQuestion()">Create Question</button>
+			<a class="btn btn-link" ui-sref="choiceQuestionType" ui-sref-active="active">Back</a>
+		</div>
+	</div>
+</div>
+<style>
+</style>

@@ -1,0 +1,91 @@
+<div ng-init="init()">
+	<div class="row content-header">
+		<div class="col-md-12 title texteffect">All Question Sets
+			<div class="radio-div">
+				<span>Order by</span>
+				<md-radio-group ng-model="fieldIndex">
+					<md-radio-button value="0" class="md-primary">Set Name</md-radio-button>
+					<md-radio-button value="1" class="md-primary">Creator</md-radio-button>
+				</md-radio-group>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row  sub-title-header">
+			<div class="col-md-6">
+				Question Set Name
+			</div>
+			<div class="col-md-5">
+				Creator
+			</div>
+			<div class="col-md-1">
+				Answers
+			</div>
+		</div>
+	</div>
+	<div class="container content-div">
+		<div class="row  groupdetails" ng-repeat="obj in  questionSets | orderBy:fields[fieldIndex] track by $index " ng-class="setActive(obj)" ng-click="gotoUse(obj)">
+			<div class="col-md-6">
+				{{obj.setName}}
+			</div>
+			<div class="col-md-5">
+				{{obj.creator}}
+			</div>
+			<div class="col-md-1">
+				{{obj.answers}}
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+
+	md-radio-group {
+		display: inline-block;
+		height: 40px;
+		margin-left: 30px;
+		color: #08157a;
+		text-shadow: 1px 1px #fff;
+	}
+
+	md-radio-button {
+		display: inline-block;
+		margin-bottom: 0px;
+		margin-left: 10px;
+	}
+
+	.content-header {
+		background-color: #42b3f4;
+	}
+
+	.sub-title-header {
+		background-color: #42b3f4;
+		margin-top: 10px;
+		margin-bottom: 0px;
+		color: #413f92;
+		text-shadow: 1px 1px #fff;
+		text-align: center;
+		padding: 3px 0px;
+		border-radius: 3px;
+		min-height: 40px;
+		line-height: 40px;
+		font-weight: bold;
+		vertical-align: middle;
+		font-size: 1.3em;
+		overflow-y: scroll;
+	}
+
+	.title {
+		color: #fff;
+		text-shadow: 1px 1px #3b5490;
+	}
+
+	.content-div {
+		height: calc(100vh - 180px);
+	}
+
+	.groupdetails.active {
+		background-color: #8d8b8b;
+		color: white;
+		text-shadow: 1px 1px #6504b3;
+	}
+</style>

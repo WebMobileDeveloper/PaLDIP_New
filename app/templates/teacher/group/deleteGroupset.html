@@ -1,0 +1,263 @@
+<div ng-init="initExportAll()" ng-cloak style="margin-top:20px;" ng-show="$root.settings.loadingfinished">
+
+
+	<div class="row">
+		<div class="col-md-12 center">
+			<h1>{{groupName}}</h1>
+		</div>
+	</div>
+	<button class="btn btn-link" myclick="exportData()">
+		<span class="glyphicon glyphicon-share"></span> Export to Excel
+	</button>
+	<button class="btn btn-danger pull-right" ng-if="groupType=='sub'" myclick="deleteGroupset()">
+		<span class="glyphicon glyphicon-trash"></span> Delete Gorupset
+	</button>
+	<button class="btn btn-danger pull-right" ng-if="groupType=='second'" myclick="deleteSubGroupset()">
+		<span class="glyphicon glyphicon-trash"></span> Delete Sub Groupset
+	</button>
+	<button class="btn btn-primary pull-right" ng-if="!anonymous" myclick="change_show_user()" ng-disabled="!anonym_enabled" style="margin-right:20px;">
+		<span ng-show="show_email">Anonymous</span>
+		<span ng-hide="show_email">Non-Anonymous</span>
+	</button>
+	<div ng-if="noAnswerMessage" class="no-data">
+		{{noAnswerMessage}}
+	</div>
+	<div ng-show="!noAnswerMessage" ng-repeat="(type, answers) in allAnswers track by $index">
+		<div ng-switch="type">
+			<table ng-switch-when="'Feedback Type'" class="table table-bordered datatable" id="table-{{$index}}" style="margin-top:10px;">
+				<thead>
+					<tr>
+						<th colspan="11">
+							<b style="font-size:1.5em;">{{groupName}}</b>
+							<br />
+							<b style="font-size:1.3em;">{{type}} Answers</b>
+							<br />
+						</th>
+					</tr>
+					<tr>
+						<th>Child Group</th>
+						<th>User</th>
+						<th>Gender</th>
+						<th>Age</th>
+						<th>Profession</th>
+						<th>Mother tongue</th>
+						<th>Question</th>
+						<th>Answer</th>
+						<th>Date/Time</th>
+						<th>Feedback</th>
+						<th>Score</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="obj in answers track by $index">
+						<td>{{$root.settings.childGroupName}}&nbsp;{{obj.groupIndex}}</td>
+						<td>
+							<span ng-if="!show_email">{{obj.show_id}}</span>
+							<span ng-if="show_email">{{obj.mail}}</span>
+						</td>
+						<td>{{obj.Gender}}</td>
+						<td>{{obj.Age}}</td>
+						<td>{{obj.Profession}}</td>
+						<td>{{obj.Mothertongue}}</td>
+						<td>{{obj.question.question}}</td>
+						<td>{{obj.answer}}</td>
+						<td>{{obj.datetime}}</td>
+						<td style="text-align:left">
+							<div ng-if="false" ng-repeat-start="feed in obj.feedtxt track by $index"></div>
+							<b>{{$index+1}}.&emsp;
+								<span ng-if="!show_email">{{feed.show_id}}</span>
+								<span ng-if="show_email">{{feed.mail}}</span>
+							</b>
+							<br style="mso-data-placement:same-cell;" />
+							<b ng-if="feed.text">&emsp;Feedback:&emsp;</b>{{feed.text}}
+							<br ng-if="feed.text" style="mso-data-placement:same-cell;" />
+							<b ng-if="feed.score">&emsp;Scores:&emsp;</b>{{feed.score}}
+							<br ng-if="feed.score" style="mso-data-placement:same-cell;" />
+							<br ng-if="feed.score" style="mso-data-placement:same-cell;" />
+							<div ng-if="false" ng-repeat-end></div>
+						</td>
+						<td>{{obj.averagescore}}</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<table ng-switch-when="'Rating Type'" class="table table-bordered datatable" id="table-{{$index}}" style="margin-top:10px;">
+				<thead>
+					<tr>
+						<th colspan="9">
+							<b style="font-size:1.5em;">{{groupName}}</b>
+							<br />
+							<b style="font-size:1.3em;">{{type}} Answers</b>
+							<br />
+						</th>
+					</tr>
+					<tr>
+						<th>Child Group</th>
+						<th>User</th>
+						<th>Gender</th>
+						<th>Age</th>
+						<th>Profession</th>
+						<th>Mother tongue</th>
+						<th>Question</th>
+						<th>Answer</th>
+						<th>Date/Time</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="obj in answers track by $index">
+						<td>{{$root.settings.childGroupName}}&nbsp;{{obj.groupIndex}}</td>
+						<td>
+							<span ng-if="!show_email">{{obj.show_id}}</span>
+							<span ng-if="show_email">{{obj.mail}}</span>
+						</td>
+						<td>{{obj.Gender}}</td>
+						<td>{{obj.Age}}</td>
+						<td>{{obj.Profession}}</td>
+						<td>{{obj.Mothertongue}}</td>
+						<td>
+							{{obj.question.question}}
+							<br style="mso-data-placement:same-cell;" />
+							<span ng-if="ratingType">Items:&emsp;{{obj.question.ratingItems}}</span>
+							<br style="mso-data-placement:same-cell;" />
+							<span ng-if="ratingType">Options:&emsp;{{obj.question.ratingOptions}}</span>
+						</td>
+						<td style="text-align:left; padding-left:20px;">
+							<div ng-if="false" ng-repeat-start="item in obj.answer track by $index"></div>
+							<b>Item{{$index+1}}.&emsp;</b>
+							<b ng-if="item.rating">&emsp;Ratings: &emsp;</b>{{item.rating}}
+							<b ng-if="item.feedbacktext">&emsp;Feedback: &emsp;</b>{{item.feedbacktext}}
+							<br style="mso-data-placement:same-cell;" />
+							<div ng-if="false" ng-repeat-end></div>
+						</td>
+						<td>{{obj.datetime}}</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<table ng-switch-when="'Contingent Type'" class="table table-bordered datatable" id="table-{{$index}}" style="margin-top:10px;">
+				<thead>
+					<tr>
+						<th colspan="12">
+							<b style="font-size:1.5em;">{{groupName}}</b>
+							<br />
+							<b style="font-size:1.3em;">{{type}} Answers</b>
+							<br />
+						</th>
+					</tr>
+					<tr>
+						<th>Child Group</th>
+						<th rowspan="2">Questions</th>
+						<th rowspan="2">Sub Questions</th>
+						<th colspan="2">Options</th>
+						<th rowspan="2">User</th>
+						<th rowspan="2">Gender</th>
+						<th rowspan="2">Age</th>
+						<th rowspan="2">Profession</th>
+						<th rowspan="2">Mother tongue</th>
+						<th rowspan="2">Date/Time</th>
+						<th rowspan="2">Answer</th>
+					</tr>
+					<tr>
+						<th>A</th>
+						<th>B</th>
+					</tr>
+				</thead>
+				<tbody>
+					<td>{{$root.settings.childGroupName}}&nbsp;{{obj.groupIndex}}</td>
+					<tr ng-if="false" ng-repeat-start="question in answers"></tr>
+					<tr ng-repeat="index in [] | range:question.answers.length *  question.subQuestions.length" ng-init="
+												userCount = question.answers.length; 	
+												subCount = question.subQuestions.length;   
+												user = getUserData(question, index, subCount);
+												sub = getSubData(question, index, userCount);			">
+						<td ng-if="index == 0" rowspan="{{userCount * subCount}}" class="question">{{question.question}}</td>
+						<td ng-if="sub" rowspan="{{userCount}}" class="sub-question">{{sub.question}}</td>
+						<td ng-if="sub" rowspan="{{userCount}}" class="option option-a">{{sub.options[0]}}</td>
+						<td ng-if="sub" rowspan="{{userCount}}" class="option option-b">{{sub.options[1]}}</td>
+
+						<td ng-if="user" rowspan="{{subCount}}">
+							<span ng-if="!show_email">{{user.show_id}}</span>
+							<span ng-if="show_email">{{user.mail}}</span>
+						</td>
+						<td ng-if="user" rowspan="{{subCount}}">{{user.Gender}}</td>
+						<td ng-if="user" rowspan="{{subCount}}">{{user.Age}}</td>
+						<td ng-if="user" rowspan="{{subCount}}">{{user.Profession}}</td>
+						<td ng-if="user" rowspan="{{subCount}}">{{user.Mothertongue}}</td>
+						<td ng-if="user" rowspan="{{subCount}}">{{user.datetime}}</td>
+						<td ng-if="user" rowspan="{{subCount}}">{{convertAnswer(user.answer)}}</td>
+					</tr>
+
+					<tr ng-if="false" ng-repeat-end></tr>
+				</tbody>
+			</table>
+
+			<table ng-switch-default class="table table-bordered datatable" id="table-{{$index}}" style="margin-top:10px;">
+				<thead>
+					<tr>
+						<th colspan="9">
+							<b style="font-size:1.5em;">{{groupName}}</b>
+							<br />
+							<b style="font-size:1.3em;">{{type}} Answers</b>
+							<br />
+						</th>
+					</tr>
+					<tr>
+						<th>Child Group</th>
+						<th>User</th>
+						<th>Gender</th>
+						<th>Age</th>
+						<th>Profession</th>
+						<th>Mother tongue</th>
+						<th>Question</th>
+						<th>Answer</th>
+						<th>Date/Time</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="obj in answers track by $index">
+						<td>{{$root.settings.childGroupName}}&nbsp;{{obj.groupIndex}}</td>
+						<td>
+							<span ng-if="!show_email">{{obj.show_id}}</span>
+							<span ng-if="show_email">{{obj.mail}}</span>
+						</td>
+						<td>{{obj.Gender}}</td>
+						<td>{{obj.Age}}</td>
+						<td>{{obj.Profession}}</td>
+						<td>{{obj.Mothertongue}}</td>
+						<td>{{obj.question.question}}</td>
+						<td>{{replaceAnswer(obj.answer)}}</td>
+						<td>{{obj.datetime}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+
+<style>
+	.main-div {
+		width: 100%;
+		padding: 2%;
+	}
+
+	.no-data {
+		margin: 100px auto;
+		width: 500px;
+		text-align: center;
+		font-size: 3em;
+		color: #fd6167;
+		font-style: italic;
+		font-weight: bold;
+	}
+
+	td>p {
+		margin: 0px;
+	}
+
+	.table>thead>tr>th,
+	.table>tbody>tr>td {
+		text-align: center;
+		vertical-align: middle;
+	}
+</style>

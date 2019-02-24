@@ -1,0 +1,159 @@
+<div class="main-div" ng-init="init();" ng-show="$root.settings.loadingfinished">
+	<div class="row center">
+		<h1>Create Question Set</h1>
+	</div>
+	<div class="row set-name">
+		<md-input-container flex>
+			<label>Type Question Set Name (e.g. XXX?)</label>
+			<input ng-model="setname" style="border-radius:5px;" />
+		</md-input-container>
+	</div>
+
+	<div class="row chip-row">
+		<md-input-container flex>
+			<md-chips ng-model="$root.selectedTags" md-autocomplete-snap="" md-transform-chip="$root.transformChip($chip)" md-require-match="false">
+				<md-autocomplete md-search-text="searchText" md-items="item in $root.querySearch(searchText)" md-item-text="item.name" placeholder="Search or input Tags">
+					<span md-highlight-text="searchText">{{item.name}}</span>
+				</md-autocomplete>
+				<md-chip-template>
+					<span>
+						<strong>{{$chip.name}}</strong>
+					</span>
+				</md-chip-template>
+			</md-chips>
+		</md-input-container>
+	</div>
+	<div class="row" ng-show="userData.private_enabled">
+		<md-input-container flex>
+			<div class="col-md-6">
+				<label>Private setting</label>
+			</div>
+			<div class="col-md-6">
+				<md-switch class="md-primary" ng-model="private_type" md-no-ink aria-label="Switch Private" style="margin: 0px 0px;">
+					<span ng-if="private_type">Private</span>
+					<span ng-if="!private_type">Public</span>
+				</md-switch>
+			</div>
+		</md-input-container>
+	</div>
+
+	<div class="row">
+		<md-input-container flex>
+			<label>Questionset Type</label>
+		</md-input-container>
+		<md-input-container flex>
+			<md-radio-group ng-model="setType">
+				<md-radio-button value="General" class="md-primary">General</md-radio-button>
+				<md-radio-button value="Multiple" class="md-primary">Multiple Type</md-radio-button>
+				<md-radio-button value="Likert" class="md-primary">Likert Type</md-radio-button>
+			</md-radio-group>
+		</md-input-container>
+	</div>
+
+
+	<div ng-show="setType=='Likert'">
+		<div class="row">
+			<md-input-container>
+				<hr />
+			</md-input-container>
+			<md-input-container flex>
+				<label>Scale Type</label>
+			</md-input-container>
+			<md-input-container flex>
+				<md-radio-group ng-model="selectedRadio" ng-change="scaleTypeChanged(selectedRadio)">
+					<md-radio-button ng-repeat="item in scaleType" ng-value="$index" class="md-primary">{{item}}</md-radio-button>
+				</md-radio-group>
+			</md-input-container>
+		</div>
+
+		<div class="row">
+			<md-input-container flex>
+				<label>Default Subscale Operation Method</label>
+			</md-input-container>
+			<md-input-container flex>
+				<md-radio-group ng-model="method" layout="row">
+					<md-radio-button ng-value="'Average'" class="md-primary" style="margin-right:70px;">Average</md-radio-button>
+					<md-radio-button ng-value="'Sum'" class="md-primary">Sum</md-radio-button>
+				</md-radio-group>
+			</md-input-container>
+		</div>
+
+		<div class="row instructions">
+			<md-input-container flex>
+				<label>Likert Questionnaire Instructions to partifipants</label>
+				<textarea ng-model="instructions.text" style="border-radius:5px;"></textarea>
+			</md-input-container>
+		</div>
+
+		<div class="row">
+			<md-input-container flex>
+				<label>Y-axis Label</label>
+				<input ng-model="yLabel" style="border-radius:5px;" />
+			</md-input-container>
+		</div>
+
+
+		<div class="row">
+			<md-input-container flex>
+				<div class="col-md-6">
+					<label>No. of Options (2 ~ 10)</label>
+				</div>
+				<div class="col-md-2 center">
+					<button class="btn btn-default" style="color:green" myclick="decCount();">&#9664;</button>
+				</div>
+				<div class="col-md-2 center">
+					<div>{{optionCount}}</div>
+				</div>
+				<div class="col-md-2 center">
+					<button class="btn btn-default" style="color:green" myclick="incCount();">&#9654;</button>
+				</div>
+			</md-input-container>
+		</div>
+
+		<div class="row">
+			<md-input-container flex>
+				<label>Options</label>
+			</md-input-container>
+			<md-input-container flex ng-repeat="option in options" style="margin-top:0px; margin-bottom:0px;">
+				<input ng-model="option.value" style="border-radius:5px;" />
+			</md-input-container>
+		</div>
+	</div>
+	<div class="row button-row">
+		<a class="btn btn-link" myclick="creatQuestionSet()">Create</a>
+		<a class="btn btn-link" ui-sref="teacherQuestion" ui-sref-active="active">Back</a>
+	</div>
+</div>
+
+
+<style>
+	.main-div {
+		font-size: 1.5em;
+		padding-top: 20px;
+	}
+
+	.set-name {
+		margin-top: 20px;
+	}
+
+	.instructions {
+		margin-top: 30px;
+	}
+
+	.instructions textarea {
+		max-height: 100px;
+	}
+
+	md-input-container {
+		margin: 15px 10%;
+	}
+
+	md-radio-group {
+		display: flex;
+		margin-left: 30px;
+	}
+
+	md-radio-button {
+		margin-right: 30px;
+	}
+</style>

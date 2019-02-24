@@ -1,0 +1,63 @@
+<div class="container login-back" ng-show="$root.settings.loadingfinished">
+	<div class="loginform">
+		<h2 class="text-center">Sign In</h2>		
+		<div class="row">
+			<md-input-container flex>
+				<label for="username">Email</label>
+				<input ng-model="loginmail" name="username" required="true" type="text">
+			</md-input-container>
+		</div>
+		<div class="row">
+			<md-input-container flex>
+				<label for="password">Password</label>
+				<input ng-model="pwd" name="password" required="true" type="password">
+			</md-input-container>
+		</div>
+
+		<div class="row">
+			<md-input-container flex class="center">
+				<button id="signin" class="btn btn-primary" myclick="login()">Log In</button>
+				<button class="btn btn-link" myclick="$root.go('register')">Register</button>
+			</md-input-container>
+		</div>
+		<div class="row">
+			<md-input-container flex class="center">
+				<button class="btn btn-link" myclick="$root.go('resetPass')">Forgot password?</button>
+			</md-input-container>
+		</div>		
+	</div>
+</div>
+<style>
+	.page-container {
+		padding: 0px;
+	}
+
+	.login-back {
+		background-image: url("./assets/img/coverimage.jpg");
+		width: 100%;
+		height: 100vh;
+		background-attachment: fixed;
+		background-size: 100% auto;
+		background-size: 100% 100%;
+		background-repeat: no-repeat;
+	}
+
+	.loginform {
+		top: 40%;
+		margin: 100px auto;
+		max-width: 550px;
+		padding: 50px 20px 30px 20px;
+		border-radius: 5px;
+		box-shadow: 0 0 5px hsla(0, 0%, 59%, .8);
+		background: #ffffff;
+	}
+
+	.loginform input {
+		font-size: 25px
+	}
+
+	button {
+		margin-left: 5%;
+		margin-right: 5%;
+	}
+</style>

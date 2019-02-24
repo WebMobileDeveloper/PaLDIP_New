@@ -1,0 +1,165 @@
+<div ng-init="init()" ng-show="$root.settings.loadingfinished">
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="title-div">
+					{{$root.settings.groupName}}
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="form-group mb-3">
+					Select Groupset:
+					<select class="form-control" ng-model="subIndex" ng-change="changeSubIndex()">
+						<option ng-repeat="groupset in groupsets track by $index" value="{{$index}}"
+							ng-selected="$index==subIndex">{{groupset.name}}</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group mb-3">
+					Select SubGroupset:
+					<select class="form-control" ng-model="secondIndex" ng-change="changeSecondIndex()"
+						ng-disabled="subIndex==0">
+						<option ng-repeat="subset in subGroupsets track by $index" value="{{$index}}"
+							ng-selected="$index==secondIndex">{{subset.name}}</option>
+					</select>
+				</div>
+			</div>
+		</div>
+		<div class="row" style="text-align: center; background: #8fc9fd; min-height: 40px; line-height: 40px;">
+			<div class="col-md-2 col-sm-2 col-xs-2" style="border: solid 1px #939897;">Question Type</div>
+			<div class="col-md-10  col-sm-10 col-xs-10" style="border: solid 1px #939897;">Question</div>
+		</div>
+		<div class="row data-content">
+			<div ng-repeat="set in QuestionSets track by $index" class="col-md-12">
+				<div class="row set-name-row" ng-class="set.isSection?'section-row':''">
+					<div class="col-md-12">
+						{{set.setname}}
+					</div>
+				</div>
+
+				<div ng-repeat="qst in set.questions track by $index" class="row question-row"
+					ng-class="{'active-row':qst.questionKey == selectedQuestionKey && qst.questionSetKey == selectedQuestionSetKey}">
+					<div class="col-md-2  col-sm-2 col-xs-2 question-set">
+						{{qst.questionType}}
+					</div>
+					<div class="col-md-8  col-sm-8 col-xs-8 question-val" style="padding-left: 10px;"
+						ng-class="{'center' : qst.questionType=='Likert Type'}">
+						<b ng-show="qst.code">CODE:&emsp; <span class="qst-title">{{qst.code}}</span></b>
+						<span class="qst-title" ng-show='qst.title'>{{qst.title}}: &emsp;</span>
+						{{qst.question}}
+					</div>
+					<div class="col-md-2  col-sm-2 col-xs-2 question-val">
+						<div class="btn-div">
+							<button id="delbtn" class="btn btn-primary eye"
+								myclick="disableView(set.key, qst, $parent.$index)">
+								<md-tooltip class="custom-tooltip no-tail">
+									{{qst.disabled?'Disabled':'Enabled'}} see result
+								</md-tooltip>
+								<i class="glyphicon glyphicon-eye-open" ng-hide="qst.disabled"></i>
+								<i class="glyphicon glyphicon-eye-close" ng-show="qst.disabled"></i>
+							</button>
+							<button id="delbtn" type="button" class="btn btn-primary" myclick="response(set.key,qst)">
+								View <span class="hide-in-small">Responses</span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	.title-div {
+		font-style: italic;
+		color: #1d22f9;
+		border-bottom: solid 1px #00000052;
+		margin: 15px 0;
+	}
+
+	.data-content {
+		height: calc(100vh - 250px);
+		overflow-y: auto;
+		overflow-x: hidden;
+		border: solid 1px #939897;
+		padding-bottom: 20px;
+	}
+
+	.set-name-row {
+		min-height: 40px;
+		text-align: center;
+		line-height: 40px;
+		font-size: 16px;
+		margin-top: 8px;
+		font-weight: bold;
+		color: #0b1699;
+	}
+
+	.set-name-row.section-row {
+		background-color: #615edd;
+		min-height: 50px;
+		line-height: 50px;
+		font-size: 18px;
+		margin-top: 2px;
+	}
+
+	.question-row {
+		margin-top: 5px;
+		margin-bottom: 5px;
+		font-weight: bold;
+		background-color: #d9edf7;
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.question-row>[class*='col-'] {
+		padding-top: 5px;
+		padding-bottom: 5px;
+		display: flex;
+		flex-direction: column;
+	}
+
+	
+
+	.qst-title {
+		color: blue;
+	}
+
+	.question-val {
+		color: #31708f;
+		display: flex;
+	}
+
+	.question-val button {
+		white-space: normal;
+		line-height: 1em;
+		padding: 5px;
+		font-size: 13px;
+		max-width: 80px;
+	}
+
+	.question-val button.eye {
+		background-color: transparent;
+		border: none;
+		color: #0643d2;
+		font-size: 20px;
+		transform: scale(1.5, 1);
+		margin-right: 5px;
+	}
+
+	.question-val button.eye .glyphicon-eye-close {
+		color: #656565;
+	}
+
+	.active-row {
+		border: solid 2px #0647cb;
+	}
+
+	.btn-div {
+		position: relative;
+		top: calc(50% - 20px);
+	}
+</style>

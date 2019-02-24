@@ -1,0 +1,107 @@
+<div ng-init="initExportAll()" style="margin-top:20px;">
+	<div ng-show="$root.settings.loadingfinished && noAnswerMessage" class="no-data">
+		{{noAnswerMessage}}
+	</div>
+	<div ng-show="$root.settings.loadingfinished && !noAnswerMessage">
+		<button class="btn btn-link" myclick="$root.exportToExcel('#table-1')">
+			<span class="glyphicon glyphicon-share"></span> Export to Excel
+		</button>
+		<button class="btn btn-primary pull-right" ng-if="!anonymous" myclick="change_show_user()" ng-disabled="!anonym_enabled">
+			<span ng-show="show_email">Anonymous</span>
+			<span ng-hide="show_email">Non-Anonymous</span>
+		</button>
+		<table class="table table-bordered datatable" id="table-1" style="margin-top:10px;">
+			<thead>
+				<tr>
+					<th colspan="11">
+						<b style="font-size:1.5em;">{{groupName}}</b>
+						<br/>
+					</th>
+				</tr>
+				<tr>
+					<th rowspan="2">Questions</th>
+					<th rowspan="2">Sub Questions</th>
+					<th colspan="2">Options</th>
+					<th rowspan="2">User</th>
+					<th rowspan="2">Gender</th>
+					<th rowspan="2">Age</th>
+					<th rowspan="2">Profession</th>
+					<th rowspan="2">Mother tongue</th>
+					<th rowspan="2">Date/Time</th>
+					<th rowspan="2">Answer</th>
+				</tr>
+				<tr>
+					<th>A</th>
+					<th>B</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-if="false" ng-repeat-start="question in answers"></tr>
+				<tr ng-repeat="index in [] | range:question.answers.length *  question.subQuestions.length" ng-init="
+						userCount = question.answers.length; 	
+						subCount = question.subQuestions.length;   
+						user = getUserData(question, index, subCount);
+						sub = getSubData(question, index, userCount);">
+					<td ng-if="index == 0" rowspan="{{userCount * subCount}}" class="question">{{question.question}}</td>
+					<td ng-if="sub" rowspan="{{userCount}}" class="sub-question">{{sub.question}}</td>
+					<td ng-if="sub" rowspan="{{userCount}}" class="option option-a">{{sub.options[0]}}</td>
+					<td ng-if="sub" rowspan="{{userCount}}" class="option option-b">{{sub.options[1]}}</td>
+
+					<td ng-if="user" rowspan="{{subCount}}">
+						<span ng-if="!show_email">{{user.show_id}}</span>
+						<span ng-if="show_email">{{user.mail}}</span>
+					</td>
+					<td ng-if="user" rowspan="{{subCount}}">{{user.Gender}}</td>
+					<td ng-if="user" rowspan="{{subCount}}">{{user.Age}}</td>
+					<td ng-if="user" rowspan="{{subCount}}">{{user.Profession}}</td>
+					<td ng-if="user" rowspan="{{subCount}}">{{user.Mothertongue}}</td>
+					<td ng-if="user" rowspan="{{subCount}}">{{user.datetime}}</td>
+					<td ng-if="user" rowspan="{{subCount}}">{{convertAnswer(user.answer)}}</td>
+				</tr>
+
+				<tr ng-if="false" ng-repeat-end></tr>
+			</tbody>
+		</table>
+	</div>
+	<style>
+		.main-div {
+			width: 100%;
+			padding: 2%;
+		}
+
+		.no-data {
+			margin: 100px auto;
+			width: 500px;
+			text-align: center;
+			font-size: 3em;
+			color: #fd6167;
+			font-style: italic;
+			font-weight: bold;
+		}
+
+		td>p {
+			margin: 0px;
+		}
+
+		.table>thead>tr>th,
+		.table>tbody>tr>td {
+			text-align: center;
+			vertical-align: middle;
+		}
+
+		.question {
+			font-weight: bold;
+			font-size: 1.2em;
+			color: #bd0707;
+		}
+
+		.sub-question {
+			font-weight: bold;
+			color: #040477;
+		}
+
+		.option {
+			font-weight: bold;
+			color: #018a20;
+		}
+	</style>

@@ -1,0 +1,143 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="answer-form">
+		<div class="row">
+			<label style="margin-left: 10%;	color: #a2a2a2;">Answer</label>
+			<div class="col col-sm-12">
+				<div class="row well ">
+					<div class="mid-cell">
+						<div class="answer-div" ng-if="!$root.settings.listType">{{answers[answerIndex].answer}}</div>
+						<div class="answer-div" ng-if="$root.settings.listType">
+							<div class="answer-list" ng-repeat="answer in answers"
+								ng-class="($index == answerIndex)?'selected':'';" ng-click="changeIndex($index)">
+								{{$index+1}}.&emsp;{{answer.answer}}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row starfield-container" ng-show="qtype && answers && feedbackquestions">
+			<label style="color: #a2a2a2;">Score</label>
+			<div class="col-md-12 starfield">
+				<div class="row" ng-repeat="option in feedbackquestions track by $index">
+					<div class="col-md-8">
+						{{option}}
+					</div>
+					<div class="col-md-4 starrow center">
+						<span class="fa fa-star " ng-repeat="i in [0,1,2,3,4]" ng-class="getStarState(i,$parent.$index)"
+							myclick="setstar(i,$parent.$index)"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row" ng-hide="qtype2" id="txtfedback">
+			<!-- <label style="margin-left: 10%;	color: #a2a2a2;">Feedback</label> -->
+			<div class="col-md-12">
+				<md-input-container flex style="width:90%; margin:30px 5%;">
+					<label>Feedback</label>
+					<textarea class="feedback-text" ng-model="answers[answerIndex].Feedbacks[uid].text" rows="3"
+						ng-change="saveFeedbackText()" style="border-radius:5px;height:10px;font-size:18px"></textarea>
+				</md-input-container>
+			</div>
+		</div>
+
+		<div ng-if="question.awardScore && question.awardPeoples">
+			<div class="row">
+				<div class="col-md-12">
+					<md-input-container>
+						<span ng-if="!question.isInvestment">Award</span>
+						<span ng-if="question.isInvestment">Investment Amount</span>
+						<input type='number' ng-model="answers[answerIndex].awardScore[uid]" ng-change="changeAward()"
+							required="required" numbers-only="numbers-only" />
+					</md-input-container>
+				</div>
+				<div class="col-md-12">
+					<md-input-container flex class="award">
+						<div class="col-md-12">
+							<span ng-if="!question.isInvestment">Score:</span>
+							<span ng-if="question.isInvestment">Budget Remaining</span>
+							&emsp; {{question.awardScore - totalAwardScore}}</span>
+						</div>
+						<div class="col-md-12">
+							<span ng-if="!question.isInvestment">Users:</span>
+							<span ng-if="question.isInvestment">No. of Investments:</span>
+							&emsp; {{totalAwardPeople}}/{{question.awardPeoples}}
+						</div>
+					</md-input-container>
+				</div>
+
+			</div>
+		</div>
+
+		<hr />
+		<div class="row center navigation-row">
+			<div class="col-md-6 col-sm-6 col-xs-6">
+				<button class="btn btn-default" myclick="decreaseindex()">&#9664;</button>
+			</div>
+			<div class="col-md-6 col-sm-6 col-xs-6">
+				<button class="btn btn-default" myclick="increaseindex()">&#9654;</button>
+			</div>
+		</div>
+		<div class="row button-row">
+			<a class="btn btn-link" myclick="$state.go('groupFeedbackAnswer')">Back</a>
+			<a class="btn btn-link" myclick="$state.go('groupFeedbackAnswer2')" ng-show="$root.settings.prevAnswer">See My
+				Results</a>
+			<a class="btn btn-link" myclick="gotoView()" ng-show="!$root.settings.prevAnswer">Group Results</a>
+		</div>
+
+	</div>
+</div>
+<style>
+	.starrow {
+		font-size: 20px;
+	}
+
+	.well {
+		padding: 20px 0px;
+	}
+
+	.mid-cell {
+		width: 95%;
+		margin: auto;
+	}
+
+	.answer-div {
+		padding: 10px;
+	}
+
+	.checked {
+		color: orange;
+	}
+
+	.navigation-row button {
+		width: 80%;
+		max-width: 100px;
+		color: green;
+		margin-bottom: 20px;
+	}
+
+	.answer-list {
+		padding-left: 5px;
+		border: solid 1px #d1d1f9;
+	}
+
+	.answer-list:hover {
+		background-color: #a1bdf64d;
+		cursor: pointer;
+	}
+
+	.answer-list.selected {
+		color: white;
+	}
+
+	md-input-container.award input {
+		width: 100px;
+	}
+
+	md-input-container.award span {
+		width: 100px;
+		margin-left: 10%;
+		font-size: 1.5em;
+	}
+</style>

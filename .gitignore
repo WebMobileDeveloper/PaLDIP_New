@@ -1,0 +1,4 @@
+backend/functions/node_modules
+backend/functions/package-lock.json
+backend/functions/.eslintrc.json
+backend/functions/yarn.lock

@@ -1,0 +1,182 @@
+<div class="container" ng-init="init()">
+	<div class="answer-form">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 title">
+				<span class="qst-title" ng-show='question.title'>{{question.title}}:</span>
+				{{question.question}}</div>
+			<div class="col-md-12 center">
+				<hr />
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<h4 class="center answered" ng-show="$root.settings.prevAnswer">You already submitted answer about this question
+					before.</h4>
+			</div>
+			<div class="col-md-12">
+				<hr />
+			</div>
+		</div>
+		<div class="row" ng-show="question.links">
+			<div class="col-md-12">
+				<div class="sub-question">
+					<label>Extra Links</label>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="sub-question" ng-repeat="link in question.links track by $index">
+					<a href={{link.url}} target="_blank" style="font-size:20px; margin-left:30px;">{{link.title}}</a>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<hr />
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 " ng-repeat="obj in question.subQuestions">
+				<div class="sub-question">
+					<label>Question&nbsp;{{$index+1}}: &emsp;{{obj.question}}</label>
+					<label class="option-label">A: &emsp; {{obj.options[0]}}&emsp;&emsp;
+						<span ng-if="currAnswer[$index]==0" class="glyphicon glyphicon-ok completed"></span>
+					</label>
+					<label class="option-label">B: &emsp; {{obj.options[1]}}&emsp;&emsp;
+						<span ng-if="currAnswer[$index]==1" class="glyphicon glyphicon-ok completed"></span>
+					</label>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<hr />
+			</div>
+		</div>
+		<div class="row additional_info_container" ng-show="$root.additional_info" ng-init="$root.getAddInfo()">
+			<div class="col-md-12">
+				<div class="sub-question">
+					<label>Additional Information / Comments</label>
+					<div id="additional_info"></div>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<hr />
+			</div>
+		</div>
+		<div class="row button-row">
+			<a class="btn btn-link" myclick="$root.go('questions')">Back</a>
+			<button class="btn btn-primary" myclick="saveanswer()" ng-hide="$root.settings.prevAnswer">Submit</button>
+			<button class="btn btn-primary" myclick="edit()" ng-show="question.editable && !$root.settings.prevAnswer">Edit
+				Answer</button>
+			<a class="btn btn-link" myclick="$root.go('studentGroupDetail')">Question Sets</a>
+			<a class="btn btn-link" myclick="goNext()" ng-show="$root.settings.prevAnswer">Next</a>
+		</div>
+	</div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="answerModal" tabindex="-1" role="dialog" aria-labelledby="addQuestion" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">{{question.question}}</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-show="question.editable">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+
+				<div class="row">
+					<div class="col-md-12 sub-title">{{subQuestion.question}}</div>
+					<div class="col-md-12 center">
+						<hr />
+					</div>
+				</div>
+
+				<div class="row img-row" ng-show="imgSrc">
+					<div class="col-md-12">
+						<img ng-src="{{imgSrc}}">
+					</div>
+					<div class="col-md-12 center">
+						<hr />
+					</div>
+				</div>
+				<div class="row center" ng-show="subQuestion.videoID">
+					<div id="playerWrapOuter">
+						<div id="playerWrap">
+							<iframe id="video-iframe" width="420" height="315" src="{{videoURL}}" frameborder="0"></iframe></div>
+					</div>
+					<div class="col-md-12 center">
+						<hr />
+					</div>
+				</div>
+
+				<div class="row">
+					<fieldset class="standard">
+						<legend>Answer</legend>
+						<div class="row">
+							<md-radio-group ng-model="selectedRadio" ng-change="radioChanged(selectedRadio)">
+								<md-radio-button ng-value="0" class="md-primary">A: &emsp;{{subQuestion.options[0]}}</md-radio-button>
+								<md-radio-button ng-value="1" class="md-primary">B: &emsp;{{subQuestion.options[1]}}</md-radio-button>
+							</md-radio-group>
+						</div>
+					</fieldset>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-danger" data-dismiss="modal" ng-show="question.editable">Close</button>
+				<button class="btn btn-primary" myclick="prev()" ng-show="question.editable">Prev Question</button>
+				<button class="btn btn-primary" myclick="next()">Next Question</button>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	.title {
+		color: green;
+		text-align: left;
+	}
+
+	.sub-title {
+		padding: 0px 5%;
+		text-align: center;
+		font-size: 1.2em;
+		font-weight: bold;
+		color: #0d8600;
+	}
+
+	fieldset {
+		width: 80%;
+		margin-left: 10%
+	}
+
+	md-input-container .md-input {
+		max-height: 200px;
+		overflow-y: auto;
+		background-color: #f8f6f9;
+		border-bottom: solid 1px #60a3f999;
+		border-radius: 10px;
+		padding: 10px;
+	}
+
+	#video-iframe {
+		width: 420px;
+		height: 315px;
+		max-width: 80vw;
+		max-height: calc(100vw * 0.6);
+	}
+
+	.sub-question {
+		width: 80%;
+		margin: 0px auto;
+	}
+
+	.sub-question>label {
+		display: block;
+	}
+
+	.option-label {
+		padding-left: 30px;
+	}
+
+	.completed {
+		color: green;
+	}
+</style>

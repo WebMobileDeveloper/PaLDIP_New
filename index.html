@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="myApp">
+
+<head>
+	<title data-ng-bind="$state.current.data.pageTitle"></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+	<META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 22 Jul 2002 11:12:01 GMT">
+	<link rel="shortcut icon" href="">
+	<!--This is what you should include-->
+	<meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">
+
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+	<base href="/">
+	<script src="./assets/js/angular.js?v=1.0.170"></script>
+
+	<!-- Angulars Material CSS using RawGit to load directly from `bower-material/master` -->
+
+	<link rel="stylesheet" href="./assets/css/angular-material.css?v=1.0.170">
+	<link rel="stylesheet" href="./assets/css/bootstrap.min.css?v=1.0.170">
+	<link rel="stylesheet" href="./assets/css/toaster.min.css?v=1.0.170" />
+	<link rel="stylesheet" href="./assets/css/dragula.min.css?v=1.0.170" />
+	<link rel="stylesheet" href="./assets/css/common.css?v=1.0.170" />
+	<link rel="stylesheet" href="./assets/css/space.css?v=1.0.170" />
+	<link rel="stylesheet" href="./assets/css/layout.css?v=1.0.170" />
+	<link rel="stylesheet" href="./assets/css/media.css?v=1.0.170" />
+	<link rel="stylesheet" href="./assets/css/modal.css?v=1.0.170" />
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+	<link rel="stylesheet" href="./assets/css/bootstrap-datetimepicker.min.css?v=1.0.170">
+	<link rel="stylesheet" href="./assets/css/bootstrap-datetimepicker-standalone.css?v=1.0.170">
+</head>
+
+<body ng-cloak>
+	<div data-ng-include="'./app/templates/common/menu.html'"></div>
+	<div class="page-container container-fluid">
+		<div ui-view></div>
+	</div>
+</body>
+
+
+<script src="./assets/js/firebase/firebase-app.5.5.9.js?v=1.0.170"></script>
+
+<!-- Add additional services that you want to use -->
+<script src="./assets/js/firebase/firebase-auth.5.5.9.js?v=1.0.170"></script>
+<script src="./assets/js/firebase/firebase-database.5.5.9.js?v=1.0.170"></script>
+<script src="./assets/js/firebase/firebase-storage.5.5.9.js?v=1.0.170"></script>
+<script src="./assets/js/firebase/firebase-functions.5.5.9.js?v=1.0.170"></script>
+
+
+
+<script src="./assets/js/angular-animate.js?v=1.0.170"></script>
+<script src="./assets/js/angular-aria.js?v=1.0.170"></script>
+<script src="./assets/js/angular-material.js?v=1.0.170"></script>
+<script src="./assets/js/angular-sanitize.js?v=1.0.170"></script>
+<script src="./assets/js/jquery.min.js?v=1.0.170"></script>
+<script src="./assets/js/bootstrap.min.js?v=1.0.170"></script>
+<script src="./assets/js/moment.min.js?v=1.0.170"></script>
+<script src="./assets/js/bootstrap-datetimepicker.js?v=1.0.170"></script>
+<script src="./assets/js/toaster.js?v=1.0.170"></script>
+<script src="./assets/js/angular-dragula.min.js?v=1.0.170"></script>
+<script src="./assets/js/chart.js?v=1.0.170"></script>
+<script src="./assets/js/dom-autoscroll.min.js?v=1.0.170"></script>
+
+<!-- xlsx -->
+<script src="./assets/js/xlsx/xlsx.full.min.js?v=1.0.170"></script>
+
+
+<script src="./assets/js/angular-ui-router.min.js?v=1.0.170"></script>
+<script src="./app/app.module.js?v=1.0.170"></script>
+<script src="./app/app.config.js?v=1.0.170"></script>
+<script src="./app/app.run.js?v=1.0.170"></script>
+
+
+<!--  common controllers -->
+<script src="./app/controller/common/login.controller.js?v=1.0.170"></script>
+<script src="./app/controller/common/forgot.controller.js?v=1.0.170"></script>
+<script src="./app/controller/common/register.controller.js?v=1.0.170"></script>
+<script src="./app/controller/common/unknown.controller.js?v=1.0.170"></script>
+<script src="./app/controller/common/chat/home.teacher.js?v=1.0.170"></script>
+<!-- chat controllers -->
+<script src="./app/controller/common/chat/home.js?v=1.0.170"></script>
+
+<!--  admin controllers -->
+<script src="./app/controller/admin/home.js?v=1.0.170"></script>
+<script src="./app/controller/admin/group.js?v=1.0.170"></script>
+<script src="./app/controller/admin/options.js?v=1.0.170"></script>
+<script src="./app/controller/admin/question.js?v=1.0.170"></script>
+<script src="./app/controller/admin/question.detail.js?v=1.0.170"></script>
+<script src="./app/controller/admin/questionsets.all.js?v=1.0.170"></script>
+<script src="./app/controller/admin/groupDetails.js?v=1.0.170"></script>
+<script src="./app/controller/admin/groupDetailsSecond.js?v=1.0.170"></script>
+<script src="./app/controller/admin/questionsets.used.js?v=1.0.170"></script>
+
+<script src="./app/controller/admin/export/allgroups.js?v=1.0.170"></script>
+<script src="./app/controller/admin/export/allteachers.js?v=1.0.170"></script>
+<script src="./app/controller/admin/export/ingroup.js?v=1.0.170"></script>
+<script src="./app/controller/admin/export/questionSet.js?v=1.0.170"></script>
+<script src="./app/controller/admin/export/question.js?v=1.0.170"></script>
+
+<script src="./app/controller/admin/settings.js?v=1.0.170"></script>
+<script src="./app/controller/admin/status.js?v=1.0.170"></script>
+
+
+
+
+<!--
+	 ///////////////////////////////////////////////////////////////////////////////
+	  				student controllers 
+	////////////////////////////////////////////////////////////////////////////////
+-->
+<!-- group -->
+<script src="./app/controller/common/profile.js?v=1.0.170"></script>
+
+<script src="./app/controller/student/group/detail.js?v=1.0.170"></script>
+<script src="./app/controller/student/group/detail.second.js?v=1.0.170"></script>
+<script src="./app/controller/student/group/detail.sub.js?v=1.0.170"></script>
+<script src="./app/controller/student/group/joingroup.js?v=1.0.170"></script>
+<script src="./app/controller/student/group/mygroup.js?v=1.0.170"></script>
+
+<!-- questions -->
+<script src="./app/controller/student/questions/questions.js?v=1.0.170"></script>
+<script src="./app/controller/student/questions/questions.sub.js?v=1.0.170"></script>
+
+<!-- direct link -->
+
+<script src="./app/controller/student/link/directLink.js?v=1.0.170"></script>
+<!-- answer -->
+<script src="./app/controller/student/answer/group/answer.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/group/digit.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/group/dropdown.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/group/feedback.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/group/feedback1.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/group/feedback2.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/group/multiple.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/group/rating.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/group/slide.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/group/text.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/group/likert.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/group/contingent.js?v=1.0.170"></script>
+
+<script src="./app/controller/student/answer/groupset/digit.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/groupset/dropdown.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/groupset/feedback.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/groupset/feedback1.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/groupset/feedback2.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/groupset/multiple.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/groupset/rating.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/groupset/slide.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/groupset/text.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/groupset/contingent.js?v=1.0.170"></script>
+<script src="./app/controller/student/answer/groupset/likert.js?v=1.0.170"></script>
+
+
+<!-- view -->
+<script src="./app/controller/student/view/group/digit.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/group/dropdown.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/group/feedback.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/group/multiple.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/group/rating.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/group/slide.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/group/text.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/group/likert.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/group/contingent.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/group/external.js?v=1.0.170"></script>
+
+<script src="./app/controller/student/view/groupset/digit.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/groupset/dropdown.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/groupset/feedback.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/groupset/multiple.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/groupset/rating.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/groupset/ratingTeam.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/groupset/slide.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/groupset/text.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/groupset/contingent.js?v=1.0.170"></script>
+<script src="./app/controller/student/view/groupset/likert.js?v=1.0.170"></script>
+
+<!--
+	 ///////////////////////////////////////////////////////////////////////////////
+	  				teacher controllers 
+	////////////////////////////////////////////////////////////////////////////////
+-->
+
+<!-- group -->
+<script src="./app/controller/teacher/group/group.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/groupRoot.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/groupSubRoot.js?v=1.0.170"></script>
+
+
+<script src="./app/controller/teacher/group/choiceaction.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/creategroup.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/uploadList.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/group.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/group.edit.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/groupsets.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/groupsetUsers.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/subsetUsers.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/groupset.edit.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/questions.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/exportGroupsetUsers.js?v=1.0.170"></script>
+
+<!-- link -->
+<script src="./app/controller/teacher/group/operation/detail.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/operation/detail.sub.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/operation/detail.second.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/operation/questions.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/operation/questions.sub.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/operation/completeset.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/operation/feedback.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/operation/feedback.sub.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/operation/rating.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/operation/rating.result.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/operation/rating.sub.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/operation/rating.sub.result.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/operation/exportUsers.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/operation/exportScores.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/operation/score.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/group/operation/external.js?v=1.0.170"></script>
+
+<!-- response / group -->
+<script src="./app/controller/teacher/response/group/dropdown.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/response/group/general.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/response/group/multiple.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/response/group/likert.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/response/group/feedback.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/response/group/rating.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/response/group/contingent.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/response/group/slide.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/response/group/answer.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/response/group/external.js?v=1.0.170"></script>
+
+<!-- response / groupset -->
+<script src="./app/controller/teacher/response/groupset/dropdown.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/response/groupset/feedback.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/response/groupset/rating.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/response/groupset/general.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/response/groupset/multiple.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/response/groupset/contingent.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/response/groupset/likert.js?v=1.0.170"></script>
+
+<!-- question -->
+<script src="./app/controller/teacher/question/questionSets.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/createQuestionSet.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/question.detail.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/subscale.detail.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/superScale.detail.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/label.detail.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/questionsInSet.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/deleteQuestion.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/deleteQuestionSet.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/deleteLikertSet.js?v=1.0.170"></script>
+
+<!-- question / create -->
+<script src="./app/controller/teacher/question/create/choicetype.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/create/bydigit.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/create/bydropdown.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/create/byfeedback.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/create/bymultiple.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/create/byrating.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/create/byslide.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/create/bytext.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/create/byLikert.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/create/bycontingent.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/create/byAnswers.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/question/create/byExternal.js?v=1.0.170"></script>
+
+<!-- export -->
+<script src="./app/controller/teacher/export/choiceGroup.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/export/export.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/export/export.sub.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/export/export.second.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/export/toExcel.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/export/likertToExcel.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/export/ratingToExcel.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/export/toExcelAll.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/export/ratingToExcelAll.js?v=1.0.170"></script>
+<script src="./app/controller/teacher/export/contingentToExcelAll.js?v=1.0.170"></script>
+<!-- delete groupset -->
+<script src="./app/controller/teacher/group/deleteGroupset.js?v=1.0.170"></script>
+
+</html>

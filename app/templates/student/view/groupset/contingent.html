@@ -1,0 +1,147 @@
+<div class="main-div" ng-show="$root.settings.loadingfinished" ng-init="init()">
+
+	<div class="row" style="padding:0px 10%;">
+		<label style="font-size:20px;">Your Answer:&emsp;{{options[getIndex($root.settings.prevAnswer)]}}</label>
+	</div>
+
+	<div class="row">
+		<div class="col-md-8 col-sm-8">
+			<div class="chart-row">
+				<div class="chart-container">
+					<canvas id="barChart" basechart="" width="600px" height="400px"></canvas>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4 col-sm-4">
+			<div class="center"><span class="question-title">Questions</span></div>
+			<div class="right-question">
+				<div ng-repeat="qst in question.subQuestions track by $index">
+					<p><b>Question {{$index+1}}-</b>{{qst.question}}</p>
+					<div class="option-row">
+						<p>Options:</p>
+						<p> <span><b>A: </b>{{qst.options[0]}}</span> </p>
+						<p> <span><b>B: </b>{{qst.options[1]}}</span> </p>
+						<hr />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row" style="text-align: center;
+								font-style: oblique;
+								font-weight: bold;
+								color: #f75a9a;
+								font-size: 1.2em;
+								margin-top: 10px;">
+		<span ng-show="chartDescription">{{chartDescription}}&emsp;(total answers:&emsp;{{numberOfAnswers}})</span>
+	</div>
+	<div class="row" ng-init="$root.getInstFeedback($root.settings.groupKey, $root.settings.questionSetKey, $root.settings.questionKey)"
+	 ng-show="$root.settings.instructor_feedback">
+		<md-input-container>
+			<h4>Instructor Feedback</h4>
+			<textarea ng-disabled='true' class="Instructor_view_area">{{$root.settings.instructor_feedback}}</textarea>
+		</md-input-container>
+	</div>
+	<div class="row">
+		<!-- Result String -->
+		<md-input-container flex ng-show="question.result_string">
+			<textarea ng-disabled="true" ng-model="question.result_string" style="min-height: 100px;	max-height: 200px; overflow-y: auto; color: black;	
+			height: 0px;	border: solid 1px #b8f2f9;	background-color: aliceblue; border-radius: 7px; padding: 10px;"></textarea>
+		</md-input-container>
+		<!-- upload result image -->
+		<md-input-container flex class="center img-row" ng-init="$root.load_result_image()" ng-show="$root.result_imgSrc">
+			<img ng-src="{{$root.result_imgSrc}}">
+		</md-input-container>
+		<!-- result video url -->
+		<md-input-container flex ng-show="question.result_videoURL" class="center">
+			<div id="playerWrapOuter">
+				<div id="playerWrap">
+					<iframe id="video-iframe" width="420" height="315" src="{{question.result_videoURL}}" frameborder="0"></iframe>
+				</div>
+			</div>
+		</md-input-container>
+	</div>
+	<div class="row button-row">
+		<a class="btn btn-link" myclick="$root.back()">Back</a>
+		<a class="btn btn-link" myclick="$root.go('subQuestions')">Select Question</a>
+		<a class="btn btn-link" myclick="$root.goSubmitNextGroupAnswer()" ng-if="!$root.checkLast()">Next Question</a>
+		<a class="btn btn-link" myclick="$root.go('studentSubGroupDetail')" ng-if="$root.checkLast() && $root.settings.groupType=='sub'">Question
+			Sets
+		</a>
+		<a class="btn btn-link" myclick="$root.go('studentSecondGroupDetail')" ng-if="$root.checkLast() && $root.settings.groupType=='second'">Question
+			Sets
+		</a>
+	</div>
+	<div class="row main-other-choice">
+		<md-radio-group ng-model="groupChoice" ng-change="changeGroupChoice()" layout="row">
+			<md-radio-button value="main" class="md-primary">This Group</md-radio-button>
+			<md-radio-button value="other" class="md-primary">Other Groups</md-radio-button>
+			<md-radio-button value="all" class="md-primary">All Groups</md-radio-button>
+		</md-radio-group>
+	</div>
+</div>
+
+<style>
+	.content {
+		width: 100%;
+	}
+
+	@media screen and (min-width: 1024px) {
+		.main-div {
+			min-width: 1000px;
+		}
+	}
+
+	.main-div>.row {
+		width: 100%;
+		margin: 20px auto;
+	}
+
+	.chart-container {
+		width: 600px;
+		height: 400px;
+		margin: 0px auto;
+	}
+
+	.question-title {
+		font-size: 1.3em;
+		font-weight: bold;
+	}
+
+	.right-question {
+		max-height: 360px;
+		padding: 10px;
+		padding-left: 20px;
+		border: solid 1px #9f9f9f;
+		text-indent: -10px;
+		color: #030e8c;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+
+	.option-row {
+		color: #0736d8;
+		text-indent: 10px;
+	}
+
+
+	/* .chart-row {
+		margin-right: 20px;
+	} */
+
+	.button-row {
+		margin: 10px 10%;
+	}
+
+	a {
+		width: 100%;
+	}
+
+	.checked {
+		color: orange;
+	}
+
+	/* #pieChart {
+		margin-right: 100px;
+	} */
+</style>

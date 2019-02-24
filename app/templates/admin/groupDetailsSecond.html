@@ -1,0 +1,109 @@
+<div class="row content-header">
+	<div class="container title texteffect ">
+		{{subGroupSet.name}}&emsp;/&emsp;{{secondGroupSet.name}}
+		<!-- <div class="pull-right">
+				<a class="btn btn-success" myclick="$state.go('adminExportInGroup');">Export All</a>
+			</div> -->
+	</div>
+</div>
+<div class="container">
+	<div class="row">
+		<div class="content-div">
+			<div class="row">
+				<div class="col-md-6 col-sm-6 ">
+					<div class="groupset-details center">
+						<div class="box-title">Properties</div>
+						<!-- properties -->
+						<div class="row">
+							<div class="col-md-7 col-sm-7"> Number of subgroups </div>
+							<div class="col-md-5 col-sm-5">{{secondGroupSet.count}}</div>
+						</div>
+						<div class="row">
+							<div class="col-md-7 col-sm-7"> Maximum students per subgroup</div>
+							<div class="col-md-5 col-sm-5">{{secondGroupSet.max_member}}</div>
+						</div>
+						<div class="row">
+							<div class="col-md-7 col-sm-7"> Exclusive</div>
+							<div class="col-md-5 col-sm-5">
+								<span ng-show="secondGroupSet.exclusive">Yes</span>
+								<span ng-show="!secondGroupSet.exclusive">No</span>
+							</div>
+						</div>
+
+						<br/>
+					</div>
+				</div>
+				<div class="col-md-6 col-sm-6">
+					<div class="groupset-details center">
+						<!-- question sets -->
+						<div class="box-title">Question Sets</div>
+						<div class="row sub-questionsets">
+							<div class="col-md-12" ng-repeat="obj in secondGroupSet.QuestionSets">
+								{{obj.setname}}
+							</div>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+</div>
+<style>
+	.content-header {
+		background-color: #426af4;
+	}
+
+	.content-div {
+		height: calc(100vh - 220px);
+	}	
+
+	.title {
+		color: yellow;
+	}
+
+
+	div.box-title {
+		font-size: 2em;
+		text-align: center;
+		margin: 10px 0px;
+		color: #0716ba;
+	}
+
+	div.groupset-details {
+		border: solid 1px #355086;
+		height: calc(100vh - 300px);
+		background-color: #e0edf9;
+		margin-top: 20px;
+		padding: 20px 0%;
+		font-size: 1.2em;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	div.groupset-details>div {
+		margin-bottom: 20px;
+	}
+
+	.sub-questionsets {
+		max-height: calc(100vh - 450px);
+		border: solid 1px #9c9c9c;
+		overflow-y: auto;
+		width: 96%;
+		margin: 0px auto;
+		padding: 10px;
+		margin-bottom: 0px;
+		background-color: azure;
+	}
+
+	.sub-questionsets>div {
+		background-color: #75c8e3;
+		margin: 5px 0px;
+		border-radius: 10px;
+		font-size: 17px;
+		padding: 5px;
+		border: solid 1px #085699;
+	}	
+</style>

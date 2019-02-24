@@ -1,0 +1,142 @@
+<div class="container" ng-init="getMultipleOptions()">
+	<div class="answer-form" ng-show="$root.settings.loadingfinished">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 title">
+				<span class="qst-title" ng-show='question.title'>{{question.title}}:</span>
+				{{question.question}}</div>
+			<div class="col-md-12 center">
+				<hr />
+			</div>
+		</div>
+		<div class="row img-row" ng-init="$root.loadimage()" ng-show="$root.imgSrc">
+			<div class="col-md-12">
+				<img ng-src="{{$root.imgSrc}}">
+			</div>
+			<div class="col-md-12 center">
+				<hr />
+			</div>
+		</div>
+		<div class="row center" ng-show="videoURL">
+			<div id="playerWrapOuter">
+				<div id="playerWrap">
+					<iframe id="video-iframe" width="420" height="315" src="{{videoURL}}" frameborder="0"></iframe>
+				</div>
+			</div>
+			<div class="col-md-12 center">
+				<hr />
+			</div>
+		</div>
+		<!-- Extra Links -->
+		<div class="row" ng-show="question.links">
+			<div class="col-md-12">
+				<md-input-container flex class="margin-vertical-0">
+					<h3>Extra Links</h3>
+					<div class="sub-question" ng-repeat="link in question.links track by $index">
+						<a href={{link.url}} target="_blank"
+							style="font-size:20px; margin-left:30px;">{{link.title}}</a>
+					</div>
+				</md-input-container>
+			</div>
+			<div class="col-md-12">
+				<hr />
+			</div>
+		</div>
+		<div class="row additional_info_container" ng-show="$root.additional_info" ng-init="$root.getAddInfo()">
+			<div class="col-md-12">
+				<md-input-container flex>
+					<h3>- Additional Information / Comments</h3>
+					<div id="additional_info"></div>
+				</md-input-container>
+			</div>
+		</div>
+		<div class="row" ng-if="!$root.settings.prevAnswer">
+			<fieldset class="standard">
+				<legend>Anonymous Type</legend>
+				<div class="row">
+					<div ng-repeat="item in options track by $index" ng-if="maximumSelection>1">
+						<md-checkbox ng-checked="currAnswerVal[$index]" ng-click="toggle($index)"
+							ng-disabled="disabled[$index]">
+							{{ item }}
+						</md-checkbox>
+					</div>
+					<md-radio-group ng-model="selectedRadio" ng-if="maximumSelection==1"
+						ng-change="radioChanged(selectedRadio)">
+						<md-radio-button ng-repeat="item in options" ng-value="$index" class="md-primary">{{item}}
+						</md-radio-button>
+					</md-radio-group>
+				</div>
+			</fieldset>
+		</div>
+		<div class="row" ng-if="$root.settings.prevAnswer">
+			<h4 class="center answered">You already submitted answer about this question before.</h4>
+			<fieldset class="standard">
+				<legend>Your Answer</legend>
+				<div class="row">
+					<div ng-repeat="item in options" ng-if="maximumSelection>1">
+						<md-checkbox ng-checked="prevAnswerVal[$index]" ng-disabled="true">
+							{{ item }}
+						</md-checkbox>
+					</div>
+					<md-radio-group ng-model="selectedRadio" ng-if="maximumSelection==1" ng-disabled="true">
+						<md-radio-button ng-repeat="item in options" ng-value="$index" class="md-primary">{{item}}
+						</md-radio-button>
+					</md-radio-group>
+				</div>
+			</fieldset>
+		</div>
+		<hr />
+
+		<div class="row" ng-if="optionFeedbacks.length">
+			<h4 class="center feedback-title">Your Option Feedback</h4>
+			<md-input-container>
+				<div class="col-md-12 feedback-body" ng-repeat="feedback in optionFeedbacks">
+					<b>{{feedback.option}}</b>&emsp;:&emsp;
+					<span>{{feedback.feedback}}</span>
+				</div>
+			</md-input-container>
+			<hr />
+		</div>
+
+
+		<div class="row" ng-if="questionFeedback">
+			<h4 class="center  feedback-title">Total score and feedback</h4>
+			<md-input-container>
+				<div class="col-md-12 feedback-body">
+					<b>{{totalScore}}</b>&emsp;:&emsp;
+					<span>{{questionFeedback.text}}</span>
+				</div>
+			</md-input-container>
+			<hr />
+		</div>
+
+		<div class="row button-row">
+			<a class="btn btn-link" myclick="goBack()">Back</a>
+			<button class="btn btn-primary" myclick="saveanswer()" ng-hide="$root.settings.prevAnswer">Submit</button>
+			<a class="btn btn-link" myclick="goNext()" ng-show="$root.settings.prevAnswer">Next</a>
+		</div>
+	</div>
+	<!-- ng-show="$root.settings.prevAnswer" -->
+
+
+
+</div>
+
+
+<style>
+	.title {
+		margin-top: 20px;
+		color: green;
+		text-align: left;
+	}
+
+	.feedback-title {
+		font-size: 1.2em;
+		font-weight: bold;
+		color: #45459f;
+	}
+
+	.feedback-body {
+		font-size: 1.2em;
+		line-height: 30px;
+	}
+</style>

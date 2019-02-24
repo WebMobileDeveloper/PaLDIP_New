@@ -1,0 +1,918 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<!-- Question string -->
+	<div class="row center">
+		<div class="col-md-12">
+			<h2>Question Details<span style="font-size:0.8em;"> &emsp;{{editable?'(editable)':'(show only)'}}</span>
+			</h2>
+		</div>
+	</div>
+	<!-- Question Image -->
+	<div class="row" ng-show="question.questionType!='Answer Type' && question.questionType!='External Activity'">
+		<div class="col-md-12 img-row center" ng-init="$root.loadimage()" ng-show="$root.imgSrc">
+			<img ng-src="{{$root.imgSrc}}">
+		</div>
+		<div class="col-md-12">
+			<md-input-container flex ng-init="$root.fileupload(true)" ng-show="$root.teacherSettings.image_enabled && editable">
+				<strong>Update Image:</strong>
+				<progress value="0" max="100" id="uploader">0%</progress>
+				<input type="file" id="fileButton" />
+			</md-input-container>
+		</div>
+	</div>
+
+	<div class="row question-content">
+		<div class="col-md-12 cener">
+			<!-- Question Title -->
+			<md-input-container flex>
+				<strong>Question Code:</strong>
+				<input type="text" ng-disabled="true" ng-model="question.code" />
+			</md-input-container>
+
+			<md-input-container flex>
+				<strong>Question Title:</strong>
+				<input type="text" ng-disabled="!editable || !$root.teacherSettings.editqst_enabled" ng-model="question.title"
+					ng-change="titleChanged()" />
+			</md-input-container>
+
+			<!-- Question String -->
+			<md-input-container flex>
+				<strong>Question String:</strong>
+				<textarea ng-disabled="!editable || !$root.teacherSettings.editqst_enabled" ng-model="question.question"
+					ng-change="questionChanged()"></textarea>
+			</md-input-container>
+
+			<!-- video url -->
+			<md-input-container flex ng-show="question.questionType!='Answer Type' && question.questionType!='External Activity'">
+				<strong>Question Video ID: <br> ( e.g. tgbNymZ7vqY )</strong>
+				<input type="text" class="mb-3" ng-disabled="!editable || !userData.video_enabled" ng-model="question.videoID"
+					ng-change="videoIdChanged()" />
+				<div class="float-div pull-right" ng-show="question.videoURL">
+					<div id="playerWrapOuter">
+						<div id="playerWrap">
+							<iframe id="video-iframe" width="420" height="315" src="{{question.videoURL}}"
+								frameborder="0"></iframe>
+						</div>
+					</div>
+				</div>
+			</md-input-container>
+
+			<!-- Question Links -->
+			<md-input-container flex ng-show="question.questionType!='Answer Type' && question.questionType!='External Activity'">
+				<strong>Extra Links:</strong>
+				<div class="float-div">
+					<button ng-if="editable && userData.link_enabled" class="btn btn-primary pull-right"
+						myclick="saveLinks()">Save
+						Links</button>
+					<div ng-if="!editable || !userData.link_enabled" ng-repeat="link in question.links track by $index">
+						- &emsp; <a href={{link.url}} target="_blank">{{link.title}}</a>
+					</div>
+				</div>
+			</md-input-container>
+
+			<div class="table-container extra-link"
+				ng-show="editable && userData.link_enabled && question.questionType!='Answer Type' && question.questionType!='External Activity'">
+				<div class="table-responsive">
+					<table class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th scope="col">#</th>
+								<th scope="col">Title</th>
+								<th scope="col">Url</th>
+								<th scope="col">Test Link</th>
+								<th scope="col"></th>
+							</tr>
+						</thead>
+
+						<tbody>
+							<tr ng-repeat="link in question.links track by $index">
+								<th scope="row">{{$index+1}}</th>
+								<td>
+									<textarea ng-model="link.title" class="table-input" autofocus
+										placeholder="link title..."></textarea>
+								</td>
+								<td>
+									<textarea ng-model="link.url" class="table-input" autofocus
+										placeholder="link url..."></textarea>
+								</td>
+								<td>
+									<a href={{link.url}} target="_blank">{{link.title}}</a>
+								</td>
+								<td class="button-cell">
+									<button class="btn btn-primary cell-button" myclick="addLink($index)">append</button>
+									<br />
+									<button class="btn btn-danger cell-button" myclick="removeLink($index)">delete</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Question Set name -->
+			<md-input-container flex>
+				<strong>Question Set:</strong>
+				<input type="text" ng-disabled="true" ng-value="$root.settings.questionSetName" />
+			</md-input-container>
+
+			<!-- Question Type -->
+			<md-input-container flex>
+				<strong>Question Type:</strong>
+				<input type="text" ng-disabled="true" ng-value="question.questionType + '&nbsp; Question'" />
+			</md-input-container>
+
+			<!-- Creator -->
+			<md-input-container flex>
+				<strong>Creator:</strong>
+				<input type="text" ng-disabled="true" ng-value="editable?'By Me':question.teacher" />
+			</md-input-container>
+
+			<!-- Show state -->
+			<md-input-container flex>
+				<strong>Show in Student Side:</strong>
+				<md-radio-group ng-disabled="!editable" ng-model="question.showState" ng-change="hideByChanged()">
+					<md-radio-button ng-value="true" class="md-primary" ng-hide="!editable && !question.showState">Show
+					</md-radio-button>
+					<md-radio-button ng-value="false" class="md-primary" ng-hide="!editable && question.showState">Hide
+					</md-radio-button>
+				</md-radio-group>
+			</md-input-container>
+
+			<!-- Anonymous -->
+			<md-input-container flex ng-show="question.questionType!='Answer Type' && question.questionType!='External Activity'">
+				<strong>Anonymous Type:</strong>
+				<md-radio-group ng-disabled="!editable" ng-model="question.anonymous" ng-change="anonymousChanged()">
+					<md-radio-button ng-value="true" class="md-primary" ng-hide="!editable && !question.anonymous">
+						<b>Anonymous</b>&nbsp;(show user ID)</span>
+					</md-radio-button>
+					<md-radio-button ng-value="false || undefined" class="md-primary" ng-hide="!editable && question.anonymous">
+						<b>Non-Anonymous</b>&nbsp;(show user Email)</span>
+					</md-radio-button>
+				</md-radio-group>
+			</md-input-container>
+
+
+			<!-- -------------------------------------------------  -->
+
+
+
+			<!-- ==========================  only feedback type =========================  -->
+			<div ng-if="question.questionType=='Feedback Type'">
+
+				<!-- Feedback type (Text/Scale/Scale&text) -->
+				<md-input-container flex>
+					<strong>Feedback Type:</strong>
+					<input type="text" ng-disabled="true" ng-value="Types[question.type]" />
+				</md-input-container>
+
+				<!-- top answers -->
+				<md-input-container flex>
+					<strong>Top Answers Count:</strong>
+					<div class="float-div">
+						<input type="number" ng-if="editable" ng-model="question.top_answers" class="top-answers"
+							ng-change="topAnswerChanged()" />
+						<span ng-class="{'read-only':!editable}">{{question.top_answers? question.top_answers:'All'}}
+							&emsp;Answers</span>
+					</div>
+				</md-input-container>
+
+
+				<!-- list type (Yes/No) -->
+				<md-input-container flex>
+					<strong>List Type:</strong>
+					<input type="text" ng-disabled="true" ng-value="question.listType?'Yes':'No'" />
+				</md-input-container>
+
+				<!-- self rate (Yes/No) -->
+				<md-input-container flex>
+					<strong>Self Rate:</strong>
+					<input type="text" ng-disabled="true" ng-value="question.selfRate?'Yes':'No'" />
+				</md-input-container>
+
+				<!-- Team Feedback -->
+				<md-input-container flex>
+					<strong>Team Feedback Type:</strong>
+					<md-radio-group ng-disabled="true" ng-model="question.groupFeedback">
+						<md-radio-button ng-value="'team'" class="md-primary" ng-hide="question.groupFeedback!='team'">
+							Team Feedback</md-radio-button>
+						<md-radio-button ng-value="'group'" class="md-primary" ng-hide="question.groupFeedback!='group'">Group
+							Feedback</md-radio-button>
+						<md-radio-button ng-value="'other'" class="md-primary" ng-hide="question.groupFeedback!='other'">Not In
+							Team
+							Feedback</md-radio-button>
+					</md-radio-group>
+				</md-input-container>
+
+				<!-- Award type -->
+				<md-input-container flex>
+					<strong>Award Type:</strong>
+					<md-radio-group ng-disabled="!editable" ng-model="question.isInvestment" ng-change="awardTypeChanged()">
+						<md-radio-button ng-value="false" class="md-primary" ng-hide="!editable && question.isInvestment">Award
+						</md-radio-button>
+						<md-radio-button ng-value="true" class="md-primary" ng-hide="!editable && !question.isInvestment">
+							Investment</md-radio-button>
+					</md-radio-group>
+				</md-input-container>
+
+				<!-- Award score -->
+				<md-input-container flex>
+					<strong ng-if="question.isInvestment">Max Investment Amount:</strong>
+					<strong ng-if="!question.isInvestment">Max Award Score:</strong>
+					<input type="number" ng-disabled="!editable" class="top-answers" ng-model="question.awardScore"
+						ng-change="awardScoreChanged()" />
+				</md-input-container>
+
+				<!-- Award people -->
+				<md-input-container flex>
+					<strong ng-if="question.isInvestment">Max Investment Peoples:</strong>
+					<strong ng-if="!question.isInvestment">Max Award Peoples:</strong>
+					<input type="number" ng-disabled="!editable" class="top-answers" ng-model="question.awardPeoples"
+						ng-change="awardPeopleChanged()" />
+				</md-input-container>
+
+				<!-- Answer Required(Required / Not Required) -->
+				<md-input-container flex>
+					<strong>Answer Required:</strong>
+					<md-radio-group ng-disabled="!editable" ng-model="question.unRequired" ng-change="requiredChanged()">
+						<md-radio-button ng-value="false || undefined" class="md-primary"
+							ng-hide="!editable && question.unRequired">Required</md-radio-button>
+						<md-radio-button ng-value="true" class="md-primary" ng-hide="!editable && !question.unRequired">
+							Not Required</md-radio-button>
+					</md-radio-group>
+				</md-input-container>
+
+				<!-- Instructions for Input Text  -->
+				<md-input-container flex>
+					<strong>Instructions for Input Text:</strong>
+					<textarea ng-disabled="!editable" ng-model="question.instruction" ng-change="instructionChanged()"></textarea>
+				</md-input-container>
+
+				<!-- feedback questions-->
+				<md-input-container flex ng-if="question.feedqts">
+					<strong>Feedback Questions:</strong>
+					<div class="float-div">
+						<div class="read-only" ng-repeat="qts in question.feedqts track by $index">
+							<b>{{$index+1}}</b>&emsp;-&emsp;{{qts}}</div>
+					</div>
+				</md-input-container>
+			</div>
+			<!-- -------------------------------------------------  -->
+
+
+
+			<!-- ========================== only rating type ==========================  -->
+
+			<div ng-if="question.questionType=='Rating Type'">
+
+
+				<!-- rating type(Text/scale/scale & text) -->
+				<md-input-container flex>
+					<strong>Rating Type:</strong>
+					<input type="text" ng-disabled="true" ng-value="Types[question.ratingtype]" />
+				</md-input-container>
+
+				<!-- top answers -->
+				<md-input-container flex>
+					<strong>Top Answers Count:</strong>
+					<div class="float-div">
+						<input type="number" ng-if="editable" ng-model="question.top_answers" class="top-answers"
+							ng-change="topAnswerChanged()" />
+						<span ng-class="{'read-only':!editable}">{{question.top_answers? question.top_answers:'All'}}
+							&emsp;Answers</span>
+					</div>
+				</md-input-container>
+
+				<!-- rating Item Type  -->
+				<md-input-container flex>
+					<strong>Rating Item Type:</strong>
+					<input type="text" ng-disabled="true" ng-value="question.teamRate?'Team Names':'Manual Items'" />
+				</md-input-container>
+
+				<!-- rating items  -->
+				<md-input-container flex ng-show="question.ratingItems">
+					<strong>Rating Items:</strong>
+					<div class="float-div">
+						<div class="read-only" ng-repeat="item in question.ratingItems track by $index">
+							<b>{{$index+1}}</b>&emsp;-&emsp;{{item}}</div>
+					</div>
+				</md-input-container>
+
+				<!-- rating options  -->
+				<md-input-container flex ng-show="question.ratingOptions" class="mb-0">
+					<strong>Rating Options:</strong>
+				</md-input-container>
+				<md-input-container flex ng-show="question.ratingOptions"
+					ng-repeat="option in question.ratingOptions track by $index" class="mt-0 mb-3 ">
+					<strong class="sub-option">Option {{$index+1}}:</strong>
+					<input type="text" ng-disabled="!editable || !$root.teacherSettings.editqst_enabled" ng-model="question.ratingOptions[$index]"
+						ng-change="ratingOptionChanged()" />
+				</md-input-container>
+
+				<!-- self rate (Yes/No) -->
+				<md-input-container flex ng-show="question.teamRate">
+					<strong>Self Rate:</strong>
+					<md-radio-group ng-disabled="!editable" ng-model="question.selfRate" ng-change="selfRateChanged()">
+						<md-radio-button ng-value="true" class="md-primary" ng-hide="!editable && !question.selfRate">
+							Yes</md-radio-button>
+						<md-radio-button ng-value="false" class="md-primary" ng-hide="!editable && question.selfRate">
+							No</md-radio-button>
+					</md-radio-group>
+				</md-input-container>
+
+				<!-- share reate(Yes/No) -->
+				<md-input-container flex>
+					<strong>Share Rate:</strong>
+					<md-radio-group ng-disabled="!editable" ng-model="question.shareRate" ng-change="shareRateChanged()">
+						<md-radio-button ng-value="true" class="md-primary" ng-hide="!editable && !question.shareRate">
+							Yes&emsp;(show other\'s rate)</md-radio-button>
+						<md-radio-button ng-value="false" class="md-primary" ng-hide="!editable && question.shareRate">
+							No&emsp;(show only own rate)</md-radio-button>
+					</md-radio-group>
+				</md-input-container>
+
+				<!-- show Team Result(Yes/No) -->
+				<md-input-container flex ng-show="question.teamRate">
+					<strong>Show Team Result:</strong>
+					<md-radio-group ng-disabled="!editable" ng-model="question.showTeamFeedback"
+						ng-change="showTeamFeedbackChanged()">
+						<md-radio-button ng-value="true" class="md-primary" ng-hide="!editable && !question.showTeamFeedback">
+							Yes</md-radio-button>
+						<md-radio-button ng-value="false" class="md-primary" ng-hide="!editable && question.showTeamFeedback">
+							No</md-radio-button>
+					</md-radio-group>
+				</md-input-container>
+
+				<!-- Award type -->
+				<md-input-container flex>
+					<strong>Award Type:</strong>
+					<md-radio-group ng-disabled="!editable" ng-model="question.isInvestment" ng-change="awardTypeChanged()">
+						<md-radio-button ng-value="false" class="md-primary" ng-hide="!editable && question.isInvestment">Award
+						</md-radio-button>
+						<md-radio-button ng-value="true" class="md-primary" ng-hide="!editable && !question.isInvestment">
+							Investment</md-radio-button>
+					</md-radio-group>
+				</md-input-container>
+
+				<!-- Award score -->
+				<md-input-container flex>
+					<strong ng-if="question.isInvestment">Max Investment Amount:</strong>
+					<strong ng-if="!question.isInvestment">Max Award Score:</strong>
+					<input type="number" ng-disabled="!editable" class="top-answers" ng-model="question.awardScore"
+						ng-change="awardScoreChanged()" />
+				</md-input-container>
+
+				<!-- Award people -->
+				<md-input-container flex>
+					<strong ng-if="question.isInvestment">Max Investment Peoples:</strong>
+					<strong ng-if="!question.isInvestment">Max Award Peoples:</strong>
+					<input type="number" ng-disabled="!editable" class="top-answers" ng-model="question.awardPeoples"
+						ng-change="awardPeopleChanged()" />
+				</md-input-container>
+
+			</div>
+			<!-- -------------------------------------------------  -->
+
+
+
+
+			<!-- ======================  only multiple type ===================================  -->
+			<div ng-if="question.questionType=='Multiple Type'">
+				<md-input-container flex ng-if="question.maximumSelection">
+					<strong>Maximum Selection:</strong>
+					<input type="text" ng-disabled="true" ng-value="question.maximumSelection+'&emsp;options'" />
+				</md-input-container>
+
+				<!-- option details -->
+				<md-input-container flex>
+					<strong> Option Details:</strong> <input type="text" style="display:none;" />
+					<div class="float-div">
+						<button class="btn btn-primary pull-right" myclick="addNewOption()"
+							ng-if="editable && $root.teacherSettings.editqst_enabled">Add
+							New Option</button>
+					</div>
+				</md-input-container>
+				<div class="table-container extra-link">
+					<div class="table-responsive">
+						<table class="table table-striped table-bordered">
+							<thead>
+								<tr>
+									<th scope="col">#</th>
+									<th scope="col">Option</th>
+									<th scope="col">Score</th>
+									<th scope="col">Feedback</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="option in question.optionDetails track by $index">
+									<th scope="row">{{$index+1}}</th>
+									<td>
+										<span ng-if="!editable || !$root.teacherSettings.editqst_enabled"
+											class="read-only">{{option.option}}</span>
+										<textarea ng-if="editable && $root.teacherSettings.editqst_enabled"
+											ng-model="option.option" class="table-input" autofocus
+											ng-change="optionChanged()"></textarea>
+									</td>
+									<td class="score-cell">
+										<span ng-if="!editable || !$root.teacherSettings.editqst_enabled"
+											class="read-only">{{option.score}}</span>
+										<input ng-if="editable && $root.teacherSettings.editqst_enabled" ng-model="option.score"
+											class="table-input" type="number" autofocus ng-change="saveOptionDetail()" />
+									</td>
+									<td>
+										<span ng-if="!editable || !$root.teacherSettings.editqst_enabled"
+											class="read-only">{{option.feedback}}</span>
+										<textarea ng-if="editable && $root.teacherSettings.editqst_enabled"
+											ng-model="option.feedback" class="table-input" autofocus
+											ng-change="saveOptionDetail()"></textarea>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<!-- Feedbacks -->
+				<md-input-container flex>
+					<strong>Question Feedback:</strong> <input type="text" style="display:none;" />
+				</md-input-container>
+				<div class="table-container extra-link">
+					<div class="table-responsive">
+						<table class="table table-striped table-bordered">
+							<thead>
+								<tr>
+									<th scope="col" rowspan="2">#</th>
+									<th scope="col" colspan="2">Range</th>
+									<th ng-if="editable && $root.teacherSettings.feedback_enabled" scope="col" rowspan="2"
+										colspan="2">Feedback</th>
+									<th ng-if="!(editable && $root.teacherSettings.feedback_enabled)" scope="col" rowspan="2">
+										Feedback</th>
+								</tr>
+								<tr>
+									<th scope="col">From(&lt;)</th>
+									<th scope="col">&nbsp;To&nbsp;&nbsp;(&le;)&nbsp;</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="feedback in question.feedbacks track by $index">
+									<th scope="row">{{$index+1}}</th>
+									<td class="score-cell">
+										<span ng-if="!(editable && $root.teacherSettings.feedback_enabled)"
+											class="read-only">{{feedback.from}}</span>
+										<input ng-if="editable && $root.teacherSettings.feedback_enabled" ng-model="feedback.from"
+											class="table-input" type="number" autofocus />
+									</td>
+									<td class="score-cell">
+										<span ng-if="!(editable && $root.teacherSettings.feedback_enabled)"
+											class="read-only">{{feedback.to}}</span>
+										<input ng-if="editable && $root.teacherSettings.feedback_enabled" ng-model="feedback.to"
+											class="table-input" type="number" autofocus />
+									</td>
+									<td>
+										<span ng-if="!(editable && $root.teacherSettings.feedback_enabled)"
+											class="read-only">{{feedback.text}}</span>
+										<textarea ng-if="editable && $root.teacherSettings.feedback_enabled"
+											ng-model="feedback.text" class="table-input" autofocus></textarea>
+									</td>
+									<td class="button-cell" ng-if="editable && $root.teacherSettings.feedback_enabled">
+										<button class="btn btn-primary cell-button" myclick="addFeedback($index)">append</button>
+										<br />
+										<button class="btn btn-danger cell-button"
+											myclick="removeFeedback($index)">delete</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<md-input-container flex class="mt-0">
+					<button ng-if="editable && $root.teacherSettings.feedback_enabled" class="btn btn-primary pull-right"
+						myclick="saveFeedbacks()">Save
+						Feedback</button>
+				</md-input-container>
+			</div>
+			<!-- -------------------------------------------------  -->
+
+
+			<!-- ======================  only slide type ===================================  -->
+			<div ng-if="question.questionType=='Slide Type'">
+				<md-input-container flex>
+					<strong>Field Type:</strong>
+					<md-radio-group ng-disabled="true" ng-model="question.isContingent">
+						<md-radio-button ng-value="true" class="md-primary">Contingent</md-radio-button>
+						<md-radio-button ng-value="false" class="md-primary">Individual</md-radio-button>
+					</md-radio-group>
+				</md-input-container>
+				<md-input-container flex ng-if="question.properties">
+					<strong>Fields:</strong>
+					<div class="float-div">
+						<div ng-repeat="property in question.properties track by $index" class="read-only">
+							<b>{{$index+1}}</b>&emsp;-&emsp;Left: &nbsp;{{property.left}}, &emsp;Right:
+							&nbsp;{{property.right}},&emsp;&emsp;Field: &nbsp;{{property.propertyquestion}}
+						</div>
+					</div>
+				</md-input-container>
+			</div>
+
+			<!-- -------------------------------------------------  -->
+
+			<!-- ======================  only dropdown, slide, multiple ===================================  -->
+			<div
+				ng-if="question.questionType=='Dropdown Type' || question.questionType=='Multiple Type' || question.questionType=='Slide Type'">
+				<md-input-container flex ng-if="question.options || question.questionType != 'Dropdown Type'">
+					<strong>Enable group within group:</strong>
+					<div class="float-div">
+						<md-radio-group ng-disabled="!editable" ng-model="question.enableGroup" ng-change="enableGroupChanged()">
+							<md-radio-button ng-value="'disabled'" class="md-primary"
+								ng-show="editable || question.enableGroup=='disabled'">Not
+								Grouping</md-radio-button>
+							<md-radio-button ng-value="'email'" class="md-primary"
+								ng-show="editable || question.enableGroup=='email'">By
+								Institution</md-radio-button>
+						</md-radio-group>
+					</div>
+				</md-input-container>
+				<md-input-container flex ng-if="question.options">
+					<strong>Options:</strong>
+					<div class="float-div">
+						<div class="read-only" ng-repeat="option in question.options track by $index">
+							<b>{{$index+1}}</b>&emsp;-&emsp;{{option}}</div>
+					</div>
+				</md-input-container>
+			</div>
+			<!-- -------------------------------------------------  -->
+
+
+			<!-- ======================  only Contingent type ===================================  -->
+			<div ng-if="question.questionType == 'Contingent Type'">
+				<!-- Edit button state -->
+				<md-input-container flex>
+					<strong>Edit Button:</strong>
+					<md-radio-group ng-disabled="!editable" ng-model="question.editable" ng-change="editableChanged()">
+						<md-radio-button ng-value="true" class="md-primary" ng-hide="!editable && !question.editable">
+							Show</md-radio-button>
+						<md-radio-button ng-value="false || undefined" class="md-primary"
+							ng-hide="!editable && question.editable">
+							Hide</md-radio-button>
+					</md-radio-group>
+				</md-input-container>
+
+				<!-- Sub Questions: -->
+				<md-input-container flex>
+					<strong>Sub Questions:</strong>
+					<div class="float-div read-only">
+						<div ng-repeat="sub in question.subQuestions track by $index" style="margin-bottom:10px;">
+							<b style="color:#023aff;">Question{{$index+1}}:</b>
+							<br /> &emsp;&emsp;
+							<b>{{sub.question}}</b>&emsp; [{{sub.options[0]}}, {{sub.options[1]}}]
+							<br />
+						</div>
+					</div>
+				</md-input-container>
+			</div>
+			<!-- -------------------------------------------------  -->
+
+
+			<!-- ======================  only Answer type ===================================  -->
+			<div ng-if="question.questionType == 'Answer Type'">
+				<!-- Show Unique ID state -->
+				<md-input-container flex>
+					<strong>Show Unique ID:</strong>
+					<md-radio-group ng-disabled="!editable" ng-model="question.show_id" ng-change="show_id_state_Changed()">
+						<md-radio-button ng-value="true" class="md-primary" ng-hide="!editable && !question.show_id">
+							Show</md-radio-button>
+						<md-radio-button ng-value="false" class="md-primary" ng-hide="!editable && question.show_id">
+							Hide</md-radio-button>
+					</md-radio-group>
+				</md-input-container>
+
+				<!-- select Question -->
+				<md-input-container class="md-block">
+					<div class="col-md-12 center">
+						<strong class="choose-question" style="font-size:20px;">Choose Questions</strong>
+						<md-checkbox class="pull-right" ng-checked="selectAll" ng-click="toggleAll()">
+							Select All
+						</md-checkbox>
+					</div>
+					<div class="col-md-12">
+						<hr />
+					</div>
+					<div class="col-md-12 question-row" ng-repeat="qst in setQuestions track by $index">
+						<span class="number-span">{{$index+1}}.</span>
+						<md-checkbox class="check-box-item" ng-checked="qst.selected" ng-click="toggle($index)">
+							{{ qst.question }}
+						</md-checkbox>
+					</div>
+					<div class="col-md-12 center" ng-show="setQuestions.length == 0">There isn't any question in this
+						set.</div>
+				</md-input-container>
+			</div>
+			<!-- -------------------------------------------------  -->
+
+
+
+			<!-- ======================  only External Activity type ===================================  -->
+			<div ng-if="question.questionType == 'External Activity'">
+				<!-- download template Link -->
+				<div class="row">
+					<div class="col-md-12">
+						<md-input-container flex>
+							<a href="{{$root.templateExternalLink}}" download>
+								* Download template XLXS File for result uploading
+							</a>
+						</md-input-container>
+					</div>
+				</div>
+			</div>
+			<!-- -------------------------------------------------  -->
+
+
+			<!--Additional Info  -->
+			<md-input-container flex ng-show="question.questionType!='Answer Type' && question.questionType!='External Activity'">
+				<strong>Additional info / Comments:</strong>
+				<div class="float-div" ng-init="fileupload()" ng-if="editable">
+					<input type="file" id="fileButton2" id="imgInp">
+					<button class="btn btn-primary pull-right" myclick="infoChanged()">Save Info</button>
+				</div>
+			</md-input-container>
+			<md-input-container flex ng-show="question.questionType!='Answer Type' && question.questionType!='External Activity'">
+				<strong>&emsp;</strong>
+				<div id="additional_info" ng-show="!editable" class="additional read-only"></div>
+				<div ng-if="editable" id="additional_info_edit" contenteditable class="additional"
+					ng-model="question.additional_info" strip-br="true" name="myWidget">&nbsp;</div>
+			</md-input-container>
+
+			<!-- Result String -->
+			<md-input-container flex ng-show="question.questionType!='Answer Type' && question.questionType!='External Activity'">
+				<strong>Result String:</strong>
+				<textarea ng-disabled="!editable || !userData.result_video_enabled" ng-model="question.result_string"
+					ng-change="resultStringChanged()"></textarea>
+			</md-input-container>
+
+			<!-- upload result image -->
+			<div class="row" ng-init="$root.result_image_upload(true)"
+				ng-show="question.questionType!='Answer Type' && question.questionType!='External Activity'">
+				<md-input-container flex>
+					<strong>Result Image:</strong>
+					<progress value="0" max="100" id="uploader1">0%</progress>
+					<input type="file" class="mb-3" id="fileButton1" ng-disabled="!editable || !userData.result_video_enabled" />
+					<div class="float-div pull-right img-row" ng-init="$root.load_result_image()" ng-show="$root.result_imgSrc">
+						<img ng-src="{{$root.result_imgSrc}}">
+					</div>
+				</md-input-container>
+			</div>
+
+			<!-- result video url -->
+			<md-input-container flex ng-show="question.questionType!='Answer Type' && question.questionType!='External Activity'">
+				<strong>Result Video ID: <br> ( e.g. tgbNymZ7vqY )</strong>
+				<input type="text" class="mb-3" ng-disabled="!editable || !userData.result_video_enabled"
+					ng-model="question.result_videoID" ng-change="result_videoIdChanged()" />
+				<div class="float-div pull-right" ng-show="question.result_videoURL">
+					<div id="playerWrapOuter">
+						<div id="playerWrap1">
+							<iframe id="video-iframe1" width="420" height="315" src="{{question.result_videoURL}}"
+								frameborder="0"></iframe>
+						</div>
+					</div>
+				</div>
+			</md-input-container>
+
+
+
+
+		</div>
+	</div>
+</div>
+<style>
+	.container {
+		margin-top: 20px;
+		font-size: 1.5em;
+	}
+
+	.container .row {
+		margin-top: 20px;
+	}
+
+	.question-content {
+		margin-bottom: 30px;
+	}
+
+	h2 {
+		border-bottom: ridge 3px black;
+		padding-bottom: 10px;
+		margin-left: 10%;
+		margin-right: 10%;
+	}
+
+	/* input container style */
+
+	md-input-container {
+		width: 80%;
+		margin: 20px 10%;
+	}
+
+	md-input-container strong {
+		width: 300px;
+		color: #0c0c89;
+		float: left;
+		vertical-align: top;
+	}
+
+	md-input-container strong.sub-option {
+		text-align: right;
+		padding-right: 50px;
+		font-size: 1em;
+	}
+
+	md-input-container .md-input,
+	md-input-container md-radio-group,
+	md-input-container progress,
+	.additional,
+	.md-resize-wrapper,
+	.float-div {
+		width: calc(100% - 300px);
+		float: left;
+	}
+
+	.additional {
+		border-bottom: solid 1px #e4e1e1;
+	}
+
+	.additional[disabled] {
+		color: #3950f8;
+	}
+
+	.additional:focus {
+		border-bottom: solid 2px rgb(63, 81, 181);
+	}
+
+	.additional .img-div {
+		resize: both;
+		overflow: auto;
+		width: 400px;
+		height: 250px;
+		background-repeat: no-repeat !important;
+		background-size: 100% 100% !important;
+	}
+
+	md-input-container .md-input[disabled],
+	md-input-container md-radio-group[disabled] {
+		color: #3950f8;
+	}
+
+	.md-resize-wrapper .md-input {
+		width: 100%;
+	}
+
+	md-radio-button {
+		display: inline-block;
+		margin-right: 30px;
+	}
+
+	/* top answers style */
+
+
+	md-input-container .md-input.top-answers {
+		width: 80px;
+		margin-right: 60px;
+	}
+
+	.read-only {
+		color: #3950f8;
+	}
+
+	/* Answer Type question styles */
+	.choose-question {
+		float: none;
+	}
+
+	.number-span {
+		display: inline-block;
+		width: 30px;
+	}
+
+	.check-box-item {
+		display: inline-block;
+		width: calc(100% - 40px);
+	}
+
+
+	/*================= external type styels =================================*/
+	table.external {
+		width: 100%;
+		border-spacing: 0;
+		font-size: 14px;
+	}
+
+	table.external thead,
+	table.external tbody,
+	table.external tr,
+	table.external th,
+	table.external td {
+		display: block;
+	}
+
+	table.external thead tr {
+		/* fallback */
+		width: 97%;
+		/* minus scroll bar width */
+		width: -webkit-calc(100% - 17px);
+		width: -moz-calc(100% - 17px);
+		width: calc(100% - 17px);
+	}
+
+	table.external tr:after {
+		/* clearing float */
+		content: ' ';
+		display: block;
+		visibility: hidden;
+		clear: both;
+	}
+
+	table.external tbody {
+		max-height: 200px;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	table.external tbody td,
+	table.external thead th {
+		float: left;
+		text-align: center;
+		height: 30px;
+	}
+
+	table.external td:nth-child(1),
+	table.external th:nth-child(1) {
+		width: 10%;
+	}
+
+	table.external td:nth-child(2),
+	table.external th:nth-child(2) {
+		width: 20%;
+	}
+
+	table.external td:nth-child(3),
+	table.external th:nth-child(3) {
+		width: 50%;
+	}
+
+	table.external td:nth-child(4),
+	table.external th:nth-child(4) {
+		width: 10%;
+	}
+
+	table.external td:nth-child(5),
+	table.external th:nth-child(5) {
+		width: 10%;
+	}
+
+	.btn-file input[type="file"] {
+		position: absolute;
+		top: 0;
+		right: 0;
+		min-width: 100%;
+		min-height: 100%;
+		font-size: 100px;
+		text-align: right;
+		filter: alpha(opacity=0);
+		opacity: 0;
+		outline: none;
+		background: white;
+		cursor: inherit;
+		display: block;
+	}
+
+	.glyphicon-ok {
+		color: green;
+	}
+
+	.glyphicon-remove {
+		color: red;
+	}
+
+	@media screen and (max-width: 1024px) {
+		.container-fluid {
+			padding: 0px;
+		}
+
+		.table-container {
+			width: 100%;
+		}
+
+		.md-resize-wrapper {
+			width: 100%;
+		}
+
+		md-input-container {
+			width: 100%;
+			margin: 20px 0;
+		}
+
+		md-input-container .md-input,
+		md-input-container md-radio-group,
+		md-input-container progress,
+		.float-div,
+		.additional {
+			width: 100%;
+		}
+	}
+</style>

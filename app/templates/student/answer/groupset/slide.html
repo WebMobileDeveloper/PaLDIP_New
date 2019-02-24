@@ -1,0 +1,105 @@
+<div ng-init="getSlides()">
+	<div class="row" style="color:green">
+		<md-input-container flex style="font-size:35px;text-align: center; ">
+			<span class="qst-title" ng-show='question.title'>{{question.title}}:</span>
+			{{question.question}}
+		</md-input-container>
+	</div>
+	<div class="row img-row" ng-init="$root.loadimage()" ng-show="$root.imgSrc">
+		<div class="col-md-12">
+			<img ng-src="{{$root.imgSrc}}">
+		</div>
+		<div class="col-md-12 center">
+			<hr />
+		</div>
+	</div>
+	<div class="row center" ng-show="videoURL">
+		<div id="playerWrapOuter">
+			<div id="playerWrap">
+				<iframe id="video-iframe" width="420" height="315" src="{{videoURL}}" frameborder="0"></iframe>
+			</div>
+		</div>
+		<div class="col-md-12 center">
+			<hr />
+		</div>
+	</div>
+	<!-- Extra Links -->
+	<div class="row" ng-show="question.links">
+		<div class="col-md-12">
+			<md-input-container flex class="margin-vertical-0">
+				<h3>Extra Links</h3>
+				<div class="sub-question" ng-repeat="link in question.links track by $index">
+					<a href={{link.url}} target="_blank" style="font-size:20px; margin-left:30px;">{{link.title}}</a>
+				</div>
+			</md-input-container>
+		</div>
+		<div class="col-md-12">
+			<hr />
+		</div>
+	</div>
+	<div class="row additional_info_container" ng-show="$root.additional_info" ng-init="$root.getAddInfo()">
+		<div class="col-md-12">
+			<md-input-container flex>
+				<h3>- Additional Information / Comments</h3>
+				<div id="additional_info"></div>
+			</md-input-container>
+		</div>
+	</div>
+	<div class="container" ng-hide="$root.settings.prevAnswer">
+
+		<div class="row" ng-repeat="obj in question.properties track by $index">
+
+			<h5 style="margin: 0px 0px 0px 35%;color:green;font-size: 23px">{{obj.propertyquestion}}</h5>
+
+			<div class="col-md-1 col-md-offset-1" style="color:#0668ad;font-size: 20px;margin-top:3px;">{{obj.left}}
+			</div>
+			<div class="col-md-8 ">
+				<md-slider aria-label="slider" ng-model="slidegraph[$index]" min="0" max="100"
+					ng-change="implementgraph($index)"></md-slider>
+			</div>
+			<div class="col-md-2" style="color:#0668ad;font-size: 20px;margin-top:3px;">{{slidegraph[$index]}}%
+				&emsp;{{obj.right}}</div>
+		</div>
+		<hr />
+	</div>
+
+
+	<div _ngcontent-c8="" class="container">
+		<div _ngcontent-c8="" class="col-xs-12 col-md-6 col-md-offset-3" ng-hide="$root.settings.prevAnswer">
+			<h5>Your Answer</h5>
+			<canvas id="pieChartforSlide1" basechart="" width="440" height="440"
+				style="display: block; width: 440px; height: 440px;"></canvas>
+		</div>
+		<div _ngcontent-c8="" class="col-xs-12 col-md-6  col-md-offset-3" ng-show="$root.settings.prevAnswer">
+			<h4>You have already submitted for this answer!</h4>
+			<canvas id="pieChartforSlide2" basechart="" width="410" height="410"
+				style="display: block; width: 410px; height: 410px;"></canvas>
+		</div>
+	</div>
+
+
+	<md-input-container flex style="text-align:center;">
+		<a class="btn btn-link" myclick="goBack()">Back</a>
+		<button class="btn btn-primary" style="width:20%;margin-right:10%;" myclick="saveslideanswer()"
+			ng-disabled="$root.settings.prevAnswer">Submit</button>
+		<a class="btn btn-link" myclick="goNext()" style="margin-left:10%" ng-show="$root.settings.prevAnswer">Next</a>
+	</md-input-container>
+
+</div>
+<style>
+	.title {
+		color: black;
+	}
+
+	.additional_info_container {
+		max-width: 700px;
+		margin: 20px auto;
+	}
+
+	.main {
+		position: relative;
+		margin-left: 5%;
+		width: 90%;
+		border-radius: 5px;
+	}
+</style>

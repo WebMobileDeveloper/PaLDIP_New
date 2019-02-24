@@ -1,0 +1,151 @@
+<div class="container" ng-init="getGroups()">
+	<div class="answer-form " ng-if="$root.settings.loadingfinished">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 title-container">
+				<div class="title">
+					<label class="qst-title"
+						ng-if='question.title'>{{question.title}}</label>
+					{{question.question}}
+				</div>
+			</div>
+		</div>
+		<hr />
+		<!-- <label style="margin-left: 10%;	color: #a2a2a2;">Items</label> -->
+		<div class="row">
+			<div class="col-md-12">
+				<div class="well">
+					<label style="margin-left: 20px; color: #a2a2a2;">Answers</label>
+					<md-radio-group ng-model="orderBy" ng-change="orderChanged(orderBy)" class="order-radio">
+						<md-radio-button value="rating" class="md-primary">Rating</md-radio-button>
+						<md-radio-button value="awardScore" class="md-primary">Award Score</md-radio-button>
+					</md-radio-group>
+					<label class="order-radio-label">Order By</label>
+					<div class="mid-cell">
+						<div class="answer-div">
+							<div class="answer-list" ng-repeat="item in answers" ng-class="($index == itemIndex)?'selected':'';"
+								ng-click="changeIndex($index)">
+								{{$index+1}}.&emsp;{{item.answer}}
+								<span class="pull-right">{{orderBy=='rating'?item.avRating:item.awardScore}}&emsp;</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row starfield-container" ng-show="type">
+			<label style="color: #a2a2a2;">Average Scores(&nbsp;{{answers[itemIndex].userCount}}&nbsp;Feedbacks)</label>
+			<div class="col-md-12 starfield">
+				<div class="row option-row" ng-repeat="option in feedqts track by $index">
+					<div class="col-md-6 col-sm-6  col-xs-8  option">
+						{{option}}
+					</div>
+					<div class="col-md-6  col-sm-6 col-xs-4  value center">
+						<span>{{answers[itemIndex].scores[$index]}}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- <hr ng-if="type % 2 == 0" />​ -->
+		<div class="row feedText" ng-show="type % 2 == 0">
+			<div class="col-md-12">
+				<div class=" well ">
+					<label style="margin-left: 20px;	color: #a2a2a2;">Feedbacks</label>
+					<div class="mid-cell">
+						<div class="answer-div">
+							<div ng-repeat="feed in answers[itemIndex].feedbacktext track by $index">
+								{{$index+1}}.&emsp;{{feed}}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- <hr /> -->
+		<div class="row center navigation-row">
+			<div class="col-md-6 col-sm-6 col-xs-6">
+				<button class="btn btn-default mb-0" myclick="decreaseindex()">&#9664;</button>
+			</div>
+			<div class="col-md-6 col-sm-6 col-xs-6">
+				<button class="btn btn-default mb-0" myclick="increaseindex()">&#9654;</button>
+			</div>
+		</div>
+		<div class="row button-row">
+			<a class="btn btn-link mb-0" myclick="$root.back()">Back</a>
+		</div>
+
+		<div class="row"
+			ng-init="$root.getInstFeedback($root.settings.groupKey, $root.settings.selectedQuestionSetKey, $root.settings.selectedQuestionKey)">
+			<md-input-container class="mt-0">
+				<h4>Instructor Feedback</h4>
+				<textarea class="Instructor_view_area" ng-model="$root.settings.instructor_feedback"
+					ng-change="$root.update_instFeedRef($root.settings.groupKey, $root.settings.selectedQuestionSetKey, $root.settings.selectedQuestionKey)"></textarea>
+			</md-input-container>
+		</div>
+
+		<!-- notes for quesiton -->
+		<div class="row mb-5" ng-init="$root.getTeacherNote($root.settings.selectedQuestionKey, true)">
+			<div class="row" ng-show="$root.allTeacherNotes">
+				<h4 class="center">Feedback from students</h4>
+				<div class="all-notes">
+					<md-input-container ng-repeat="note in $root.allTeacherNotes track by $index" ng-show="note">
+						<textarea class="users-note" ng-model="note" ng-disabled="true"></textarea>
+					</md-input-container>
+				</div>
+			</div>
+			<div class="row" ng-show="$root.allPublicNotes">
+				<h4 class="center">Notes from all students</h4>
+				<div class="all-notes">
+					<md-input-container ng-repeat="note in $root.allPublicNotes track by $index" ng-show="note">
+						<textarea class="users-note" ng-model="note" ng-disabled="true"></textarea>
+					</md-input-container>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	.answer-form {
+		margin: 20px auto;
+	}
+
+	.title-container {
+		margin-top: 20px;
+		padding: 0px 50px;
+	}
+
+	.title {
+		color: green;
+		max-height: 200px;
+		overflow-y: auto;
+	}
+
+	.well {
+		padding: 20px 0px;
+		margin-left: 20px;
+		margin-right: 20px;
+	}
+
+	.mid-cell {
+		width: 95%;
+		margin: auto;
+	}
+
+	.answer-div {
+		padding: 10px;
+	}
+
+	.checked {
+		color: orange;
+	}
+
+	.navigation-row button {
+		width: 80%;
+		max-width: 100px;
+		color: green;
+		margin-bottom: 20px;
+	}
+</style>

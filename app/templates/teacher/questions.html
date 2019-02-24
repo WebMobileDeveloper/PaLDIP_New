@@ -1,0 +1,1415 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<!-- title -->
+	<div class="row center title-row">
+		<span class="qst-title mr-3" ng-show="setData.LikertType && questions.length > 0">{{questions[0].code}} : </span>
+		<span class="title">
+			<span class="set-code">{{$root.settings.questionSetKey}}</span>{{setData.setname}}
+		</span>
+		&emsp; Question Set
+		<a class="btn btn-info pull-right" myclick="showEditTitleModal()" ng-show="editable"><i class="glyphicon glyphicon-pencil"></i>
+			<md-tooltip class="custom-tooltip" md-direction="top">Edit Question Set Title</md-tooltip>
+		</a>
+		<h4 class="center mt-0 mb-0">
+			<span class="creator-title">Creator:&emsp;{{creatorEmail}}</span>
+			<span ng-if="creatorNickName">&emsp;(&emsp;{{creatorNickName}}&emsp;)&emsp;</span>
+		</h4>
+		<hr class="mb-0" />
+	</div>
+
+
+	<!-- tags -->
+	<div class="row center">
+		<div class="chip-row col-md-12">
+			<md-chips ng-model="$root.selectedTags" md-autocomplete-snap="" md-transform-chip="$root.transformChip($chip)"
+			 md-require-match="false" readonly="!editable">
+				<md-autocomplete md-search-text="searchText" md-items="item in $root.querySearch(searchText)" md-item-text="item.name"
+				 placeholder="input new tag">
+					<span md-highlight-text="searchText">{{item.name}}</span>
+				</md-autocomplete>
+				<md-chip-template>
+					<span>
+						<strong>{{$chip.name}}</strong>
+					</span>
+				</md-chip-template>
+			</md-chips>
+		</div>
+	</div>
+
+	<!-- buttons -->
+	<div class="row button-row" ng-if="editable">
+		<a class="btn btn-primary" myclick="updateTags()">Update Tags</a>
+		<!-- <a class="btn btn-danger" myclick="deleteQuestionSet()">Delete Set</a> -->
+
+		<a class="btn btn-primary" myclick="gotoChoiceQuestionType()" ng-if="checkShowQuestionCreate()">Create Question</a>
+		<a class="btn btn-primary" myclick="showQstModal()" ng-if="checkShowLikertQuestionCreate()">Create Question</a>
+		<a class="btn btn-primary" myclick="gotoMultipleType()" ng-if="checkShowMultipleQuestionCreate()">Create Question</a>
+
+		<a class="btn btn-primary" myclick="showChoiceModal()" ng-if="checkShowLikertScaleCreate()">Create Scale</a>
+		<a class="btn btn-primary" myclick="showModalMultiple()" ng-if="checkShowMultipleScaleCreate()">Create Subscale</a>
+
+		<a class="btn btn-primary" myclick="showCopyModal()" ng-if="checkCopySet()">Copy Set</a>
+		<a class="btn btn-primary" myclick="showSiblingModal()" ng-if="checkCreateSiblingSet()">Create Sibling</a>
+
+		<a class="btn btn-danger" myClick="publishLikert()" ng-if="setData.isDraft">Publish</a>
+
+		<div class="switch-div" ng-if="setData && userData">
+			<md-switch class="md-primary" ng-model="setData.private" md-no-ink aria-label="Switch Private" ng-change="changePrivate(setData.private)"
+			 ng-disabled="!getPrivateEnable()">
+				{{setData.private ? 'Private' : 'Public' }}
+			</md-switch>
+		</div>
+		<a class="btn btn-primary" ng-if="setData.private" myClick="showShareModal()">Share</a>
+
+		<div class="switch-div" ng-if="!setData.LikertType">
+			<md-switch class="md-primary" ng-model="setData.lockNext" md-no-ink aria-label="Switch lock Next" ng-change="changeLockNext(setData.lockNext)"
+			 ng-disabled="!userData.lockNext_enabled">
+				{{setData.lockNext ? 'Locked Next Question' : 'Unlocked Next Question' }}
+			</md-switch>
+		</div>
+
+		<div class="switch-div" ng-if="setData.LikertType">
+			<md-switch class="md-primary" ng-model="setData.graph" md-no-ink aria-label="Switch GraphType" ng-change="changeGraphType(setData.graph)">
+				{{setData.graph ? 'Profile + Graph' : 'Profile Only' }}
+			</md-switch>
+		</div>
+
+	</div>
+
+	<div class="row button-row" ng-if="!editable">
+		<a class="btn btn-primary" myclick="showCopyModal()">Copy Set</a>
+		<a class="btn btn-primary" myclick="showSiblingModal()" ng-if="checkCreateSiblingSet()">Create Sibling</a>
+
+		<div class="switch-div">
+			<md-switch class="md-primary" ng-model="setData.private" md-no-ink aria-label="Switch Private" ng-disabled="true">
+				{{setData.private ? 'Private' : 'Public' }}
+			</md-switch>
+		</div>
+
+		<div class="switch-div" ng-if="!setData.LikertType">
+			<md-switch class="md-primary" ng-model="setData.lockNext" md-no-ink aria-label="Switch lock Next" ng-disabled="true">
+				{{setData.lockNext ? 'Locked Next Question' : 'Unlocked Next Question' }}
+			</md-switch>
+		</div>
+
+		<div class="switch-div" ng-if="setData.LikertType">
+			<md-switch class="md-primary" ng-model="setData.graph" md-no-ink aria-label="Switch GraphType" ng-disabled="true">
+				{{setData.graph ? 'Profile + Graph' : 'Profile Only' }}
+			</md-switch>
+		</div>
+	</div>
+
+	<div class="row" ng-if="editable">
+		<md-input-container>
+			<textarea class="question-title pl-3" ng-model="setData.infoForTeacher" placeholder="Information about this Questionset(for teacher)"
+			 ng-change="changeTeacherInfo(setData.infoForTeacher)"></textarea>
+		</md-input-container>
+	</div>
+	<div class="row" ng-if="!editable && setData.infoForTeacher">
+		<md-input-container>
+			<textarea class="question-title  pl-3" ng-disabled="true" placeholder="Information about this Questionset(for teacher)"
+			 ng-model="setData.infoForTeacher"></textarea>
+		</md-input-container>
+	</div>
+	<!-- tab row -->
+	<div class="row tab-row" ng-if="setData.LikertType">
+		<div class="col-md-4 col-sm-4" ng-class="getClass('question')" ng-click="setActive('question')">Questions</div>
+		<div class="col-md-4 col-sm-4" ng-class="getClass('subscale')" ng-click="setActive('subscale')">Scales</div>
+		<div class="col-md-4 col-sm-4" ng-class="getClass('options')" ng-click="setActive('options')">Likert Setup</div>
+	</div>
+	<div class="row tab-row" ng-if="setData.MultipleType">
+		<div class="col-md-6 col-sm-6" ng-class="getClass('question')" ng-click="setActive('question')">Questions</div>
+		<div class="col-md-6 col-sm-6" ng-class="getClass('subscale')" ng-click="setActive('subscale')">Subscales</div>
+	</div>
+
+	<!-- Question div -->
+	<div ng-show="selectedTab=='question' && questions.length>0">
+		<div class="row question-div" ng-if="checkDrag()" ng-show="questions" dragula='"drag-div"' dragula-model="questions">
+			<div class="col-md-12 qtdetails" ng-class="{hideByMe:obj.hideBy}" ng-repeat="obj in questions track by $index"
+			 ng-click="showDetail(obj)">
+				<span class="order-span">{{$index+1}}&nbsp;-&nbsp;</span>
+				<span class="qst-title mr-3" ng-show="!setData.LikertType">{{obj.code}} : </span>
+				<!-- <span ng-if="obj.new" class="blink">[new]&nbsp;</span> -->
+				<span ng-if="obj.title" class="qst-title">{{obj.title}}&emsp;:&emsp;</span>
+				<!-- [{{obj.questionType}}]- -->
+				<span ng-if="!checkEditQuestion()">
+					{{obj.question}}
+				</span>
+
+				<input ng-if="checkEditQuestion()" type="text" class="form-control likert-qst" ng-model="obj.question" ng-change="questionChanged(obj)" />
+				<div class="delete">
+					<a class="btn btn-info" myclick="showCopyQuestionModal(obj)" ng-if="!setData.LikertType">Copy Question</a>
+				</div>
+				<span ng-if="obj.anonymous" class="anonymous">Anonymous</span>
+			</div>
+		</div>
+
+		<div class="row question-div" ng-if="!checkDrag()" ng-show="questions">
+			<div class="col-md-12 qtdetails" ng-repeat="obj in questions | unHide track by $index" ng-click="showDetail(obj)">
+				<span class="order-span">{{$index+1}}&nbsp;-&nbsp;</span>
+				<span class="qst-title mr-3" ng-show="!setData.LikertType">{{obj.code}} : </span>
+				<!-- <span ng-if="obj.new" class="blink">[new]&nbsp;</span> -->
+				<span ng-if="obj.title" class="qst-title">{{obj.title}}&emsp;:&emsp;</span>
+				<!-- [{{obj.questionType}}]- -->
+				{{obj.question}}
+				<span ng-if="obj.anonymous" class="anonymous">Anonymous</span>
+				<div class="delete">
+					<a class="btn btn-info" myclick="showCopyQuestionModal(obj)" ng-if="!setData.LikertType">Copy Question</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Likert, Multiple type subscale div -->
+	<div ng-show="selectedTab=='subscale'  && subscales.length > 0">
+		<div class="row question-div" ng-show="setData" ng-if="checkDrag()" dragula='"drag-div-subscale"' dragula-model="subscales">
+			<div ng-repeat="obj in subscales track by $index">
+				<div class="qtdetails" ng-click="showSubScaleDetail(obj)">
+					<span class="order-span">{{$index+1}}&nbsp;-&nbsp;</span>
+					<span ng-if="obj.type=='super'" class="super-type">(Super)</span>
+					<span ng-if="obj.type=='label'" class="label-type">(Label)</span>
+					&nbsp;{{obj.title}}
+					<a class="btn btn-danger delete" myclick="deleteSubscale(obj)">
+						<span class="glyphicon glyphicon-trash"></span> &emsp;Delete</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="row question-div" ng-show="setData" ng-if="!checkDrag()">
+			<div class="col-md-12 byOther" ng-repeat="obj in subscales" ng-click="showSubScaleDetail(obj)">
+				<div class="qtdetails">
+					<span class="order-span">{{$index+1}}&nbsp;-&nbsp;</span>
+					<span ng-if="obj.type=='super'" class="super-type">(Super)</span>
+					<span ng-if="obj.type=='label'" class="label-type">(Label)</span>
+					&nbsp;{{obj.title}}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Likert options div -->
+	<div class="option-div row" ng-show="selectedTab=='options'">
+
+
+		<div ng-if="editable">
+			<md-input-container flex class="instructions">
+				<label>Likert Questionnaire Instructions to partifipants</label>
+				<textarea ng-model="setData.instructions" class="box-style" ng-change="instructionChanged(setData.instructions)"></textarea>
+			</md-input-container>
+
+			<!-- video url -->
+			<md-input-container flex>
+				<strong ng-if="userData.video_enabled">Questionset Video ID: ( e.g. tgbNymZ7vqY )</strong>
+				<input ng-if="userData.video_enabled" type="text" class="mb-3" ng-model="setData.videoID" ng-change="videoIdChanged()" />
+				<div class="center" ng-show="setData.videoURL">
+					<div class="col-md-12"><strong>Questionset Video</strong></div>
+					<div id="playerWrapOuter">
+						<div id="playerWrap">
+							<iframe id="video-iframe" width="420" height="315" src="{{setData.videoURL}}" frameborder="0"></iframe>
+						</div>
+					</div>
+				</div>
+			</md-input-container>
+
+			<md-input-container class="md-block" ng-if="siblingEditable">
+				<div class="col-md-6 col-sm-6"><label>Default Subscale Operation Method</label></div>
+				<div class="col-md-6 col-sm-6">
+					<md-radio-group ng-model="setData.method" layout="row" ng-change="defaultSubscaleOpChanged(setData.method)">
+						<md-radio-button ng-value="'Average'" class="md-primary" style="margin-right:70px;">Average</md-radio-button>
+						<md-radio-button ng-value="'Sum'" class="md-primary">Sum</md-radio-button>
+						<button class="btn btn-primary change-all-button" myclick="changeAllMethod()">Change All Method</button>
+					</md-radio-group>
+				</div>
+			</md-input-container>
+
+			<md-input-container class="md-block">
+				<div class="col-md-6 col-sm-6"><label>Compare groups in student side</label></div>
+				<div class="col-md-6 col-sm-6">
+					<md-radio-group ng-model="setData.compare" layout="row" ng-change="compareChanged(setData.compare)">
+						<md-radio-button ng-value="false" class="md-primary" style="margin-right:70px;">Disabled</md-radio-button>
+						<md-radio-button ng-value="true" class="md-primary">Enabled</md-radio-button>
+					</md-radio-group>
+				</div>
+			</md-input-container>
+
+			<!-- graph type -->
+			<md-input-container class="md-block">
+				<div class="col-md-6 col-sm-6"><label>Y-Axis Scale Type</label></div>
+				<div class="col-md-6 col-sm-6">
+					<md-radio-group ng-model="setData.yScaleType" layout="row" ng-change="yScaleTypeChanged(setData.yScaleType)">
+						<md-radio-button ng-value="'Fixed'" class="md-primary" style="margin-right:70px;">Fixed</md-radio-button>
+						<md-radio-button ng-value="'Dynamic'" class="md-primary">Dynamic</md-radio-button>
+					</md-radio-group>
+				</div>
+			</md-input-container>
+
+			<md-input-container flex>
+				<label>Y-axis Label</label>
+				<input ng-model="setData.yLabel" style="border-radius:5px;" ng-change="labelChanged(setData.yLabel)" ng-disabled="!siblingEditable" />
+			</md-input-container>
+
+			<md-input-container flex>
+				<div class="col-md-6 col-sm-6"><label>No. of Options</label></div>
+				<div class="col-md-6 col-sm-6">{{setData.options.length}}</div>
+			</md-input-container>
+
+			<div ng-if="siblingEditable">
+				<md-input-container flex>
+					<div class="col-md-6 col-sm-6 col-xs-6">
+						<label>Option score mode</label>
+					</div>
+					<div class="col-md-6 col-sm-6 col-xs-6">
+						<md-switch class="md-primary direction-switch" ng-model="valueDirection" md-no-ink aria-label="value Direction"
+						 ng-change="changeDirection(valueDirection)">
+							<span ng-if="!valueDirection">Increase</span>
+							<span ng-if="valueDirection">Decrease</span>
+						</md-switch>
+					</div>
+				</md-input-container>
+
+				<md-input-container class="center" style="border-bottom: solid 1px cornflowerblue;">
+					<div class="col-md-8 col-sm-8"><b>Options</b></div>
+					<div class="col-md-4 col-sm-4"><b>Scores</b>
+						<button class="btn btn-primary pull-right" myclick="save_change()">Update Score</button>
+					</div>
+				</md-input-container>
+
+				<div flex ng-repeat="option in setData.options track by $index" class="option-value-container center">
+					<div class="col-md-8 col-sm-8">
+						<span ng-if="!userData.editqst_enabled">{{option}}</span>
+						<input type="text" class="form-control likert-option" ng-if="userData.editqst_enabled" ng-model="option"
+						 ng-change="optionChanged(option,$index)" />
+					</div>
+					<div class="col-md-4 col-sm-4">
+						<input class="center" type="number" ng-model="setData.optionScores[$index]" style="border-radius:5px;" aria-label="score"
+						 ng-blur="changeValue(setData.optionScores[$index],$index)" />
+					</div>
+				</div>
+			</div>
+			<div ng-if="!siblingEditable">
+				<md-input-container class="center" style="border-bottom: solid 1px cornflowerblue;">
+					<div class="col-md-6 col-sm-6">Options</div>
+					<div class="col-md-6 col-sm-6">scores</div>
+				</md-input-container>
+
+				<md-input-container flex ng-repeat="option in setData.options track by $index" class="option-value-container center">
+					<div class="col-md-6 col-sm-6">{{option}}</div>
+					<div class="col-md-6 col-sm-6">{{setData.optionScores[$index]}}</div>
+				</md-input-container>
+			</div>
+
+			<!-- sibling Set order and show state -->
+			<md-input-container flex style="margin-top:50px;" ng-if="setData.siblingSetKey">
+				<strong class="mb-3"> Sibling Sets order and show state:</strong>
+				<div class="row question-div" dragula='"drag-div-sibling1"' dragula-model="siblingSets">
+					<div ng-repeat="set in siblingSets track by $index">
+						<div class="siblings">
+							<span class="order-span">{{$index+1}}&nbsp;-&nbsp;</span>
+							&nbsp;{{set.setname}}
+							<span ng-if="set.setKey==setData.siblingSetKey" class="first-sibling ml-5"> [First Sibling]</span>
+							<span class="btn eye" myclick="changeSiblingHideState(set)">
+								<i class="glyphicon glyphicon-eye-open" ng-show="set.show"></i>
+								<i class="glyphicon glyphicon-eye-close" ng-hide="set.show"></i>
+							</span>
+						</div>
+					</div>
+				</div>
+			</md-input-container>
+
+			<!-- Result String -->
+			<md-input-container flex >
+				<strong>Live Feedback:</strong>
+				<textarea ng-disabled="!userData.result_video_enabled" ng-model="setData.result_string" ng-change="resultStringChanged()"></textarea>
+			</md-input-container>
+
+			<!-- result video url -->
+			<md-input-container flex>
+				<strong ng-if="userData.result_video_enabled">Result Video ID: ( e.g. tgbNymZ7vqY )</strong>
+				<input ng-if="userData.result_video_enabled" type="text" class="mb-3" ng-model="setData.result_videoID" ng-change="result_videoIdChanged()" />
+				<div class="center" ng-show="setData.result_videoURL">
+					<div class="col-md-12"><strong>Result Video</strong></div>
+					<div id="playerWrapOuter">
+						<div id="playerWrap1">
+							<iframe id="video-iframe1" width="420" height="315" src="{{setData.result_videoURL}}" frameborder="0"></iframe>
+						</div>
+					</div>
+				</div>
+			</md-input-container>
+
+			<!--Additional Info  -->
+			<md-input-container flex ng-init="fileupload()" style="padding-bottom:20px;">
+				<strong class="mb-3">Additional info / Comments:</strong>
+
+				<input type="file" id="fileButton" id="imgInp" style="width:calc(100% - 200px);">
+				<button class="btn btn-primary pull-right" myclick="infoChanged()">Save Info</button>
+
+				<div id="additional_info_edit" contenteditable class="additional" ng-model="setData.additional_info" strip-br="true"
+				 name="myWidget">&nbsp;</div>
+			</md-input-container>
+
+		</div>
+
+
+		<div ng-if="!editable">
+			<md-input-container flex class="center">
+				<div class="col-md-6 col-sm-6">Likert Questionnaire Instructions to partifipants : </div>
+				<div class="col-md-6 col-sm-6">{{setData.instructions}}</div>
+			</md-input-container>
+
+			<!-- video url -->
+			<md-input-container flex ng-show="setData.videoURL">
+				<strong>Questionset Video ID: ( e.g. tgbNymZ7vqY )</strong>
+				<input type="text" class="mb-3" ng-model="setData.videoID" ng-disabled="true" />
+				<div class="center">
+					<div class="col-md-12"><strong>Questionset Video</strong></div>
+					<div id="playerWrapOuter">
+						<div id="playerWrap">
+							<iframe id="video-iframe" width="420" height="315" src="{{setData.videoURL}}" frameborder="0"></iframe>
+						</div>
+					</div>
+				</div>
+			</md-input-container>
+
+			<md-input-container flex class="center">
+				<div class="col-md-6 col-sm-6">Default Subscale Operation Method</div>
+				<div class="col-md-6 col-sm-6">{{setData.method}}</div>
+			</md-input-container>
+
+			<md-input-container flex class="center">
+				<div class="col-md-6 col-sm-6">Compare groups in student side</div>
+				<div class="col-md-6 col-sm-6">{{setData.compare?'Enabled':'Disabled'}}</div>
+			</md-input-container>
+
+			<!-- graph type -->
+			<md-input-container flex class="center">
+				<div class="col-md-6 col-sm-6">Y-Axis Scale Type</div>
+				<div class="col-md-6 col-sm-6">{{setData.yScaleType}}</div>
+			</md-input-container>
+
+			<md-input-container flex class="center">
+				<div class="col-md-6 col-sm-6">Y-axis Label : </div>
+				<div class="col-md-6 col-sm-6">{{setData.yLabel}}</div>
+			</md-input-container>
+
+			<md-input-container flex class="center">
+				<div class="col-md-6 col-sm-6">No. of Options</div>
+				<div class="col-md-6 col-sm-6">{{setData.options.length}}</div>
+			</md-input-container>
+
+			<md-input-container class="center" style="border-bottom: solid 1px cornflowerblue;">
+				<div class="col-md-6 col-sm-6">Options</div>
+				<div class="col-md-6 col-sm-6">scores</div>
+			</md-input-container>
+
+			<md-input-container flex ng-repeat="option in setData.options track by $index" class="option-value-container center">
+				<div class="col-md-6 col-sm-6">{{option}}</div>
+				<div class="col-md-6 col-sm-6">{{setData.optionScores[$index]}}</div>
+			</md-input-container>
+
+			<!-- sibling Set order and show state -->
+			<md-input-container flex style="margin-top:50px;" ng-if="setData.siblingSetKey">
+				<strong class="mb-3"> Sibling Sets order and show state:</strong>
+				<div class="row question-div">
+					<div ng-repeat="set in siblingSets track by $index">
+						<div class="siblings">
+							<span class="order-span">{{$index+1}}&nbsp;-&nbsp;</span>
+							&nbsp;{{set.setname}}
+							<span ng-if="set.setKey==setData.siblingSetKey" class="first-sibling ml-5"> [First Sibling]</span>
+							<span class="btn eye">
+								<i class="glyphicon glyphicon-eye-open" ng-show="set.show"></i>
+								<i class="glyphicon glyphicon-eye-close" ng-hide="set.show"></i>
+							</span>
+						</div>
+					</div>
+				</div>
+			</md-input-container>
+
+			<!--result video url -->
+			<md-input-container flex ng-show="setData.result_videoURL">
+				<strong>Result Video ID: ( e.g. tgbNymZ7vqY )</strong>
+				<input type="text" class="mb-3" ng-model="setData.result_videoID" ng-disabled="true" />
+				<div class="center">
+					<div class="col-md-12"><strong>Result Video</strong></div>
+					<div id="playerWrapOuter">
+						<div id="playerWrap">
+							<iframe id="video-iframe" width="420" height="315" src="{{setData.result_videoURL}}" frameborder="0"></iframe>
+						</div>
+					</div>
+				</div>
+			</md-input-container>
+
+			<!--Additional Info  -->
+			<md-input-container flex ng-init="get_additional_info()" ng-show="setData.additional_info && setData.additional_info!='&emsp;' && setData.additional_info!=undefined && setData.additional_info!='<br/>'">
+				<strong>Additional info / Comments:</strong>
+				<div id="additional_info" class="additional read-only"></div>
+			</md-input-container>
+		</div>
+	</div>
+</div>
+
+<!-- create likert question modal -->
+<div class="modal fade" id="questionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+ aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Create Question</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<md-input-container class="md-block">
+					<label> Question: e.g. Tutorial</label>
+					<input required md-no-asterisk ng-model="newQuestion" name="Name">
+				</md-input-container>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" myclick="createQuestion()">Create</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- choiceTypeModal -->
+<div class="modal fade" id="choiceTypeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+ aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Choice Scale Type</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<h3 class="center">Scale Type</h3>
+				<md-input-container class="md-block">
+					<md-radio-group ng-model="scaleType">
+						<md-radio-button value="sub" class="md-primary">Sub scale</md-radio-button>
+						<md-radio-button value="super" class="md-primary">Super scale</md-radio-button>
+						<md-radio-button value="label" class="md-primary">Label</md-radio-button>
+					</md-radio-group>
+				</md-input-container>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-primary" myclick="selectedScaleType()">Next Step</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- create Likert subscale modal -->
+<div class="modal fade" id="subscaleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+ aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Create Subscale</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+
+				<md-input-container class="md-block mb-5">
+					<label> Subscale Title:</label>
+					<input required md-no-asterisk ng-model="subscale.title" name="Name">
+				</md-input-container>
+				<md-input-container class="md-block mb-5">
+					<div class="col-md-6 col-sm-6"><label>Subscale Operation</label></div>
+					<div class="col-md-6 col-sm-6">
+						<md-radio-group ng-model="subscale.method" layout="row">
+							<md-radio-button ng-value="'Average'" class="md-primary mr-5">Average</md-radio-button>
+							<md-radio-button ng-value="'Sum'" class="md-primary">Sum</md-radio-button>
+						</md-radio-group>
+					</div>
+				</md-input-container>
+				<md-input-container class="md-block">
+					<label class="choose-question"> Choose Questions</label>
+					<md-checkbox ng-checked="selectAll" ng-click="toggleAll()" class="check-all">
+						Select All
+					</md-checkbox>
+					<hr />
+					<div class="row">
+						<div class="col-md-12">
+							<div ng-repeat="qst in questions track by $index">
+								<div class="row">
+									<div class="col-md-12 check-box-div">
+										<span>{{$index+1}}.</span>
+										<md-checkbox ng-checked="qstArray[$index].selected" ng-click="toggle($index)">
+											{{ qst.question }}
+										</md-checkbox>
+										<button class="btn btn-primary" ng-disabled="!qstArray[$index].selected" ng-class="{'reversed':!qstArray[$index].reversed}"
+										 myclick="toggleReverse($index)">Reverse</button>
+									</div>
+								</div>
+							</div>
+							<div ng-show="questions.length == 0">There isn't any question.</div>
+						</div>
+
+					</div>
+				</md-input-container>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" myclick="createSubscale()">Create</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- create Likert Super scale modal -->
+<div class="modal fade" id="createSuperScaleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+ aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Create Super Scale</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<md-input-container class="md-block">
+					<label>Super Scale Title:</label>
+					<input required md-no-asterisk ng-model="superscale.title">
+				</md-input-container>
+				<h3 class="center">Scale Operation</h3>
+				<div class="row noselect">
+					<div class="col-md-12">
+						<md-input-container>
+							<div ng-if="superscale.subscales.length>0">
+								<b>Score&emsp;=&emsp;</b>
+								(
+								<span ng-repeat="subscale in superscale.subscales track by $index">
+									<span ng-if="$index!=0 || subscale.operator=='-'">&emsp;{{subscale.operator}}&emsp;</span>
+									{{setData.subscales[subscale.subscaleKey].title}}</span>
+								)
+								<span ng-if="superscale.average">&emsp;/&emsp;{{superscale.subscales.length}}</span>
+							</div>
+							<div ng-if="superscale.subscales.length==0">
+								<b>Score&emsp;=&emsp;</b>0
+							</div>
+						</md-input-container>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="table-responsive">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th scope="col">op</th>
+										<th scope="col">Subscale</th>
+										<th scope="col"><button class="btn btn-success cell-button" myclick="appendSubscale()">Add item</button></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="subscale in superscale.subscales track by $index">
+										<td class="score-cell">
+											<select class="form-control" ng-model="subscale.operator">
+												<option value="+" ng-selected="subscale.operator=='+'">+</option>
+												<option value="-" ng-selected="subscale.operator=='-'">-</option>
+											</select>
+										</td>
+										<td class="score-cell">
+											<select class="form-control" ng-model="subscale.subscaleKey">
+												<option ng-repeat="sub in subscaleArray track by $index" value="{{sub.key}}" ng-selected="subscale.subscaleKey == sub.key">{{sub.title}}</option>
+											</select>
+										</td>
+										<td class="button-cell">
+											<button class="btn btn-danger cell-button" myclick="removeSubscale($index)">delete</button>
+										</td>
+									</tr>
+									<tr ng-if="superscale.subscales.length > 0">
+										<td colspan="3">
+											Average&emsp;:&emsp;
+											<md-checkbox ng-checked="superscale.average" ng-click="superscale.average = !superscale.average">&emsp;
+												<span ng-show="superscale.average">Yes</span>
+												<span ng-show="!superscale.average">N o</span>
+											</md-checkbox>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" myclick="createSuperScale()">Create</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- create Likert Label modal -->
+<div class="modal fade" id="createLabelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+ aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Create Label</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<md-input-container class="md-block">
+					<label>Label:</label>
+					<input required md-no-asterisk ng-model="superscale.title">
+				</md-input-container>
+				<h3 class="center">Label Condition</h3>
+				<div class="row noselect">
+					<div class="col-md-12">
+						<md-input-container>
+							<div ng-if="superscale.subscales.length>0">
+								<b>IF&emsp;</b>
+								<span ng-repeat="subscale in superscale.subscales track by $index">
+									<b ng-if="$index!=0">AND&emsp;</b>
+									<br />&emsp;&emsp;{{setData.subscales[subscale.subscaleKey].title}}
+									&emsp;{{subscale.operator}}&emsp;
+									{{subscale.num}}&emsp;
+								</span>
+								<br /><b>THEN &emsp;
+									<span ng-if="superscale.title">{{superscale.title}}</span>
+									<span ng-if="!superscale.title">LABEL</span>
+								</b>
+							</div>
+							<div ng-if="superscale.subscales.length==0">
+								<b>No Condition</b>
+							</div>
+						</md-input-container>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="table-responsive">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th scope="col">Sub Scale</th>
+										<th scope="col" class="num-cell">Op</th>
+										<th scope="col" class="num-cell">Number</th>
+										<th scope="col"><button class="btn btn-success cell-button" myclick="appendLabel()">Add item</button></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="subscale in superscale.subscales track by $index">
+										<td class="score-cell">
+											<select class="form-control" ng-model="subscale.subscaleKey">
+												<option ng-repeat="sub in subscaleArray track by $index" value="{{sub.key}}" ng-selected="subscale.subscaleKey == sub.key">{{sub.title}}</option>
+											</select>
+										</td>
+										<td class="score-cell" class="num-cell">
+											<select class="form-control" ng-model="subscale.operator">
+												<option value=">" ng-selected="subscale.operator=='>'">&gt;</option>
+												<option value=">=" ng-selected="subscale.operator=='>='">&gt;=</option>
+												<option value="<" ng-selected="subscale.operator=='<'">&lt;</option>
+												<option value="<=" ng-selected="subscale.operator=='<='">&lt;=</option>
+											</select> </td>
+										<td class="num-cell">
+											<input type="number" class="form-control" ng-model="subscale.num" value="0" />
+										</td>
+										<td class="button-cell">
+											<button class="btn btn-danger cell-button" myclick="removeLabel($index)">delete</button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" myclick="createLabel()">Create</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- create Multiple subscale modal -->
+<div class="modal fade" id="multipleSubscaleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+ aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Create Subscale</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<md-input-container class="md-block">
+					<label> Subscale Title:</label>
+					<input required md-no-asterisk ng-model="subscale.title" name="Name">
+				</md-input-container>
+
+				<md-input-container class="md-block">
+					<label class="choose-question"> Choose Questions</label>
+					<md-checkbox ng-checked="selectAll" ng-click="toggleAll()" class="check-all">
+						Select All
+					</md-checkbox>
+					<hr />
+					<div class="row">
+						<div class="col-md-12">
+							<div ng-repeat="qst in questions">
+								<div class="row">
+									<div class="col-md-2 col-sm-2 col-xs-2" style="font-weight: bold;">
+										{{$index+1}}. &emsp;
+									</div>
+									<div class="col-md-10 col-sm-10 col-xs-10">
+										<md-checkbox ng-checked="qstArray[$index].selected" ng-click="toggle($index)">
+											{{ qst.question }}
+										</md-checkbox>
+									</div>
+								</div>
+							</div>
+							<div ng-show="questions.length == 0">There isn't any question.</div>
+						</div>
+
+					</div>
+				</md-input-container>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" myclick="createMultipleSubscale()">Create</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- create Feedback modal -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+ aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document" style="width: 800px;">
+		<div class="modal-content" style="min-width: 800px;">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Edit Feedback</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row" style="margin: 0px 20px;">
+					<div class="row center">
+						<div class="col-md-4"> Range </div>
+						<div class="col-md-8"> Feedback </div>
+					</div>
+					<div class="row line-div"></div>
+					<div ng-repeat="range in ranges track by $index">
+						<div class="row center">
+							<div class="col-md-4 range-div">
+								<input class="range-input" ng-model="range.start" ng-blur="change_start($index)" press-enter="change_start($index)"
+								 select-on-click />
+								<span>&lt; &nbsp; range&nbsp;{{$index+1}} &nbsp; &le;</span>
+								<input class="range-input" ng-model="range.end" ng-blur="change_end($index)" press-enter="change_end($index)"
+								 select-on-click />
+							</div>
+							<div class="col-md-8">
+								<textarea class="feedback-input" ng-model="range.text"></textarea>
+							</div>
+						</div>
+						<div class="row line-div"></div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" myclick="saveFeedback()">Save</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- copy Questionset modal -->
+<div class="modal fade" id="copyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+ aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Copy Questionset</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<md-input-container class="md-block">
+					<label> New Questionset Name:</label>
+					<input required md-no-asterisk ng-model="newSetName" name="Name">
+				</md-input-container>
+				<md-input-container class="md-block">
+					<span class="description">* &emsp;All of data and questions of this question set will be copied to new question
+						set when you copy question set.</span>
+				</md-input-container>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" myclick="copySet()">Copy Questionset</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- create Likert Sibling Questionset modal -->
+<div class="modal fade" id="siblingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+ aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Create Sibling Set </span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<md-input-container class="md-block">
+					<label>New Sibling Question Set Name:</label>
+					<input required md-no-asterisk ng-model="newSetName" name="Name">
+				</md-input-container>
+
+				<md-input-container class="md-block">
+					<span class="description">* &emsp;<span class="marked">"Sibling Set"</span> used to compare student answers with
+						all <span class="marked">"Siblings"</span> in same group.</span>
+					<span class="description">* &emsp;All options and questions of origin set are copied into a new set when you
+						create a <span class="marked">Sibling</span>.</span>
+					<span class="description">* &emsp;<span class="marked">Sibling</span> will be publish directly and you can't add
+						new question to created <span class="marked">Sibling</span>.</span>
+					<span class="description">* &emsp;<span class="marked">Sibling</span> will behavior as normal set if there isn't
+						any other <span class="marked">Sibling</span> in same group.</span>
+				</md-input-container>
+				<md-input-container class="md-block">
+					<span class="title">Show Siblings in Graph</span>
+					<div class="row question-div" dragula='"drag-div-sibling"' dragula-model="newSiblingSets">
+						<div ng-repeat="set in newSiblingSets track by $index">
+							<div class="siblings">
+								<span class="order-span">{{$index+1}}&nbsp;-&nbsp;</span>
+								&nbsp;{{set.setname}}
+								<span ng-if="set.setKey==setData.siblingSetKey" class="first-sibling ml-5"> [First Sibling]</span>
+								<span class="btn eye" myclick="hideSibling(set)">
+									<i class="glyphicon glyphicon-eye-open" ng-show="set.show"></i>
+									<i class="glyphicon glyphicon-eye-close" ng-hide="set.show"></i>
+								</span>
+							</div>
+						</div>
+					</div>
+				</md-input-container>
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" myclick="createSibling()">Create Sibling</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- edit set title modal -->
+<div class="modal fade" id="editSetTitleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+ aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Import Questionset Title</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<md-input-container class="md-block">
+					<label> Questionset Name:</label>
+					<input required md-no-asterisk ng-model="newSetName" name="Name" />
+				</md-input-container>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" myclick="updateSetName()">Save</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- copy question modal -->
+<div class="modal fade" id="copyQuestionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+ aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Edit Question</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<md-input-container class="md-block">
+					<label style="margin-bottom:25px;"> Question:</label>
+					<h1 ng-show='copyQst.title'>{{copyQst.title}}</h1>
+					<div class="col-md-12">{{copyQst.question}}</div>
+					<hr />
+				</md-input-container>
+
+				<md-input-container class="md-block" style="margin-top:40px;">
+					<label style="margin-bottom:25px;"> Copy to:</label>
+					<div class="qset-section">
+						<div class="col-md-12 noselect" ng-repeat="(key,qset) in mySets" ng-click="copyTo(key)">{{qset.setname}}</div>
+					</div>
+				</md-input-container>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- shared list modal -->
+<div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="addModal" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Shared Teachers</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-12 center">Shared Teachers</div>
+				</div>
+				<div class="row ">
+					<div class="col-md-12">
+						<md-input-container class="mt-0 mb-0 sharedList">
+							<div class="row">
+								<div class="col-md-12 mb-3 teacher-row" ng-repeat="(key,teacher) in tempShared track by $index">
+									{{teacher.email}}
+
+									<button class="btn btn-danger pull-right" myclick="deleteTeacher(key)">
+										<span class="glyphicon glyphicon-trash"></span> Delete
+									</button>
+									<md-switch class="md-primary editable-switch" ng-model="teacher.editable" md-no-ink aria-label="editable">
+										<span>Editable</span>
+									</md-switch>
+								</div>
+							</div>
+						</md-input-container>
+					</div>
+				</div>
+				<hr />
+				<div class="row">
+					<md-input-container class="md-block">
+						<span class="description">* &emsp;Please enter the email of the registered teacher below. Note the teacher must
+							have a registered account to be added.</span>
+					</md-input-container>
+				</div>
+				<md-input-container class="md-block">
+					<label> Type Email Address </label>
+					<input md-no-asterisk ng-model="email" name="email" press-enter="addTeacher()">
+				</md-input-container>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-success" myclick="saveShare()">Save Setting</button>
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<style>
+	.title-row {
+		padding: 10px 10%;
+		font-size: 24px;
+	}
+
+	.title {
+		color: #0927bf;
+		font-weight: 600;
+	}
+
+
+	.chip-row {
+		padding: 0px 10%;
+	}
+
+	.question-div {
+		max-height: calc(100vh - 375px);
+		overflow-y: auto;
+		padding: 5px;
+		border: solid 1px #e3e1e1 !important;
+		background: white;
+	}
+
+	/* .question-div>div {
+		margin: 5px 0px;
+		padding: 5px;
+	} */
+
+	.question-div>div.byOther {
+		margin: 3px 0px;
+	}
+
+	.qtdetails {
+		font-size: 1.1em;
+		background-color: #f6fec6;
+		padding: 3px 10px;
+		color: #031c87;
+		line-height: 2em;
+		min-height: 50px;
+		width: 100%;
+		border: solid 5px #bfbfbf;
+	}
+
+	.qtdetails.hideByMe {
+		color: #031c8799;
+	}
+
+	.qtdetails:hover {
+		background-color: #f6fec6;
+		border: solid 5px #a1a1a1;
+	}
+
+	.byOther .qtdetails {
+		margin-bottom: 0px;
+		display: block;
+	}
+
+
+	.button-row {
+		padding-top: 4px;
+	}
+
+	.button-row>a.btn {
+		min-width: 90px;
+		padding: 6px 10px;
+		margin: 0px 10px;
+		max-height: 44px;
+		font-size: 14px;
+	}
+
+	span.anonymous {
+		font-weight: bold;
+		color: black;
+		font-style: italic;
+		float: right;
+	}
+
+	.delete {
+		float: right;
+	}
+
+	.delete .btn {
+		margin: 0px 10px;
+	}
+
+	/* md-input-container>.row {
+		padding-left: 50px;
+	} */
+
+	hr {
+		border-color: #7a7a7d;
+	}
+
+	.range-input {
+		max-width: 40px;
+		text-align: center;
+		border: solid 1px transparent;
+	}
+
+	.range-input:focus,
+	.range-input:hover {
+		border: solid 1px #ccc;
+	}
+
+	.operator {
+		text-align: center;
+		border: solid 1px transparent;
+		background-color: transparent;
+	}
+
+	.operator:focus,
+	.operator:hover {
+		border: solid 1px #ccc;
+		background-color: #eaeaea;
+		box-shadow: 1px 1px 1px 1px #989898;
+		border-radius: 5px;
+	}
+
+	select.operator::-ms-expand {
+		display: none;
+	}
+
+	.feedback-input {
+		border: none;
+		width: 100%;
+		text-align: center;
+		border: solid 1px #ccc;
+	}
+
+	/* .feedback-input:focus,
+	.feedback-input:hover {
+		border: solid 1px #ccc;
+	} */
+
+	.line-div {
+		border-bottom: solid 1px #b1b1b1;
+		margin: 10px -15px;
+	}
+
+	.range-div {
+		padding: 20px 15px;
+	}
+
+	.switch-div {
+		display: inline-block;
+		margin: 0px 10px;
+		min-width: 100px;
+		vertical-align: middle;
+	}
+
+	.btn-primary.reversed {
+		background-color: #ccc;
+		color: #656565;
+		border-color: #ccc;
+	}
+
+	/* option div style */
+
+	.option-div {
+		max-height: calc(100vh - 375px);
+		overflow-y: auto;
+		overflow-x: hidden;
+		padding: 0px;
+		font-size: 1.2em;
+		margin-top: 10px;
+	}
+
+	.instructions {
+		margin-top: 40px;
+	}
+
+	.direction-option {
+		line-height: 30px;
+		margin: 16px 0;
+	}
+
+	.direction-switch {
+		display: inline-block;
+	}
+
+	.option-value-container {
+		margin: 10px 10%;
+	}
+
+	md-input-container {
+		margin: 15px 10%;
+	}
+
+	.check-all {
+		position: absolute;
+		right: 18px;
+		top: -10px;
+	}
+
+	.choose-question {
+		width: 200px !important;
+	}
+
+	.qst-title {
+		color: #0927bf;
+		font-size: 1.1em;
+	}
+
+	md-input-container textarea.box-style {
+		min-height: 100px;
+		max-height: 200px;
+		overflow-y: auto;
+		color: black;
+		height: 0px;
+		border: solid 1px #b8f2f9;
+		background-color: aliceblue;
+		border-radius: 7px;
+		padding: 10px;
+	}
+
+	md-input-container textarea.md-input.question-title {
+		min-height: 50px !important;
+		max-height: 100px !important;
+		overflow-y: auto;
+		border-top: solid 1px antiquewhite;
+		border-left: solid 1px antiquewhite;
+		border-right: solid 1px antiquewhite;
+	}
+
+	md-input-container .qset-section {
+		max-height: 300px;
+		padding: 5px;
+		overflow-x: hidden;
+		overflow-y: auto;
+		border: solid 1px aquamarine;
+
+	}
+
+	.qset-section>div {
+		background-color: #e9e9e9;
+		margin-bottom: 8px;
+		cursor: pointer;
+		box-shadow: 2px 2px #bcb6b6;
+	}
+
+	#additional_info_edit {
+		border: solid 1px darkgray;
+		margin-top: 45px;
+	}
+
+	.additional .img-div {
+		resize: both;
+		overflow: auto;
+		width: 400px;
+		height: 250px;
+		background-repeat: no-repeat !important;
+		background-size: 100% 100% !important;
+	}
+
+	.modal-content {
+		margin: 30px auto;
+	}
+
+	.check-box-div md-checkbox {
+		width: calc(100% - 130px);
+	}
+
+	.check-box-div>span {
+		display: inline-block;
+		width: 30px;
+		text-align: right;
+		margin-right: 5px;
+	}
+
+	table tr th,
+	table tr td {
+		text-align: center;
+	}
+
+	.modal {
+		overflow: auto;
+	}
+
+	.num-cell {
+		width: 100px;
+	}
+
+	.super-type {
+		color: #e40202;
+		font-weight: bold;
+	}
+
+	.label-type {
+		color: blue;
+		font-weight: bold;
+	}
+
+	.likert-option {
+		width: calc(100% - 40px);
+		float: right;
+		background-color: transparent;
+		border: none;
+		box-shadow: none;
+		text-align: center;
+		font-size: 20px;
+		border-bottom: solid 1px #4f9ef880;
+	}
+
+	.likert-qst {
+		width: calc(100% - 150px);
+		display: inline-block;
+		background-color: transparent;
+		border: none;
+		box-shadow: none;
+	}
+
+	.change-all-button {
+		margin-left: 70px;
+		padding: 5px;
+	}
+
+	.form-control.likert-qst:focus,
+	.form-control.likert-qst:hover {
+		border-color: #66afe9;
+		outline: 0;
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(255, 10, 53, 0.71);
+	}
+
+	.siblings {
+		font-size: 14px;
+		background-color: #f6fec6;
+		padding: 0px 10px;
+		color: #031c87;
+		line-height: 2em;
+		min-height: 30px;
+		width: 100%;
+		border: solid 2px #bfbfbf;
+		margin-bottom: 2px;
+	}
+
+	.siblings:hover {
+		background-color: #f6fec6;
+		border: solid 2px #a1a1a1;
+		cursor: pointer;
+	}
+
+	.first-sibling {
+		color: red;
+	}
+
+	span.eye {
+		float: right;
+		height: 30px;
+		background-color: transparent;
+	}
+
+	.glyphicon-eye-open {
+		color: #0959e4;
+	}
+
+	.glyphicon-eye-close {
+		color: #3b52ff80;
+	}
+
+	.sharedList {
+		height: 200px;
+		padding: 10px;
+		border: solid 1px #aeaeae;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+
+
+	.editable-switch {
+		float: right;
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-right: 10px !important;
+		font-size: 15px;
+	}
+
+	.set-code {
+		color: red;
+		font-size: 20px;
+		padding-right: 30px;
+	}
+
+	@media screen and (min-width: 650px) {
+		.modal-content {
+			min-width: 650px;
+		}
+	}
+</style>

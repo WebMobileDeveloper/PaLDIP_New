@@ -1,0 +1,176 @@
+<div ng-init="init()" ng-show="$root.settings.loadingfinished">
+
+	<div class="row" style="text-align: center;">
+		<h2>Question Sets</h2>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="row button-bar">
+					<div class="col-md-2 col-sm-4 col-md-offset-1">
+						<button class="btn" ng-class="showInactive('Used')" myclick="changeShow('Used')">Question Sets Used</button>
+					</div>
+					<div class="col-md-2 col-sm-4 ">
+						<button class="btn" ng-class="showInactive('ByMe')" myclick="changeShow('ByMe')">My Question Sets</button>
+					</div>
+					<div class="col-md-2 col-sm-4 ">
+						<button class="btn" ng-class="showInactive('ByOther')" myclick="changeShow('ByOther')">Question Set Pool</button>
+					</div>
+					<div class="col-md-2 col-sm-4 ">
+						<button class="btn" myclick="$state.go('createQuestionSet')" style="background-color: #099b1a; color: #f9ff05;">Create Question Set</button>
+					</div>
+					<div class="col-md-2 col-sm-4 ">
+						<button class="btn" myclick="choiceExportGroup()" style="background-color: #30cef9; color: #091be4;">Export Response</button>
+					</div>
+				</div>
+				<hr />
+				<div class="col-md-12">
+					<div class="col-md-3" ng-init="$root.loadTags()">
+						<h4>Search Tags</h4>
+						<md-chips ng-model="$root.selectedTags" md-autocomplete-snap="" md-transform-chip="$root.transformChip($chip)" md-require-match="false" md-on-add="chipChanged()" md-on-remove="chipChanged()">
+							<md-autocomplete md-search-text="searchText" md-items="item in $root.querySearch(searchText)" md-item-text="item.name" placeholder="Search by tags or name...">
+								<span md-highlight-text="searchText">{{item.name}}</span>
+							</md-autocomplete>
+							<md-chip-template>
+								<span>
+									<strong>{{$chip.name}}</strong>
+								</span>
+							</md-chip-template>
+						</md-chips>
+					</div>
+					<div class="col-md-9">
+						<div class="set-box">
+							<div ng-repeat="set in setList | orderObjectBy :'setname':false track by $index" class="setlists" ng-class="{active:set.key==$root.settings.questionSetKey}" ng-click="showQuestionsInSet(set)" ng-show="getShowState(set.key)">
+								<span class="pull-left set-code">{{set.key}} : </span>
+								{{set.setname}}
+								<span class="pull-right show-state mr-3">
+									<span ng-show="set.byTag">T
+										<md-tooltip class="custom-tooltip height-50" md-direction="top">
+											Tag name is matched
+										</md-tooltip>
+									</span>
+									<span ng-show="set.byQCode">Q
+										<md-tooltip class="custom-tooltip height-50" md-direction="top">
+											Question Code is matched
+										</md-tooltip>
+									</span>
+									<span ng-show="set.bySCode">S
+										<md-tooltip class="custom-tooltip height-50" md-direction="top">
+											Set Code is matched
+										</md-tooltip>
+									</span>
+									<span ng-show="set.bySName">N
+										<md-tooltip class="custom-tooltip height-50" md-direction="top">
+											Set Name is matched
+										</md-tooltip>
+									</span>
+								</span>
+								<span ng-show="set.shared" class="shared pull-right">(Shared)
+									<md-tooltip class="custom-tooltip height-50" md-direction="top">
+										Shared QuestionSet
+									</md-tooltip>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<style>
+	h2 {
+		color: #3e3c8d;
+		font-weight: bold;
+	}
+
+	.row {
+		margin-right: 0px;
+		margin-left: 0%;
+	}
+
+	.button-bar {
+		margin: 20px 0px 0px;
+		text-align: center;
+	}
+
+	.button-bar>div {
+		margin-bottom: 20px;
+	}
+
+	.button-bar .btn {
+		color: white;
+		font-weight: 600;
+		border-radius: 10px;
+		background-color: #167aff;
+		white-space: normal;
+		font-size: 20px;
+		line-height: 1.2em;
+		width: 100%;
+	}
+
+	a.btn {
+		padding-top: 0.6em;
+	}
+
+	.button-bar button.inactive {
+		background-color: #8d94c5cc;
+	}
+
+	.set-box {
+		text-align: center;
+		max-height: 70vh;
+		overflow-x: hidden;
+		padding: 0px 10px;
+		/* background-color: red; */
+	}
+
+	.setlists {
+		background-color: #07697c;
+		border-radius: 5px;
+		color: white;
+		margin: 5px auto;
+		width: 95%;
+		cursor: pointer;
+		font-weight: bold;
+		font-size: 20px;
+		box-shadow: 1px 2px gray;
+		font-weight: bold;
+	}
+
+	.setlists.active {
+		background-color: #00a5ff;
+		color: black;
+	}
+
+	.setlists:hover {
+		opacity: 0.8;
+	}
+
+	.set-code {
+		margin-left: 10px;
+		font-size: 17px;
+		color: gold;
+	}
+
+	.show-state span {
+		color: #05177d !important;
+		background-color: #fffd0a;
+		border-radius: 7px;
+		width: 16px;
+		height: 16px;
+		display: inline-block;
+		font-size: 12px;
+		font-weight: bold;
+		margin-left: -2px;
+	}
+
+	.shared {
+		margin-top: 4px;
+		margin-right: 10px;
+		font-size: 15px;
+		color: #f5f500;
+	}
+</style>

@@ -1,0 +1,56 @@
+<div ng-init="init()">
+	<div class="row content-header">
+		<div class="container">
+			<div class="col-md-12 title texteffect">
+				{{$root.settings.groupName}}
+			</div>
+		</div>
+	</div>
+	<div ng-cloak style="margin-top:20px;" ng-show="$root.settings.loadingfinished">
+		<button class="btn btn-link" myclick="$root.exportToExcel('#table-1')">
+			<span class="glyphicon glyphicon-share"></span> Export to Excel
+		</button>
+
+		<table class="table table-bordered datatable" id="table-1" style="margin-top:10px;">
+			<thead>
+				<tr>
+					<th colspan="{{2+finalScoreQuestionKeys.length}}">{{$root.settings.groupName}}</th>
+				</tr>
+				<tr>
+					<th colspan="{{2+finalScoreQuestionKeys.length}}" style="text-align:left; padding-left: 20px;">
+						<div ng-if="false" ng-repeat-start="question in allQuestions track by $index"></div>
+						<span style="display:inline-block; width:55px;">Qst {{$index+1}}: </span>{{question.question}}
+						<br style="mso-data-placement:same-cell;" />
+						<div ng-if="false" ng-repeat-end></div>
+					</th>
+				</tr>
+				<tr>
+					<th>No</th>
+					<th>Unique ID</th>
+					<th ng-repeat="question in allQuestions track by $index">Qst {{$index+1}}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="user in Users track by $index">
+					<td>
+						{{$index + 1}}
+					</td>
+					<td>{{user.show_id}}</td>
+					<td ng-repeat="score in user.scores track by $index">{{score}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<style>
+	.content-header {
+		background-color: #426af4;
+	}
+
+	.table>thead>tr>th,
+	.table>tbody>tr>td {
+		text-align: center;
+		vertical-align: middle;
+	}
+</style>

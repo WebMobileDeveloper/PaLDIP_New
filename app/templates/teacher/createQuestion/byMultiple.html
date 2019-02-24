@@ -1,0 +1,177 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="answer-form">
+		<div class="row">
+			<div class="col-md-12" style="text-align:center;font-size:1.3em;">
+				<label style="border-bottom: ridge 5px #8f8f8f; padding: 12px 40px;">{{$root.settings.questionSetName}}</label>
+			</div>
+		</div>
+		<!-- Question Title -->
+		<div class="row">
+			<md-input-container flex>
+				<label>Question Title</label>
+				<input ng-model="title" style="border-radius:5px;" />
+			</md-input-container>
+		</div>
+		<!-- Question String -->
+		<div class="row">
+			<md-input-container flex>
+				<label>Question String</label>
+				<textarea ng-model="mainQuestion" style="border-radius:5px;"></textarea>
+			</md-input-container>
+		</div>
+		<!-- Question Links -->
+		<div class="row" ng-show="$root.teacherSettings.link_enabled">
+			<md-input-container flex>
+				<label style="color: #4d4c4c;">Extra Links</label>
+			</md-input-container>
+
+			<div class="table-container  extra-link">
+				<div class="table-responsive">
+					<table class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th scope="col">#</th>
+								<th scope="col">Title</th>
+								<th scope="col">Url</th>
+								<th scope="col">Test Link</th>
+								<th scope="col"></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="link in $root.links track by $index">
+								<th scope="row">{{$index+1}}</th>
+								<td>
+									<textarea ng-model="link.title" class="table-input" autofocus placeholder="link title..."></textarea>
+								</td>
+								<td>
+									<textarea ng-model="link.url" class="table-input" autofocus placeholder="link url..."></textarea>
+								</td>
+								<td>
+									<a href={{link.url}} target="_blank">{{link.title}}</a>
+								</td>
+								<td class="button-cell">
+									<button class="btn btn-primary cell-button" myclick="$root.addLink($index)">append</button>
+									<br />
+									<button class="btn btn-danger cell-button" myclick="$root.removeLink($index)">delete</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<md-input-container flex>
+				<label>Maximum selection count</label>
+				<input ng-model="maximumSelection" type="number" style="border-radius:5px;" />
+			</md-input-container>
+		</div>
+		<div class="row" ng-show="$root.teacherSettings.image_enabled">
+			<md-input-container flex>
+				<label for="uploadfile" ng-hide="true">choose file</label>
+				<progress value="0" max="100" id="uploader" style="width:100%">0%</progress>
+				<input type="file" value="upload" id="fileButton" />
+			</md-input-container>
+		</div>
+		<div class="row" ng-show="$root.teacherSettings.video_enabled">
+			<md-input-container flex>
+				<label>Youtube video ID ( e.g. tgbNymZ7vqY )</label>
+				<input ng-model="videoID" style="border-radius:5px;" />
+			</md-input-container>
+		</div>
+		<hr />
+
+		<div class="row">
+			<fieldset ng-if="choices.length>0">
+				<div class="col-md-12 mb-3" data-ng-repeat="choice in choices track by $index">
+					<input type="text" ng-model="choice.name" name="" placeholder="Enter Option Name" style="width:90%">
+					<button class="remove" ng-show="$last" myclick="removeChoice()">-</button>
+				</div>
+			</fieldset>
+			<md-input-container flex>
+				<button class="btn btn-info" myclick="addNewChoice()">Add fields</button>
+			</md-input-container>
+		</div>
+		<hr />
+		<div class="row">
+			<md-input-container flex>
+				<label>Enable group within group:</label>
+			</md-input-container>
+			<md-input-container flex>
+				<md-radio-group ng-model="enableGroup" layout="row">
+					<md-radio-button ng-value="'disabled'" class="md-primary" style="margin-left:50px; margin-right:70px;">Not
+						Grouping</md-radio-button>
+					<md-radio-button ng-value="'email'" class="md-primary">By Institution</md-radio-button>
+				</md-radio-group>
+			</md-input-container>
+		</div>
+		<hr />
+		<div class="row">
+			<fieldset class="standard">
+				<legend>Anonymous Type</legend>
+				<div class="row">
+					<md-radio-group ng-model="selectedRadio" ng-change="radioChanged(selectedRadio)">
+						<md-radio-button ng-value="0" class="md-primary">Non-anonymous</md-radio-button>
+						<md-radio-button ng-value="1" class="md-primary">Anonymous</md-radio-button>
+					</md-radio-group>
+				</div>
+			</fieldset>
+		</div>
+
+		<!-- result data -->
+		<div ng-show="$root.teacherSettings.result_video_enabled">
+			<div class="row">
+				<md-input-container flex>
+					<label>Result String</label>
+					<textarea ng-model="result_string" style="border-radius:5px;"></textarea>
+				</md-input-container>
+			</div>
+			<div class="row">
+				<md-input-container flex>
+					<p>Upload result image</p>
+					<input type="file" id="fileButton1" />
+					<progress value="0" max="100" id="uploader1" style="width:100%">0%</progress>
+				</md-input-container>
+			</div>
+			<div class="row">
+				<md-input-container flex>
+					<label>Youtube result video ID ( e.g. tgbNymZ7vqY )</label>
+					<input ng-model="result_videoID" style="border-radius:5px;" />
+				</md-input-container>
+			</div>
+		</div>
+		<div class="button-row">
+			<md-input-container flex>
+				<button class="btn btn-primary" myclick=" $state.go('questionsInSet')">Question Set</button>
+				<button class="btn btn-primary" myclick="creatMultipleQuestion()">Create Question</button>
+				<a class="btn btn-link" myclick="$root.back()">Back</a>
+			</md-input-container>
+		</div>
+	</div>
+</div>
+<style>
+	fieldset {
+		width: 80%;
+		margin-left: 10%
+	}
+
+	#choicesDisplay {
+		padding: 10px;
+		background: rgb(227, 250, 227);
+		border: 1px solid rgb(171, 239, 171);
+		color: rgb(9, 56, 9);
+	}
+
+	.remove {
+		background: #C76868;
+		color: #FFF;
+		font-weight: bold;
+		font-size: 21px;
+		border: 0;
+		cursor: pointer;
+		display: inline-block;
+		padding: 4px 9px;
+		vertical-align: top;
+		line-height: 100%;
+	}
+</style>

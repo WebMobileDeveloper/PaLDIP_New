@@ -1,0 +1,105 @@
+<div class="" ng-init="initExportAll()" style="margin-top:30px;">
+	<div ng-if="$root.settings.loadingfinished">
+		<button class="btn btn-link" myclick="$root.exportToExcel('#table-1')">
+			<span class="glyphicon glyphicon-share"></span> Export to Excel
+		</button>
+		<button class="btn btn-danger pull-right" ng-if="deleteType=='Question'" myclick="deleteQuestion()">
+			<span class="glyphicon glyphicon-trash"></span> Delete Question
+		</button>
+		<button class="btn btn-danger pull-right" ng-if="deleteType=='Subscale'" myclick="deleteSubscale()">
+			<span class="glyphicon glyphicon-trash"></span> Delete Subscale
+		</button>
+		<table class="table table-bordered datatable" id="table-1">
+			<thead>
+				<tr>
+					<th colspan="12">
+						<b style="font-size:1.5em;">{{$root.settings.questionSetName}} &emsp; Question Set</b>
+						<br/>
+					</th>
+				</tr>
+				<tr>
+					<th colspan="12">
+						<b style="font-size:1.2em; padding:0px 20px;">{{question.question}}</b>
+						<br/>
+					</th>
+				</tr>
+				<tr>
+					<th>No</th>
+					<th class="narrow-td">Teacher</th>
+					<th>Group</th>
+					<th class="narrow-td">Student</th>
+					<th>Gender</th>
+					<th>Age</th>
+					<th>Profession</th>
+					<th>Mother tongue</th>
+					<th class="wide-td">Answer</th>
+					<th>Date/Time</th>
+					<th>Feedback</th>
+					<th>Score</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="answer in result">
+					<td>{{$index+1}}</td>
+					<td class="narrow-td">{{answer.teacher}}</td>
+					<td>{{answer.group}}</td>
+					<td class="narrow-td">{{answer.student}}</td>
+					<td>{{answer.gender}}</td>
+					<td>{{answer.age}}</td>
+					<td>{{answer.profession}}</td>
+					<td>{{answer.language}}</td>
+					<td class="wide-td" style="text-align:center" ng-if="answer.questionType != 'Rating Type'">{{answer.answer}}</td>
+					<td class="wide-td" style="text-align:left; padding-left:20px;" ng-if="answer.questionType == 'Rating Type'">
+						<div ng-if="false" ng-repeat-start="item in answer.answer track by $index"></div>
+						<b>Item{{$index+1}}.&emsp;</b>
+						<b ng-if="item.rating">&emsp;Ratings: &emsp;</b>{{item.rating}}
+						<b ng-if="item.feedbacktext">&emsp;Feedback: &emsp;</b>{{item.feedbacktext}}
+						<br style="mso-data-placement:same-cell;" />
+						<div ng-if="false" ng-repeat-end></div>
+					</td>
+					<td>{{answer.date}}</td>
+					<td>
+						<div ng-if="false" ng-repeat-start="feed in answer.feedback track by $index"></div>
+						<b>{{$index+1}}: </b>{{feed}}
+						<br style="mso-data-placement:same-cell;" />
+						<div ng-if="false" ng-repeat-end></div>
+					</td>
+					<td>{{answer.score}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<style>
+		.main-div {
+			width: 100%;
+			padding: 2%;
+		}
+
+		.no-data {
+			margin: 100px auto;
+			width: 500px;
+			text-align: center;
+			font-size: 3em;
+			color: #fd6167;
+			font-style: italic;
+			font-weight: bold;
+		}
+
+		td>p {
+			margin: 0px;
+		}
+
+		th,
+		td {
+			text-align: center;
+		}
+
+		/* .wide-td{
+			width: 300px;
+		} */
+
+		.narrow-td {
+			max-width: 115px !important;
+			word-wrap: break-word;
+		}
+	</style>

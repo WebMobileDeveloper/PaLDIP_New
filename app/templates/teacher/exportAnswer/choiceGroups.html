@@ -1,0 +1,22 @@
+<div class="row content-header title texteffect">
+	<div>My Groups</div>
+</div>
+<div class="row" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="container content-div">
+		<div class="col-md-12 groupdetails" ng-repeat="obj in groups" ng-click="gotoGroupExport(obj)" ng-class="setActive(obj)">
+			{{obj["groupname"]}}
+			<span class="pull-right" ng-show="!obj.byMe">shared&emsp;</span>
+		</div>
+	</div>
+</div>
+<style>
+	.content-header {
+		background-color: palevioletred;
+		height: 50px;
+		line-height: 50px;
+	}
+
+	.groupdetails.active {
+		background-color: #bbc2f2;
+	}
+</style>

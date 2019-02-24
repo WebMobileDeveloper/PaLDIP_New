@@ -1,0 +1,181 @@
+<div class="container">
+	<div class="row" style="text-align: center;">
+		<div class="col-md-12">
+			<div class="row">
+				<div class="col-md-10 col-sm-10 col-xs-10 title">
+					Teachers
+					<div class="radio-div">
+						<span>Order by</span>
+						<md-radio-group ng-model="orderField" ng-change="sortBy(orderField)">
+							<md-radio-button value="Date" class="md-primary">Register Date</md-radio-button>
+							<md-radio-button value="Email" class="md-primary">Email</md-radio-button>
+						</md-radio-group>
+					</div>
+				</div>
+
+				<div class="col-md-2 col-sm-2 col-xs-2">
+					<h2>
+						<button myclick="$state.go('adminExportAllTeachers')" type="button" class="exportbtn btn btn-success" style="background-color:#177c48;border-color:white;">Export
+							All
+						</button>
+						<!-- <button myclick="addUserCreateTime()" type="button" class="exportbtn btn btn-success">update</button> -->
+					</h2>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container data-div" ng-init="getRegisteredTeachers()" ng-show="$root.settings.loadingfinished">
+
+	<div class="row title-row center ">
+		<div class="col-md-6 col-sm-12 col-xs-12">Teahcer Email</div>
+		<div class="col-md-6 col-sm-12 col-xs-12">
+			<div class="row option-title-row">
+				<div class="col-md-1 col-sm-1 col-xs-1"></div>
+				<div class="col-md-2 col-sm-2 col-xs-2">Approved Teacher</div>
+				<div class="col-md-2 col-sm-2 col-xs-2">Non- Anonym</div>
+				<div class="col-md-2 col-sm-2 col-xs-2">Private Set</div>
+				<div class="col-md-2 col-sm-2 col-xs-2">Edit Question</div>
+				<div class="col-md-2 col-sm-2 col-xs-2">Extra Link</div>
+				<div class="col-md-1 col-sm-1 col-xs-1"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row content-row ">
+		<div class="col-md-12">
+			<div class="row user-row " ng-repeat="obj in teachers track by $index" ng-class="setActive(obj)">
+				<div ng-click="showGroups(obj)" class="col-md-6 col-sm-12 col-xs-12 email-div">
+					<div>{{obj.ID}}</div>
+				</div>
+				<div class="col-md-6 col-sm-12 col-xs-12">
+					<div class="row">
+						<div class="col-md-1 col-sm-1 col-xs-1">
+						</div>
+						<div class="col-md-2 col-sm-2 col-xs-2">
+							<md-switch class="md-primary" ng-model="obj.approved" md-no-ink aria-label="Switch Approved" ng-change="changeApprove(obj)">
+							</md-switch>
+							<md-tooltip>Approved
+								<span ng-if="obj.approved"></span>
+								<span ng-if="!obj.approved"></span>
+							</md-tooltip>
+						</div>
+						<div class="col-md-2 col-sm-2 col-xs-2">
+							<md-switch ng-model="obj.anonym_enabled" md-no-ink aria-label="Switch Non-Anonymous" ng-change="changeAnonym(obj)">
+							</md-switch>
+							<md-tooltip>Non-Anonymous
+								<span ng-if="obj.anonym_enabled"></span>
+								<span ng-if="!obj.anonym_enabled"></span>
+							</md-tooltip>
+						</div>
+						<div class="col-md-2 col-sm-2 col-xs-2">
+							<md-switch ng-model="obj.private_enabled" md-no-ink aria-label="Switch Private Set" ng-change="changePrivate(obj)">
+							</md-switch>
+							<md-tooltip>Private Set
+								<span ng-if="obj.private_enabled"></span>
+								<span ng-if="!obj.private_enabled"></span>
+							</md-tooltip>
+						</div>
+						<div class="col-md-2 col-sm-2 col-xs-2">
+							<md-switch ng-model="obj.editqst_enabled" md-no-ink aria-label="Switch Edit Question" ng-change="changeEditQst(obj)">
+							</md-switch>
+							<md-tooltip>Edit Question
+								<span ng-if="obj.editqst_enabled"></span>
+								<span ng-if="!obj.editqst_enabled"></span>
+							</md-tooltip>
+						</div>
+						<div class="col-md-2 col-sm-2 col-xs-2">
+							<md-switch ng-model="obj.link_enabled" md-no-ink aria-label="Switch Extra Link" ng-change="changeExtraLink(obj)">
+							</md-switch>
+							<md-tooltip>Extra Link
+								<span ng-if="obj.link_enabled"></span>
+								<span ng-if="!obj.link_enabled"></span>
+							</md-tooltip>
+						</div>
+						<div class="col-md-1 col-sm-1 col-xs-1">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+	</div>
+</div>
+
+<style>
+	.title {
+		color: #070771;
+		line-height: 60px;
+	}
+
+	md-radio-group {
+		display: inline-block;
+		height: 40px;
+		margin-left: 30px;
+		color: #08157a;
+		text-shadow: 1px 1px #fff;
+	}
+
+	md-radio-button {
+		display: inline-block;
+		margin-bottom: 0px;
+		margin-left: 10px;
+	}
+
+	.title-row {
+		border: solid 1px #5d5d5d;
+		background-color: #69b5ff;
+		padding-top: 7px;
+		padding-bottom: 7px;
+		font-size: 20px;
+		overflow-y: scroll;
+	}
+
+
+
+	.content-row {
+		border: solid 1px #a8a8a8;
+		max-height: calc(100vh - 200px);
+		overflow-y: auto;
+	}
+
+	.user-row {
+		background-color: #d1d1d1;
+		margin: 5px -15px;
+		min-height: 44px;
+		line-height: 40px;
+		text-align: center;
+		font-size: 1.4em;
+		border: solid 1px #9b9b9b;
+	}
+
+	.user-row:hover {
+		background-color: #b6b6b6;
+	}
+
+	.user-row.active {
+		background-color: #77fbf6;
+	}
+
+	md-switch {
+		display: inline-flex;
+		margin: 0px;
+		padding-left: 10px;
+		height: 44px;
+	}
+
+	.md-tooltip {
+		margin-top: 0px !important;
+		background-color: black !important;
+		font-size: 1.1em;
+	}
+
+	.email-div {
+		cursor: pointer;
+	}
+
+	.option-title-row {
+		font-size: 0.8em;
+	}
+</style>

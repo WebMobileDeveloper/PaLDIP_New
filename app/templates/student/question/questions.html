@@ -1,0 +1,104 @@
+<div ng-init="init()" ng-show="$root.settings.loadingfinished" class="container">
+	<div class="row  ">
+		<div class="col-md-12 title-div center">
+			<span>Question Set: {{$root.settings.questionSetName}}</span>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-12 center">
+			<span class="title">Questions</span>
+		</div>
+		<div class="col-md-12  question-div">
+			<div class="col-md-12 qtdetails" ng-repeat="obj in questions track by $index" ng-click="goSubmitAnswer(obj,$index)" ng-show="showByLastCompleted($index)">
+				<span class="pull-left">{{$index+1}}&nbsp;-&nbsp;</span>
+
+				<span class="question-span">
+					<span class="type-span" ng-if="$root.DevServer">[{{obj.questionType}}]</span>&emsp;
+					<!-- <span ng-if="obj.new" class="blink">[new]&nbsp;</span> -->
+					<span class="qst-title" ng-if='obj.title'>{{obj.title}}:</span>
+					&emsp;{{obj.question}}
+				</span>
+
+				<div class="pull-right center" style="width:40px;	height: 100%;">
+					<span ng-if="obj.completed" class="glyphicon glyphicon-ok completed" title="Completed Questionset"></span>
+					<div ng-if="obj.completed==undefined" class="waiting" title="waiting"></div>
+					<span ng-if="obj.completed==false" title="waiting">&nbsp;</span>
+				</div>
+				<span ng-if="obj.anonymous" class="anonymous">Anonymous</span>
+			</div>
+		</div>
+		<div class="col-md-12 note" ng-if="note">
+			*&emsp;{{note}}
+		</div>
+	</div>
+	<div class="row subscaleSection" ng-if="setData.MultipleType && setData.subscales && !note">
+		<div class="col-md-12 center">
+			<span class="title">Subscale Feedback</span>
+		</div>
+		<div class="col-md-12 scale-row" ng-repeat="scale in setData.subscales track by $index">
+			<b>{{scale.title}}:</b>&nbsp; [{{scale.result.score}}]&emsp;{{scale.result.text}}
+		</div>
+	</div>
+</div>
+<style>
+	.title-div {
+		text-shadow: none;
+	}
+
+	@media screen and (max-width: 600px) {
+		.title-div {
+			font-size: 1em;
+		}
+	}
+
+	.title {
+		color: #3737b4;
+		border-bottom: solid 1px;
+		padding: 5px 30px;
+	}
+
+	.question-div {
+		margin-top: 20px;
+		max-height: calc(100vh - 200px);
+		overflow-y: auto;
+	}
+
+	span.anonymous {
+		font-weight: bold;
+		color: black;
+		font-style: italic;
+		float: right;
+	}
+
+	.option-div {
+		min-width: 100px;
+		display: inline-block;
+		word-wrap: break-word;
+		padding: 20px 30px;
+		font-size: 1.3em;
+		font-weight: bold;
+		vertical-align: top;
+	}
+
+	.question-span {
+		width: calc(100% - 120px);
+		display: inline-block;
+	}
+
+	.note {
+		text-align: center;
+		color: #5289c8;
+		margin-top: 20px;
+		font-size: 1.2em;
+	}
+
+	.subscaleSection {
+		margin-top: 20px;
+	}
+
+	.scale-row {
+		padding: 30px 15px 0px;
+		font-size: 1.2em;
+	}
+</style>

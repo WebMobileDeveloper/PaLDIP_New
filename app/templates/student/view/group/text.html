@@ -1,0 +1,170 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="row answer-form">
+		<div class="row">
+			<md-input-container flex>
+				<label>Your Answer</label>
+				<textarea class="answer-div" style="border-radius:5px;height:10px" readonly="true">{{$root.settings.prevAnswer}}</textarea>
+			</md-input-container>
+		</div>
+
+		<div class="row">
+			<md-input-container flex ng-if="question.showScore && myAns.score">
+				<label>Your Score: &emsp;<span style="color:#242424">{{myAns.score}}</span></label>
+			</md-input-container>
+			<md-input-container flex ng-if="question.showFeedback && myAns.feedback">
+				<label>Your Feedback</label>
+				<textarea class="answer-div" style="border-radius:5px;height:10px" readonly="true">{{myAns.feedback}}</textarea>
+			</md-input-container>
+		</div>
+
+		<div class="row">
+			<md-input-container flex style="margin: 0px 10%;">
+				<label>Others Answer</label>
+			</md-input-container>
+			<md-input-container flex class="answer-div">
+				<div ng-if="groupSetting.thumbup" class="ans-row row" ng-repeat="ans in otherAnswers|showObject:groupChoice | orderBy : ['-order','-likeCount'] track by $index">
+					<div class="col-md-9">
+						<b style="color: blue;">{{$index+1}}: &nbsp;</b>
+						{{ans.answer}}
+					</div>
+					<div class="col-md-3">
+						<span class="glyphicon glyphicon-thumbs-down pull-right thumb" ng-class="getDisLikeClass(ans)" myclick="thumbDown(ans)">:{{ans.dislikeCount}}</span>
+						<span class="glyphicon glyphicon-thumbs-up pull-right thumb" ng-class="getLikeClass(ans)" myclick="thumbUp(ans)">:{{ans.likeCount}}</span>
+					</div>
+				</div>
+				<div ng-if="!groupSetting.thumbup" class="ans-row row" ng-repeat="ans in otherAnswers|showObject:groupChoice track by $index">
+					<div class="col-md-12">
+						<b style="color: blue;">{{$index+1}}: &nbsp;</b>
+						{{ans.answer}}
+					</div>
+				</div>
+			</md-input-container>
+		</div>
+
+		<div class="row button-row mt-3" ng-show="groupSetting.otherGroup">
+			<div class="col-md-12" style="text-align: center; font-size: 1.3em; color: blue;  font-weight: 500;">
+				{{description}}
+			</div>
+			<div class="col-md-12 main-other-choice">
+				<md-radio-group ng-model="groupChoice" ng-change="changeGroupChoice()" layout="row">
+					<md-radio-button value="main" class="md-primary">This Group</md-radio-button>
+					<md-radio-button value="other" class="md-primary">Other Groups</md-radio-button>
+					<md-radio-button value="all" class="md-primary">All Groups</md-radio-button>
+				</md-radio-group>
+			</div>
+		</div>
+
+		<div class="row button-row">
+			<a class="btn btn-link" myclick="$root.back()">Back</a>
+			<a class="btn btn-link" ui-sref="questions" ui-sref-active="active">Select Question</a>
+			<a class="btn btn-link" myclick="$root.goSubmitNextAnswer()" ng-if="!$root.checkLast()">Next Question</a>
+			<a class="btn btn-link" myclick="$root.go('studentGroupDetail')" ng-if="$root.checkLast()">Question Sets</a>
+		</div>
+
+
+		<div class="row" ng-init="$root.getInstFeedback($root.settings.groupKey, $root.settings.questionSetKey, $root.settings.questionKey)"
+		 ng-show="$root.settings.instructor_feedback">
+			<md-input-container>
+				<h4>Instructor Feedback</h4>
+				<textarea ng-disabled='true' class="Instructor_view_area">{{$root.settings.instructor_feedback}}</textarea>
+			</md-input-container>
+		</div>
+		<div class="row">
+			<!-- Result String -->
+			<md-input-container flex ng-show="question.result_string">
+				<label>Result Text</label>
+				<textarea ng-disabled="true" ng-model="question.result_string" style="min-height: 100px;	max-height: 200px; overflow-y: auto; color: black;	
+											height: 0px;	border: solid 1px #b8f2f9;	background-color: aliceblue; border-radius: 7px; padding: 10px;"></textarea>
+			</md-input-container>
+			<!-- upload result image -->
+			<md-input-container flex class="center img-row" ng-init="$root.load_result_image()" ng-show="$root.result_imgSrc">
+				<label class="text-left">Result Image</label>
+				<img ng-src="{{$root.result_imgSrc}}">
+			</md-input-container>
+			<!-- result video url -->
+			<md-input-container flex ng-show="question.result_videoURL" class="center">
+				<label class="text-left">Result Video</label>
+				<div id="playerWrapOuter">
+					<div id="playerWrap">
+						<iframe id="video-iframe" width="420" height="315" src="{{question.result_videoURL}}" frameborder="0"></iframe>
+					</div>
+				</div>
+			</md-input-container>
+		</div>
+
+
+		<!-- notes for quesiton -->
+		<div class="row mb-5" ng-init="$root.getNote($root.settings.questionKey)">
+			<md-input-container class="mb-0">
+				<label>Feedback to Teacher</label>
+				<textarea ng-model="$root.teacherNote" class="note-area" ng-change="$root.changeTeacherNote()"></textarea>
+			</md-input-container>
+			<md-input-container class="mb-0">
+				<label>Your Private Note for Question</label>
+				<textarea ng-model="$root.privateNote" class="note-area" ng-change="$root.changePrivateNote()"></textarea>
+			</md-input-container>
+			<md-input-container class="mb-0">
+				<label>Your Public Note for Question</label>
+				<textarea ng-model="$root.publicNote" class="note-area" ng-change="$root.changePublicNote()"></textarea>
+			</md-input-container>
+		</div>
+		<div class="row" ng-show="$root.allPublicNotes">
+			<h4 class="center">Notes from all students</h4>
+			<div class="all-notes">
+				<md-input-container ng-repeat="note in $root.allPublicNotes track by $index" ng-show="note">
+					<textarea class="users-note" ng-model="note" ng-disabled="true"></textarea>
+				</md-input-container>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	md-input-container .md-input.answer-div,
+	.answer-div {
+		border-bottom: 1px solid #0ea3cbb3;
+		background-color: #e1eaea66;
+		overflow-x: hidden;
+	}
+
+	.well {
+		padding: 20px 0px;
+	}
+
+	.glyphicon-thumbs-up {
+		margin-right: 10px;
+	}
+
+	.thumb {
+		color: #075ad7;
+	}
+
+	.thumb:hover {
+		cursor: pointer;
+	}
+
+	.thumb.checked {
+		color: #565656;
+	}
+
+	.thumb.like {
+		color: green;
+	}
+
+	.thumb.dislike {
+		color: red;
+	}
+
+	.ans-row {
+		padding: 10px 15px;
+		background-color: #dbdbdb;
+		margin-bottom: 5px;
+	}
+
+	.answer-div {
+		max-height: 400px;
+	}
+
+	img {
+		max-width: 100%;
+	}
+</style>

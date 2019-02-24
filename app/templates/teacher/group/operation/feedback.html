@@ -1,0 +1,221 @@
+<div class="container" ng-init="init()">
+	<div class="answer-form " ng-if="$root.settings.loadingfinished">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 title-container">
+				<div class="title">{{question.question}} </div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="well">
+					<div class="mid-cell">
+						<div class="answer-div">
+							<div class="answer-list" ng-repeat="item in answers"
+								ng-class="($index == selectedAnswerIndex)?'selected':'';" ng-click="changeIndex($index)">
+								<div class="list-num">{{$index+1}}</div>
+								<div class="list-body">{{item.answer}}</div>
+								<div class="list-rating">{{item.totalScore}}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<label style="margin-left:50px;	color: #a2a2a2;">Total Score Setting(%)</label>
+			</div>
+			<div class="col-md-6">
+				<md-input-container>
+					<input type="number" ng-model="feedbackSetting.studentRate" placeholder="Student Score Rating"
+						ng-change="changeRate(feedbackSetting.studentRate,'student')" />
+				</md-input-container>
+			</div>
+			<div class="col-md-6">
+				<md-input-container>
+					<input type="number" ng-model="feedbackSetting.teacherRate" placeholder="Teacher Score Rating"
+						ng-change="changeRate(feedbackSetting.teacherRate,'teacher')" />
+				</md-input-container>
+			</div>
+		</div>
+
+		<hr />
+		<div class="row">
+			<div class="col-md-12">
+				<label style="margin-left:50px;	color: #a2a2a2;">Feedbacks</label>
+			</div>
+			<div class="col-md-12 center">
+				<label style="color: #5a5858; font-size: 18px !important;">Student
+					scores&emsp;:&emsp;{{answers[selectedAnswerIndex].scoreCount['student']}}&emsp;Students</label>
+			</div>
+			<div class="col-md-12 center">
+				<label style="color: #5a5858; font-size: 18px !important;">Teacher
+					scores&emsp;:&emsp;{{answers[selectedAnswerIndex].scoreCount['teacher']}}&emsp;Teachers</label>
+			</div>
+			<div class="col-md-12 center">
+				<label style="color: #5a5858; font-size: 18px !important;">Total
+					Score&emsp;:&emsp;{{answers[selectedAnswerIndex].totalScore}}&emsp;&emsp;&emsp;&nbsp;</label>
+			</div>
+			<div class="col-md-12 center">
+				<md-input-container flex>
+					<b style="margin-right:20px;">Feedback Type</b>
+					<md-radio-group ng-model="userType" ng-change="selectFeedback(userType)">
+						<md-radio-button value="student" class="md-primary">Student</md-radio-button>
+						<md-radio-button value="teacher" class="md-primary">Teacher</md-radio-button>
+					</md-radio-group>
+				</md-input-container>
+			</div>
+		</div>
+
+		<hr />​
+		<div class="row">
+			<div class="col-md-12 center">
+				<label>Other's Feedback</label>
+			</div>
+		</div>
+
+		<div class="row starfield-container" ng-show="type">
+			<div class="col-md-12 starfield">
+				<div class="row option-row" ng-repeat="option in feedqts track by $index">
+					<div class="col-md-9 col-sm-9  col-xs-10  option">
+						{{option}}
+					</div>
+					<div class="col-md-3  col-sm-3 col-xs-2  value center">
+						<span>{{answers[selectedAnswerIndex].feedbackArr[userType][selectedFeedbackIndex[userType]].score[$index]}}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row feedText" ng-if="type % 2 == 0">
+			<md-input-container flex>
+				<label>Feedback Text</label>
+				<textarea class="feedback-text"
+					ng-model="answers[selectedAnswerIndex].feedbackArr[userType][selectedFeedbackIndex[userType]].text" rows="3"
+					ng-disabled="true" placeholder=""></textarea>
+			</md-input-container>
+		</div>
+
+		<div class="row center button-row">
+			<button class="btn btn-success" myclick="decreaseFeedIndex()">Prev Feedback</button>
+			<button class="btn btn-success" myclick="increaseFeedIndex()">Next Feedback</button>
+			<button class="btn btn-danger" myclick="deleteFeedback()">
+				<span class="glyphicon glyphicon-trash"></span> Delete
+			</button>
+		</div>
+
+
+		<!-- teacher score -->
+		<hr />​
+		<div class="row">
+			<div class="col-md-12 center">
+				<label>Your Feedback</label>
+			</div>
+		</div>
+		<div class="row starfield-container" ng-show="type && answers && myFeedback">
+			<hr />​
+			<div class="col-md-12 starfield">
+				<div class="row" ng-repeat="option in feedqts track by $index">
+					<div class="col-md-8">
+						{{option}}
+					</div>
+					<div class="col-md-4 starrow center">
+						<span class="fa fa-star " ng-repeat="i in [0,1,2,3,4] track by $index"
+							ng-class="getStarState(i,$parent.$index)" myclick="setstar(i,$parent.$index)"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="row" ng-hide="type2" id="txtfedback" ng-if="myFeedback">
+			<md-input-container flex>
+				<label>Feedback Text</label>
+				<textarea class="feedback-text" placeholder="" ng-model="myFeedback.text" rows="3"
+					ng-change="changeFeedbackText()"></textarea>
+			</md-input-container>
+		</div>
+
+		<hr />​
+		<div class="row center button-row">
+			<button class="btn btn-primary" myclick="decreaseindex()">Prev Answer</button>
+			<button class="btn btn-primary" myclick="increaseindex()">Next Answer</button>
+		</div>
+	</div>
+</div>
+<style>
+	md-radio-button {
+		display: inline-block;
+		margin-right: 30px;
+	}
+
+	md-input-container {
+		margin-bottom: 0px;
+	}
+
+	textarea.feedback-text {
+		border-radius: 5px;
+		height: 150px !important;
+		font-size: 18px;
+		background-color: #effcfa;
+		border: solid 2px #c1ddf5;
+		border-bottom: solid 2px #c1ddf5 !important;
+		padding: 10px;
+		overflow-y: auto;
+		color: black !important;
+	}
+
+	.answer-form hr {
+		margin: 10px 5%;
+	}
+
+	.answer-form {
+		margin: 20px auto;
+	}
+
+	.title-container {
+		margin-top: 20px;
+		padding: 0px 50px;
+	}
+
+	.title {
+		color: green;
+		max-height: 200px;
+		overflow-y: auto;
+		padding: 0px !important;
+	}
+
+	.well {
+		padding: 20px 0px;
+		margin-left: 20px;
+		margin-right: 20px;
+	}
+
+	.mid-cell {
+		width: 95%;
+		margin: auto;
+	}
+
+	.answer-div {
+		padding: 10px;
+		display: block;
+		max-height: 300px;
+		overflow-y: auto;
+	}
+
+	.checked {
+		color: orange;
+	}
+
+	.navigation-row button {
+		width: 80%;
+		max-width: 100px;
+		color: green;
+		margin-bottom: 20px;
+	}	
+
+	.checked {
+		color: orange;
+	}
+</style>

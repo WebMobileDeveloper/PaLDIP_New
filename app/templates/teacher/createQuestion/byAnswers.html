@@ -1,0 +1,109 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="answer-form">
+		<div class="row">
+			<div class="col-md-12" style="text-align:center;font-size:1.3em;">
+				<label style="border-bottom: ridge 5px #8f8f8f; padding: 12px 40px;">{{$root.settings.questionSetName}}</label>
+			</div>
+		</div>
+		<!-- Question Title -->
+		<div class="row">
+			<md-input-container flex>
+				<label>Question Title</label>
+				<input ng-model="title" style="border-radius:5px;" />
+			</md-input-container>
+		</div>
+		<!-- Question String -->
+		<div class="row">
+			<md-input-container flex>
+				<label>Question String</label>
+				<textarea ng-model="mainQuestion" style="border-radius:5px;"></textarea>
+			</md-input-container>
+		</div>
+
+		<div class="row">
+			<md-input-container>
+				<label>Show Unique ID</label>
+				<md-radio-group ng-model="show_id" ng-change="radioChanged(show_id)" layout="row" class="radio-item">
+					<md-radio-button ng-value="true" class="md-primary">Show</md-radio-button>
+					<md-radio-button ng-value="false" class="md-primary">Hide</md-radio-button>
+				</md-radio-group>
+			</md-input-container>
+		</div>
+
+		<!-- select Question -->
+		<div class="row">
+			<md-input-container class="md-block">
+				<div class="col-md-12 center">
+					<strong class="choose-question" style="font-size:20px;">Choose Questions</strong>
+					<md-checkbox class="pull-right" ng-checked="selectAll" ng-click="toggleAll()">
+						Select All
+					</md-checkbox>
+				</div>
+				<div class="col-md-12">
+					<hr />
+				</div>
+				<div class="col-md-12 question-row" ng-repeat="qst in setQuestions track by $index">
+					<span class="number-span">{{$index+1}}.</span>
+					<md-checkbox class="check-box-item" ng-checked="qst.selected" ng-click="toggle($index)">
+						{{ qst.question }}
+					</md-checkbox>
+				</div>
+				<div class="col-md-12 center" ng-show="setQuestions.length == 0">There isn't any question in this set.</div>
+			</md-input-container>
+		</div>
+
+		<div class="button-row">
+			<md-input-container flex>
+				<a class="btn btn-link" ui-sref="questionsInSet" ui-sref-active="active">Question Set</a>
+				<a class="btn btn-link" myclick="$root.back()">Back</a>
+				<!-- <button class="btn btn-primary" myclick=" $state.go('questionsInSet')">Question Set</button> -->
+				<button class="btn btn-primary" myclick="creatStudentAnswerQuestion()">Create Question</button>
+			</md-input-container>
+		</div>
+	</div>
+</div>
+<style>
+	fieldset {
+		width: 80%;
+		margin-left: 10%
+	}
+
+	#choicesDisplay {
+		padding: 10px;
+		background: rgb(227, 250, 227);
+		border: 1px solid rgb(171, 239, 171);
+		color: rgb(9, 56, 9);
+	}
+
+	.remove {
+		background: #C76868;
+		color: #FFF;
+		font-weight: bold;
+		font-size: 21px;
+		border: 0;
+		cursor: pointer;
+		display: inline-block;
+		padding: 4px 9px;
+		vertical-align: top;
+		line-height: 100%;
+	}
+
+	.radio-item {
+		width: calc(100% - 250px);
+		margin-left: 200px;
+	}
+
+	.question-row {
+		border-bottom: solid 1px beige;
+		padding-top: 10px;
+	}
+
+	.number-span {
+		width: 30px;
+		display: inline-block;
+	}
+
+	.check-box-item {
+		width: calc(100% - 50px);
+	}
+</style>

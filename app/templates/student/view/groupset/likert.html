@@ -1,0 +1,82 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="row center" style="margin-top: 50px">
+		<div class="col-md-12">
+			<h2>{{$root.settings.questionSetName}}</h2>
+		</div>
+	</div>
+	<div class="row center" ng-if="setData.graph">
+		<div class="col-md-12 center">
+			<div class="chart-container" ng-if="graphData">
+				<canvas id="mychart" basechart="" width="1000px" height="500px" style="display: block; width: 1000px; height: 500px;"
+				 ng-init="paintgraph()"></canvas>
+			</div>
+		</div>
+	</div>
+	<div ng-if="groupLikertSettings.showScore">
+		<div class="row" style="margin-top: 50px" ng-if="scoreLabels.length">
+			<div class="col-md-12 feedback-title" ng-if="scoreLabels.length">Your Labels</div>
+			<div class="col-md-12" ng-repeat="label in scoreLabels track by $index">
+				<div class="feedback-content">
+					<b style="color: #ff0315; text-shadow: 1px 1px #f0ff00;">{{label}}</b>
+				</div>
+			</div>
+			<hr />
+		</div>
+		<div class="row" style="margin-top: 50px">
+			<div class="col-md-12 feedback-title">Your scores and feedback</div>
+			<div class="col-md-12" ng-repeat="answer in calcValues[0] track by $index">
+				<div ng-if="title[$index]" class="feedback-content">
+					<b>[{{title[$index].join(" ")}}]</b>&ensp;:&ensp;{{getFeedback(answer,$index )}}
+				</div>
+			</div>
+			<hr />
+		</div>
+	</div>
+	<div class="row center" ng-show="setData.result_string">
+		<div class="col-md-12 feedback-title">Live feedback fron teacher</div>
+		<div class="col-md-12 feedback-content">
+			<textarea ng-disabled="true" style="width:100%;">{{setData.result_string}}</textarea>
+		</div>
+		<div class="col-md-12 center">
+			<hr />
+		</div>
+	</div>
+	<div class="row center" ng-show="result_videoURL">
+		<div id="playerWrapOuter">
+			<div id="playerWrap">
+				<iframe id="video-iframe" width="420" height="315" src="{{result_videoURL}}" frameborder="0"></iframe>
+			</div>
+		</div>
+		<div class="col-md-12 center">
+			<hr />
+		</div>
+	</div>
+	<div class="row additional_info_container" ng-show="additional_info" ng-init="getAddInfo()">
+		<div class="col-md-12">
+			<md-input-container flex>
+				<h3>- Additional Information / Comments</h3>
+				<div id="additional_info"></div>
+			</md-input-container>
+		</div>
+	</div>
+
+	<div class="row">
+		<md-input-container flex style="text-align:center;">
+			<a class="btn btn-link" myclick="$root.back()" style="width:150px;font-size: 20px">Back</a>
+			<a class="btn btn-link" myclick="$root.go('studentGroupDetail')">Question Sets</a>
+		</md-input-container>
+	</div>
+</div>
+<style>
+	.chart-container {
+		max-width: 1000px;
+		margin: 20px auto;
+	}
+
+	.feedback-title {
+		font-size: 20px;
+		font-weight: bold;
+		text-align: center;
+		color: #4a4ab6;
+	}
+</style>

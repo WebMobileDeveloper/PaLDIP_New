@@ -1,0 +1,176 @@
+<div ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="row title-div">
+		<div class="container">
+			<span>{{$root.settings.groupName}}/{{groupSet.name}}</span>
+			<span class="btn-add-member pull-right" style="margin-right: 20px;" myclick="finalCalc()">Initialize</span>
+			<span class="btn-add-member pull-right" style="margin-right: 20px;" myclick="saveChange()">Save Members</span>
+			<!-- <span class="btn-add-member pull-right" style="margin-right: 20px;" myclick="applyRandomRule()" ng-show="groupSet.addRule.type=='randomly'">Apply Random Rule</span>
+			<span class="btn-add-member pull-right" style="margin-right: 20px;" myclick="applyCriteriaRule()" ng-show="groupSet.addRule.type=='criteria'">Apply Criteria Rule</span> -->
+
+		</div>
+	</div>
+	<div class="container">
+		<div class="row" ng-repeat="group in groups track by $index">
+			<div class="col-md-12 group-title">
+				<span class="glyphicon mr-3" ng-class="{'glyphicon-triangle-right': !group.expand, 'glyphicon-triangle-bottom': group.expand}" myclick="group.expand=!group.expand"></span>
+				{{group.name}}
+			</div>
+			<div class="col-md-4 col-sm-4 user-list" ng-show="group.expand">
+				<div class="row group-users" dragula='"drag-div{{$index}}"' dragula-model="group.availableUsers">
+					<span class="user-span" ng-repeat="user in group.availableUsers track by $index" useremail="{{user.ID}}" ng-class="{'used':user.used}">
+						{{user.ID}}
+						<span class="pull-right glyphicon glyphicon-ok mt-1" ng-if="user.used">
+							<md-tooltip class="custom-tooltip" md-direction="top">
+								Joined User
+							</md-tooltip>
+						</span>
+					</span>
+				</div>
+			</div>
+			<div class="col-md-8 col-sm-8 user-list" ng-show="group.expand">
+				<div class="row group-div" ng-repeat="subgroup in group.subgroupsets[subSetKey].groups track by $index" ng-class="{'acceptable' : subgroup.acceptable}">
+					<div class="col-md-12">
+						<span class="glyphicon mr-3" ng-class="{'glyphicon-triangle-right': !subgroup.expand, 'glyphicon-triangle-bottom': subgroup.expand}" myclick="subgroup.expand=!subgroup.expand"></span>
+						<span class="group-name-span">{{subgroup.name}}</span>
+						<span>{{subgroup.users.length}} / {{subSet.max_member}}&emsp;Students</span>
+					</div>
+					<div class="col-md-12 child-group-users" dragula='"drag-div{{$parent.$index}}"' dragula-model="subgroup.users" subindex="{{$index}}" usercount="{{subgroup.users.length}}" ng-class="{'no-user':subgroup.users.length==0, 'contracted': !subgroup.expand, 'expanded': subgroup.expand}">
+						<span class="user-span" ng-repeat="user in subgroup.users track by $index" ng-class="{'joined':user.joined}" useremail="{{user.ID}}">
+							{{user.ID}}
+							<span class="pull-right glyphicon glyphicon-link mt-1" ng-if="user.joined">
+								<md-tooltip class="custom-tooltip" md-direction="top">
+									Joined User
+								</md-tooltip>
+							</span>
+						</span>
+
+						<!-- <div class="row center" ng-show="group.users.length==0">
+							<span class="empty-span">There are currently no students in this group. Add a student to get started.</span>
+						</div> -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+</div>
+
+<style>
+	.group-title {
+		font-size: 20px;
+		margin-top: 20px;
+		border-bottom: dotted 2px #d4d4d4;
+		padding-bottom: 10px;
+		margin-bottom: 14px;
+	}
+	.user-span {
+		display: block;
+		width: 250px;
+		margin: 5px 0px;
+		padding: 5px;
+		color: #444;
+		border: solid 1px #a4a4a4;
+		border-radius: 3px;
+		cursor: pointer;
+	}
+
+	.user-span::before {
+		content: '⣿';
+	}
+
+	.user-span.joined {
+		color: #f94949;
+	}
+
+	span.used .glyphicon-ok {
+		color: #22399c;
+	}
+
+	.user-list {
+		height: 70vh;
+		overflow-y: auto;
+		overflow-x: hidden;
+		background-color: #e4e4e41a;
+		border: solid 1px #edeaea;
+	}
+
+	.user-list.col-md-8 {
+		padding: 10px 30px;
+	}
+
+	.group-users {
+		height: calc(70vh - 10px);
+		overflow-y: auto;
+		overflow-x: hidden;
+		padding: 10px 20px;
+	}
+
+	.group-div {
+		border-bottom: 1px dashed #c2c8d0;
+		padding-top: 20px;
+		padding-bottom: 10px;
+	}
+
+	.group-name-span {
+		width: 400px;
+		display: inline-block;
+	}
+
+	.child-group-users {
+		min-height: 50px;
+		width: calc(100% - 100px);
+		margin: 10px 50px;
+		background-color: white;
+	}
+
+	.child-group-users.contracted {
+		min-height: 20px;
+		margin-top: 0px;
+		margin-bottom: 0px;
+	}
+
+	.child-group-users.expanded {
+		margin-top: 30px;
+	}
+
+
+	.child-group-users.no-user.expanded {
+		border: 1px dashed #c2c8d0;
+	}
+
+	.child-group-users.no-user.expanded::before {
+		position: absolute;
+		white-space: pre;
+		display: inline;
+		top: 36px;
+		left: 50%;
+		transform: translate(-50%, -25px);
+		content: 'There are currently no students in this group. Add a student to get started.';
+	}
+
+	.child-group-users.contracted .user-span {
+		display: none;
+	}
+
+	.acceptable {
+		background-color: #d1d1d1;
+	}
+
+	.btn-add-member {
+		color: #2d46b4;
+		font-weight: bold;
+		cursor: pointer;
+		text-shadow: none;
+		font-size: 16px;
+		line-height: 40px;
+	}
+
+	.btn-add-member:hover {
+		text-shadow: 1px 1px #d1d1d1;
+		color: blue;
+	}
+
+	
+</style>

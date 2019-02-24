@@ -1,0 +1,84 @@
+<div class="main-div" ng-init="init()" ng-show="$root.settings.loadingfinished">
+
+	<div class="row center">
+		<label class="qst-title" ng-if='question.title'>{{question.title}}</label>
+		<label style="font-size:3vh; font-weight:bold;">{{question.question}}</label>
+	</div>
+	<hr />
+	<div class="row chart-row">
+		<div class="chart-container">
+			<canvas id="barChart" basechart="" width="600px" height="400px"></canvas>
+		</div>
+	</div>
+	<div class="row" style="text-align: center;
+											font-style: oblique;
+											font-weight: bold;
+											color: #f75a9a;
+											font-size: 1.2em;
+											margin-top: 10px;">
+		<span ng-show="chartDescription">{{chartDescription}}&emsp;(total answers:&emsp;{{numberOfAnswers}})</span>
+	</div>
+
+
+	<div class="row" ng-show="question.enableGroup">
+		<md-input-container flex class="mb-0">
+			<div class="col-md-4 center" style="line-height: 34px;">
+				<strong>Filter By:</strong>
+			</div>
+			<div class="col-md-8">
+				<div class="form-group mb-0">
+					<select class="form-control" ng-model="selectedFilter" ng-change="finalCalc()">
+						<option ng-repeat="item in filterList track by $index" ng-value="item" ng-selected="item==selectedFilter">{{item}}</option>
+					</select>
+				</div>
+			</div>
+		</md-input-container>
+	</div>
+	<div class="row main-other-choice">
+		<md-radio-group ng-model="groupChoice" ng-change="changeGroupChoice()" layout="row">
+			<md-radio-button value="main" class="md-primary">This Group</md-radio-button>
+			<md-radio-button value="other" class="md-primary">Other Groups</md-radio-button>
+			<md-radio-button value="all" class="md-primary">All Groups</md-radio-button>
+		</md-radio-group>
+	</div>
+	<div class="row button-row">
+		<a class="btn btn-link" myclick="$root.back()">Back</a>
+	</div>
+	<div class="row" ng-init="$root.getInstFeedback($root.settings.groupKey, $root.settings.selectedQuestionSetKey, $root.settings.selectedQuestionKey)">
+		<md-input-container>
+			<h4>Instructor Feedback</h4>
+			<textarea class="Instructor_view_area" ng-model="$root.settings.instructor_feedback" ng-change="$root.update_instFeedRef($root.settings.groupKey, $root.settings.selectedQuestionSetKey, $root.settings.selectedQuestionKey)"></textarea>
+		</md-input-container>
+	</div>
+
+	<!-- notes for quesiton -->
+	<div class="row mb-5" ng-init="$root.getTeacherNote($root.settings.selectedQuestionKey, true)">
+		<div class="row" ng-show="$root.allTeacherNotes">
+			<h4 class="center">Feedback from students</h4>
+			<div class="all-notes">
+				<md-input-container ng-repeat="note in $root.allTeacherNotes track by $index" ng-show="note">
+					<textarea class="users-note" ng-model="note" ng-disabled="true"></textarea>
+				</md-input-container>
+			</div>
+		</div>
+		<div class="row" ng-show="$root.allPublicNotes">
+			<h4 class="center">Notes from all students</h4>
+			<div class="all-notes">
+				<md-input-container ng-repeat="note in $root.allPublicNotes track by $index" ng-show="note">
+					<textarea class="users-note" ng-model="note" ng-disabled="true"></textarea>
+				</md-input-container>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<style>
+	.chart-row {
+		margin-right: 20px;
+	}
+
+	#barChart {
+		margin-right: 100px;
+	}
+</style>

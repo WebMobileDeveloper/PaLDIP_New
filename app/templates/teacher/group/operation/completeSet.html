@@ -1,0 +1,180 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+
+	<br>
+	<div class="row tab-row">
+		<div class="col-md-6 col-sm-6" ng-class="{active: selectedTab == 'questionList'}" ng-click="setActive('questionList')">By Questions</div>
+		<div class="col-md-6 col-sm-6" ng-class="{active: selectedTab == 'userList'}" ng-click="setActive('userList')">By Users</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12 center"><span class="sendmail-span" myclick="showEmailModal()">Send email to users who haven't completed all questions</span></div>
+	</div>
+	<div class="row" ng-show="selectedTab == 'questionList'">
+		<div class="col-md-9">
+			<div class="row center">
+				<h3>Questions</h3>
+			</div>
+			<div class="item-list">
+				<div class="item-row" ng-repeat="qst in questionList track by $index" ng-click="selectQuestion($index)" ng-class="{selected:$index==questionIndex}">
+					<span class="item-content">{{qst.question}}</span>
+					<span ng-if="qst.completeSet" class="glyphicon glyphicon-ok completed" title="Completed"></span>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="row center">
+				<h3>Users</h3>
+			</div>
+			<div class="item-list" ng-if="questionList.length > 0">
+				<div class="item-row" ng-repeat="user in questionList[questionIndex].users track by $index">
+					<span class="item-content">{{user.show_id}}</span>
+					<span ng-if="user.complete" class="glyphicon glyphicon-ok completed" title="Completed"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row" ng-show="selectedTab == 'userList'">
+		<div class="col-md-3">
+			<div class="row center">
+				<h3>Users</h3>
+			</div>
+			<div class="item-list">
+				<div class="item-row" ng-repeat="user in userList track by $index" ng-click="selectUser($index)" ng-class="{selected:$index==userIndex}">
+					<span class="item-content">{{user.show_id}}</span>
+					<span ng-if="user.completeSet" class="glyphicon glyphicon-ok completed" title="Completed"></span>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-9">
+			<div class="row center">
+				<h3>Questions</h3>
+			</div>
+			<div class="item-list" ng-if="userList.length > 0">
+				<div class="item-row" ng-repeat="qst in userList[userIndex].questions track by $index">
+					<span class="item-content">{{qst.question}}</span>
+					<span ng-if="qst.complete" class="glyphicon glyphicon-ok completed" title="Completed"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="sendMailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="modal-title" id="exampleModalLongTitle">Send email to users who haven't completed all questions</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-4">
+						<h3 class="center mt-0 mb-0">Users</h3>
+						<div class="row mail-user-list">
+							<div class="col-md-12 mail-user" ng-repeat="user in userList track by $index" ng-show="!user.completeSet">{{user.show_id}}</div>
+						</div>
+					</div>
+					<div class="col-md-8">
+						<md-input-container class="md-block" style="width: 100%; margin: 30px auto 0px;">
+							<label>Email Content</label>
+							<textarea ng-model="emailTemplate" style="min-height: 190px; max-height: 190px;	overflow: hidden auto; font-size: 14px;"></textarea>
+						</md-input-container>
+					</div>
+				</div>
+				<md-input-container class="mt-0 mb-0">
+					<div class="row">
+						<div class="col-md-12 note">
+							*&emsp;{{note}}
+						</div>
+					</div>
+				</md-input-container>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-success" myclick="sendEmail()">Send</button>&emsp;
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	/* button.list {
+		width: 100%;
+		margin: 5px 0px;
+	} */
+	.note {
+		color: #5289c8;
+		margin-top: 20px;
+	}
+
+	.item-list {
+		max-height: calc(100vh - 240px);
+		overflow-y: auto;
+		border: solid 2px #d8d7d7;
+	}
+
+	.item-row {
+		background-color: #d5d5d5b3;
+		margin-bottom: 5px;
+		margin-top: 5px;
+		color: #0b18a4;
+		font-size: 20px;
+		padding: 4px 0px;
+		cursor: pointer;
+		box-shadow: 1px 2px #82828399;
+		border-radius: 3px;
+	}
+
+	.item-row .item-content {
+		width: calc(100% - 30px);
+		display: inline-block;
+		text-align: center;
+	}
+
+	.item-row.selected {
+		background-color: #7d75f9;
+		color: white;
+	}
+
+	.item-row:hover {
+		opacity: 0.8;
+	}
+
+	.item-row.complete {
+		background-color: #08ad0899;
+		color: black;
+	}
+
+	span.completed {
+		float: right;
+		margin-right: 10px;
+		color: green;
+		font-size: 13px;
+		margin-top: 7px;
+	}
+
+	.sendmail-span {
+		display: inline-block;
+		padding-top: 20px;
+		font-size: 18px;
+		font-weight: bold;
+		color: #061981;
+		cursor: pointer;
+		border-bottom: solid 2px;
+	}
+
+	.mail-user-list {
+		max-height: 200px;
+		overflow-x: hidden;
+		overflow-y: auto;
+		border: solid 1px cadetblue;
+		width: 80%;
+		margin: 0px auto;
+	}
+
+	.mail-user {
+		font-size: 14px;
+		text-align: center;
+		margin-top: 3px;
+		margin-bottom: 3px;
+	}
+</style>

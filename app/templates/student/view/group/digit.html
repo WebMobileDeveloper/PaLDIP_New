@@ -1,0 +1,85 @@
+<div class="container" ng-init="getclassAverage()">
+	<div class="row answer-form">
+		<div class="row">
+			<md-input-container flex>
+				<label>Your Answer</label>
+				<textarea class="answer-div" style="border-radius:5px;height:10px" readonly="true">{{$root.settings.prevAnswer}}</textarea>
+			</md-input-container>
+		</div>
+
+		<div class="row">
+			<md-input-container flex>
+				<label>Average Answer</label>
+				<input rows="3" readonly="true" ng-model="averageanswer">
+			</md-input-container>
+		</div>
+
+		<div class="row" ng-init="$root.getInstFeedback($root.settings.groupKey, $root.settings.questionSetKey, $root.settings.questionKey)"
+		 ng-show="$root.settings.instructor_feedback">
+			<md-input-container>
+				<h4>Instructor Feedback</h4>
+				<textarea ng-disabled='true' class="Instructor_view_area">{{$root.settings.instructor_feedback}}</textarea>
+			</md-input-container>
+		</div>
+
+		<div class="row">
+			<!-- Result String -->
+			<md-input-container flex ng-show="question.result_string">
+				<label>Result Text</label>
+				<textarea ng-disabled="true" ng-model="question.result_string" style="min-height: 100px;	max-height: 200px; overflow-y: auto; color: black;	
+					height: 0px;	border: solid 1px #b8f2f9;	background-color: aliceblue; border-radius: 7px; padding: 10px;"></textarea>
+			</md-input-container>
+			<!-- upload result image -->
+			<md-input-container flex class="center img-row" ng-init="$root.load_result_image()" ng-show="$root.result_imgSrc">
+				<label class="text-left">Result Image</label>
+				<img ng-src="{{$root.result_imgSrc}}">
+			</md-input-container>
+			<!-- result video url -->
+			<md-input-container flex ng-show="question.result_videoURL" class="center">
+				<label class="text-left">Result Video</label>
+				<div id="playerWrapOuter">
+					<div id="playerWrap">
+						<iframe id="video-iframe" width="420" height="315" src="{{question.result_videoURL}}" frameborder="0"></iframe>
+					</div>
+				</div>
+			</md-input-container>
+		</div>
+
+		<div class="row button-row">
+			<a class="btn btn-link" myclick="$root.back()">Back</a>
+			<a class="btn btn-link" ui-sref="questions" ui-sref-active="active">Select Question</a>
+			<a class="btn btn-link" myclick="$root.goSubmitNextAnswer()" ng-if="!$root.checkLast()">Next Question</a>
+			<a class="btn btn-link" myclick="$root.go('studentGroupDetail')" ng-if="$root.checkLast()">Question Sets</a>
+		</div>
+		<!-- notes for quesiton -->
+		<div class="row mb-5" ng-init="$root.getNote($root.settings.questionKey)">
+			<md-input-container class="mb-0">
+				<label>Feedback to Teacher</label>
+				<textarea ng-model="$root.teacherNote" class="note-area" ng-change="$root.changeTeacherNote()"></textarea>
+			</md-input-container>
+			<md-input-container class="mb-0">
+				<label>Your Private Note for Question</label>
+				<textarea ng-model="$root.privateNote" class="note-area" ng-change="$root.changePrivateNote()"></textarea>
+			</md-input-container>
+			<md-input-container class="mb-0">
+				<label>Your Public Note for Question</label>
+				<textarea ng-model="$root.publicNote" class="note-area" ng-change="$root.changePublicNote()"></textarea>
+			</md-input-container>
+		</div>
+		<div class="row" ng-show="$root.allPublicNotes">
+			<h4 class="center">Notes from all students</h4>
+			<div class="all-notes">
+				<md-input-container ng-repeat="note in $root.allPublicNotes track by $index" ng-show="note">
+					<textarea class="users-note" ng-model="note" ng-disabled="true"></textarea>
+				</md-input-container>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	md-input-container .md-input.answer-div,
+	.answer-div {
+		border-bottom: 1px solid #0ea3cbb3;
+		background-color: #f0f6f6;
+	}
+</style>

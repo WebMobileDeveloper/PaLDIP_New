@@ -1,0 +1,93 @@
+<div class="main-div" ng-init="viewQuestionContingentAnswer()" ng-show="$root.settings.loadingfinished">
+
+	<div class="row center question-row">
+		<label class="qst-title" ng-if='question.title'>{{question.title}}</label>
+		<label style="font-size:3vh; font-weight:bold;">{{question.question}}</label>
+	</div>
+	<div class="row button-row select-row">
+		<div class="col-md-6 col-sm-6">
+			<md-input-container flex>
+				<label for="username">Sub Groupset</label>
+				<md-select data-ng-model="GroupIndex" class="md-block flex-gt-sm" ng-change="changeGroup()" md-container-class="dropDown">
+					<md-option data-ng-value="$index" data-ng-repeat="name in subNames">{{ name }}</md-option>
+				</md-select>
+			</md-input-container>
+		</div>
+		<div class="col-md-6 col-sm-6">
+			<md-input-container flex>
+				<label for="username">2nd Sub Groupset</label>
+				<md-select data-ng-model="SubGroupIndex" class="md-block flex-gt-sm" ng-change="changeGroup()" md-container-class="dropDown"
+				 ng-disabled="$root.settings.groupType =='sub'">
+					<md-option data-ng-value="$index" data-ng-repeat="name in secondNames">{{ name }}</md-option>
+				</md-select>
+			</md-input-container>
+		</div>
+	</div>
+
+	<hr/>
+	<div class="row chart-row">
+		<div class="chart-container">
+			<canvas id="barChart" basechart="" width="550px" height="400px"></canvas>
+		</div>
+	</div>
+	<div class="row" style="text-align: center;	font-style: oblique; font-weight: bold;color: #f75a9a;	font-size: 1.2em;	margin-top: 10px;">
+		<span>&emsp;(total answers:&emsp;{{numberOfAnswers}})</span>
+	</div>
+
+	<div class="row button-row">
+		<a class="btn btn-link" myclick="$root.back()">Back</a>
+	</div>
+
+
+</div>
+
+
+<style>
+	.main-div {
+		background-color: #f5f4f3;
+	}
+
+	.select-row {
+		margin-top: 20px;
+		font-size: 20px !important;
+		color: #010a71 !important;
+	}
+
+	.select-row md-input-container {
+		margin-bottom: 0px;
+	}
+
+	.question-row {
+		max-height: 130px;
+		overflow-y: auto;
+		border-bottom: solid 1px #5386ed;
+		font-size: 1.5em;
+		font-weight: bold;
+		padding: 10px 10px;
+		background-color: #f0f0f0;
+		margin: 0px 20px 20px;
+		border-radius: 10px;
+	}
+
+	md-input-container label {
+		font-size: 20px;
+	}
+
+	.dropDown {
+		/* top: 150px !important; */
+		border: solid 1px #d1d1d1;
+		font-size: 20px !important;
+	}
+
+	md-option {
+		border-bottom: solid 1px #e7e7e7;
+	}
+
+	.chart-row {
+		margin-right: 20px;
+	}
+
+	#barChart {
+		margin-right: 100px;
+	}
+</style>

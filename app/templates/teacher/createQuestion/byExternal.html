@@ -1,0 +1,39 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+	<div class="answer-form">
+		<div class="row">
+			<div class="col-md-12" style="text-align:center;font-size:1.3em;">
+				<label style="border-bottom: ridge 5px #8f8f8f; padding: 12px 40px;">{{$root.settings.questionSetName}}</label>
+			</div>
+		</div>
+		<!-- Question Title -->
+		<div class="row">
+			<md-input-container flex>
+				<label>Question Title</label>
+				<input ng-model="title" style="border-radius:5px;" />
+			</md-input-container>
+		</div>
+		<!-- Question String -->
+		<div class="row">
+			<md-input-container flex>
+				<label>Question String</label>
+				<textarea ng-model="mainQuestion" style="border-radius:5px;"></textarea>
+			</md-input-container>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<md-input-container flex>
+					<a href="{{$root.templateExternalLink}}" download>
+						* Download template XLXS File for result uploading
+					</a>
+				</md-input-container>
+			</div>
+		</div>
+		<div class="button-row">
+			<md-input-container flex>
+				<a class="btn btn-link" ui-sref="questionsInSet" ui-sref-active="active">Question Set</a>
+				<a class="btn btn-link" myclick="$root.back()">Back</a>
+				<button class="btn btn-primary" myclick="creatExternalQuestion()">Create Question</button>
+			</md-input-container>
+		</div>
+	</div>
+</div>

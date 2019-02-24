@@ -1,0 +1,124 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+
+
+	<div class="row">
+		<div class="col-md-12 col-xs-12 title">{{$root.settings.questionSetName}}</div>
+	</div>
+	<hr />
+	<div class="row center" ng-show="videoURL">
+		<div id="playerWrapOuter">
+			<div id="playerWrap">
+				<iframe id="video-iframe" width="420" height="315" src="{{videoURL}}" frameborder="0"></iframe>
+			</div>
+		</div>
+		<div class="col-md-12 center">
+			<hr />
+		</div>
+	</div>
+
+	<div class="row" ng-if="setData.instructions">
+		<div class="col-md-12 col-xs-12 instructions">{{setData.instructions}}</div>
+	</div>
+	<div class="row question-row">
+		<div ng-repeat="answer in tempAnswers| orderObjectBy :'order':false">
+			<div class="col-md-12 question-div">
+				{{$index+1}}.&emsp;{{answer.question}}
+				<span ng-if="checkAnswer(answer.answer)" class="no-answer">&emsp;&emsp; Empty question &emsp; *</span>
+			</div>
+			<md-radio-group ng-model="answer.answer" ng-change="radioChanged()" ng-disabled="answered">
+				<div class="col-md-12 center">
+					<div ng-repeat="option in setData.options" ng-style="{width:'{{100/setData.options.length}}%'}"
+						class="option-div">
+						<md-radio-button ng-value="$index" class="md-primary" aria-label='value'></md-radio-button>
+						<div class="option-title">
+							{{option}}
+						</div>
+					</div>
+				</div>
+			</md-radio-group>
+			<div class="col-md-12 hr-row">
+				<hr />
+			</div>
+		</div>
+	</div>
+
+	<div class="row button-row">
+		<a class="btn btn-link" myclick="$root.back()">Back</a>
+		<button class="btn btn-primary" ng-show="!answered" myclick="submitAnswer()">Submit</button>
+		<a class="btn btn-link" myclick="goNext()" ng-show="answered">Next</a>
+	</div>
+</div>
+
+
+<style>
+	.container {
+		padding-top: 50px;
+	}
+
+	.title {
+		color: green;
+	}
+
+	md-input-container .md-input {
+		max-height: 200px;
+		overflow-y: auto;
+		background-color: #f8f6f9;
+		border-bottom: solid 1px #60a3f999;
+		border-radius: 10px;
+		padding: 10px;
+	}
+
+	.question-row {
+		font-weight: bold !important;
+	}
+
+	.question-div {
+		color: blue;
+		font-size: 1.3em;
+		margin-bottom: 10px;
+	}
+
+	.question-div hr {
+		border-bottom: solid 1px red;
+	}
+
+	.option-div {
+		min-width: 100px;
+		display: inline-block;
+		text-align: center;
+		vertical-align: top;
+	}
+
+	.option-title {
+		min-width: 100px;
+		word-wrap: break-word;
+		padding: 0px 20px;
+	}
+
+	.hr-row {
+		padding: 0px 5%;
+	}
+
+	.hr-row hr {
+		margin: 5px 0px 15px;
+		border-bottom: solid 1px #0000004d;
+	}
+
+	md-radio-button .md-container {
+		left: calc(50% - 10px);
+		margin-bottom: 5px;
+	}
+
+	.no-answer {
+		color: red;
+		font-size: 0.8em;
+	}
+
+	.instructions {
+		color: blue;
+		text-align: center;
+		padding: 20px 10%;
+		font-size: 1.4em;
+		font-weight: 700;
+	}
+</style>

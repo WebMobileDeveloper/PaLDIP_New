@@ -1,0 +1,347 @@
+<div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished">
+
+	<!-- Register Settings -->
+	<div class="row">
+		<div class="col-md-12 center">
+			<h2>Register Settings</h2>
+		</div>
+	</div>
+
+	<div class="row title-row center ">
+		<div class="col-md-4 col-sm-4 col-xs-4">Fields</div>
+		<div class="col-md-4 col-sm-4 col-xs-4">State</div>
+		<div class="col-md-4 col-sm-4 col-xs-4">Optional</div>
+	</div>
+
+	<div class="row content-row ">
+		<div class="col-md-12">
+			<div class="row option-row " ng-repeat="item in registerSettings track by $index">
+				<div class="col-md-4 col-sm-4 col-xs-4">
+					<div>{{item.field}}</div>
+				</div>
+				<div class="col-md-4 col-sm-4 col-xs-4">
+					<md-switch class="md-primary" ng-model="item.value[0]" md-no-ink aria-label="Switch View" ng-change="changeRegisterSettings(item)">
+						<span ng-if="item.value[0]">Show</span>
+						<span ng-if="!item.value[0]">Hide</span>
+					</md-switch>
+				</div>
+				<div class="col-md-4 col-sm-4 col-xs-4">
+					<md-switch class="md-primary" ng-model="item.value[1]" md-no-ink aria-label="Switch Optional" ng-change="changeRegisterSettings(item)" ng-disabled="!item.value[0]" ng-class="{activeDisabled: !item.value[0]}">
+						<span ng-if="item.value[1]">Mandatory</span>
+						<span ng-if="!item.value[1]">Optional</span>
+					</md-switch>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- institution -->
+	<div class="row">
+		<div class="col-md-12 center">
+			<h2>Institution Settings</h2>
+		</div>
+	</div>
+
+	<div class="row title-row center ">
+		<div class="col-md-4 col-sm-4 col-xs-4">Institution Name</div>
+		<div class="col-md-4 col-sm-4 col-xs-4">Domain</div>
+		<div class="col-md-4 col-sm-4 col-xs-4">
+			<a class="btn btn-success" myclick="showInstModal()">
+				<span class="glyphicon glyphicon-plus" style="font-weight:bold;"></span>
+				<md-tooltip class="custom-tooltip no-tail" md-direction="left">
+					Register new institution
+				</md-tooltip>
+			</a>
+		</div>
+	</div>
+
+	<div class="row content-row">
+		<div class="col-md-12">
+			<div class="row option-row " ng-repeat="(key, item) in institutions track by key">
+				<div class="col-md-4 col-sm-4 col-xs-4">
+					{{item.name}}
+				</div>
+				<div class="col-md-4 col-sm-4 col-xs-4">
+					{{item.domain}}
+				</div>
+				<div class="col-md-4 col-sm-4 col-xs-4">
+					<a class="btn btn-primary mr-5" myclick="showInstModal(key)" ng-show="item.name!='Unspecified Institution'">
+						<span class="glyphicon glyphicon-pencil"></span>
+						<md-tooltip class="custom-tooltip no-tail" md-direction="left">
+							Edit institution
+						</md-tooltip>
+					</a>
+
+					<a class="btn btn-danger" myclick="removeInstitution(key)" ng-show="item.name!='Unspecified Institution'">
+						<span class="glyphicon glyphicon-trash"></span>
+						<md-tooltip class="custom-tooltip no-tail" md-direction="left">
+							Remove institution
+						</md-tooltip>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Register Settings -->
+	<div class="row">
+		<div class="col-md-12 center">
+			<h2>Create Question Default Settings</h2>
+		</div>
+	</div>
+
+	<div class="row title-row center ">
+		<div class="col-md-6 col-sm-6 col-xs-6">Question Type</div>
+		<div class="col-md-6 col-sm-6 col-xs-6">Default Setting</div>
+	</div>
+
+	<div class="row content-row">
+		<div class="col-md-12">
+			<div class="row option-row " ng-repeat="item in createQuestionSettings track by $index">
+				<div class="col-md-6 col-sm-6 col-xs-6">
+					<div>{{item.type}}</div>
+				</div>
+				<div class="col-md-6 col-sm-6 col-xs-6">
+					<md-switch class="md-primary" ng-model="item.value" md-no-ink ng-change="changeCreateQuestionSettings(item)">
+						<span ng-if="item.value">Enabled</span>
+						<span ng-if="!item.value">Disabled</span>
+					</md-switch>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+	<!-- Reminder Email setting -->
+	<div class="row">
+		<h2 class="center">Reminder Email Settings</h2>
+		<div class="row">
+			<div class="col-md-12 note center">
+				*&emsp;{{note}}
+			</div>
+		</div>
+	</div>
+	<div class="email-body">
+		<div class="email-content">
+			<div class="row">
+				<div class="col-md-12">
+					<input type="text" class="center reminder-title" ng-model="reminderSettings.title" ng-change="changedReminder()" />
+				</div>
+				<div class="col-md-12">
+					<textarea type="text" id="reminder-headerContent" class="center reminder-headerContent" ng-model="reminderSettings.headerContent" ng-change="changedReminder()"></textarea>
+				</div>
+				<div class="col-md-12">
+					<div class="list">
+						<p><b>Group Name:</b> Group name1</p>
+						<p><b>Questionset Name:</b> Questionset name1</p>
+						<p><b>Past Time:</b> 4 days 5 hours</p>
+					</div>
+					<div class="list">
+						<p><b>Group Name:</b> Group name2</p>
+						<p><b>Questionset Name:</b> Questionset name2</p>
+						<p><b>Past Time:</b> 2 days 3 hours</p>
+					</div>
+					<div class="list">
+						<p><b>Group Name:</b> Group name3</p>
+						<p><b>Questionset Name:</b> Questionset name3</p>
+						<p><b>Past Time:</b> 1 days 10 hours</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- add institution Modal -->
+	<div class="modal fade" id="addInstitutionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<span class="modal-title" id="exampleModalLongTitle">{{editInstKey?'Update Institution':'Register New Institution'}}</span>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+
+					<div class="row">
+						<div class="col-md-4 col-sm-6 col-xs-6">
+							Institution Name
+						</div>
+						<div class="col-md-8 col-sm-6 col-xs-6">
+							<input class="form-control" type="text" placeholder="e.g. Sydney University" ng-model="instItem.name">
+						</div>
+					</div>
+
+					<div class="row mt-5">
+						<div class="col-md-4 col-sm-6 col-xs-6">
+							Domain Type
+						</div>
+						<div class="col-md-8 col-sm-6 col-xs-6">
+							<md-radio-group ng-model="instItem.type" layout="row">
+								<md-radio-button value="Specified" class="md-primary">Specified</md-radio-button>
+								<md-radio-button value="Unspecified" class="md-primary">Unspecified</md-radio-button>
+							</md-radio-group>
+						</div>
+					</div>
+
+					<div class="row mt-5" ng-show="instItem.type=='Specified'">
+						<div class="col-md-4 col-sm-6 col-xs-6">
+							Domain
+						</div>
+						<div class="col-md-8 col-sm-6 col-xs-6">
+							<input class="form-control" type="text" placeholder="e.g. @uni.sydney.edu.au" ng-model="instItem.domain">
+						</div>
+					</div>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" myclick="addInstitution()" ng-show="!editInstKey">Register Institution</button>
+					<button type="button" class="btn btn-danger" myclick="updateInstitution()" ng-show="editInstKey">Update Institution</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	.email-body {
+		background-color: #d8dad9;
+		display: inline-block;
+		width: 100%;
+		margin-bottom: 30px;
+	}
+
+	.email-content {
+		width: 90%;
+		margin: 51px auto;
+		background: white;
+		border-radius: 5px;
+	}
+
+	.reminder-title {
+		display: block;
+		width: 80%;
+		margin: 0px auto;
+		font-size: 36px;
+		border: none;
+		border-radius: 5px;
+	}
+
+	/* textarea {		
+		overflow: hidden;
+		padding: 0px;
+		width: 250px;
+		font-size: 14px;
+		margin: 50px auto;
+		display: block;
+		border-radius: 10px;
+		border: 6px solid #556677;
+	}  */
+
+	.reminder-headerContent {
+		position: relative;
+		display: block;
+		height: auto;
+		width: calc(100% - 30px);
+		margin: 0px auto 30px;
+		padding: 10px;
+		text-align: left;
+		border: none;
+		border-radius: 5px;
+		font-size: 18px;
+		overflow: hidden;
+	}
+
+	.reminder-title:hover,
+	.reminder-headerContent:hover,
+	.reminder-title:focus,
+	.reminder-headerContent:focus {
+		border-bottom: solid 1px #7384e1;
+		background-color: #fcfbf1;
+	}
+
+	.list {
+		border-bottom: solid 1px #c3c3c3;
+		width: 600px;
+		margin: 0px 0px 20px 40px;
+	}
+
+	.list>p>b {
+		display: inline-block;
+		width: 150px;
+	}
+
+
+	.title-row {
+		border: solid 1px #5d5d5d;
+		background-color: #69b5ff;
+		padding: 7px;
+		font-size: 20px;
+	}
+
+	.content-row {
+		border: solid 1px #a8a8a8;
+		margin-bottom: 30px;
+	}
+
+	.option-row {
+		margin: 5px -15px;
+		padding: 3px 0px;
+		text-align: center;
+		font-size: 1.4em;
+		background-color: #dbdbdb;
+		border: solid 1px #9b9b9b;
+	}
+
+	.option-row:hover {
+		background-color: #cbcbcb;
+	}
+
+	.option-row.active {
+		background-color: #77fbf6;
+	}
+
+	.option-row input {
+		height: 38px;
+		margin-top: 2px;
+		font-size: 18px;
+		color: #292828;
+		font-weight: bold;
+	}
+
+
+	md-switch {
+		display: inline-flex;
+		margin: 0px;
+	}
+
+	md-switch[disabled].activeDisabled .md-container>div {
+		cursor: default;
+		background: #C2C2C2;
+	}
+
+	md-switch[disabled].activeDisabled .md-container>div>div {
+		background: #DDDDDD;
+	}
+
+	md-switch[disabled].activeDisabled.md-checked .md-container>div {
+		cursor: default;
+		background: #BCBECD;
+	}
+
+	md-switch[disabled].activeDisabled.md-checked .md-container>div>div {
+		background: #A6ACC9;
+	}
+
+	.note {
+		color: #0150aa;
+		margin-top: 20px;
+		margin-bottom: 10px;
+	}
+
+	.modal-body {
+		padding: 40px 10% 20px;
+	}
+</style>

@@ -1,0 +1,16 @@
+<div class="main-div" ng-init="getGroups()" ng-show="$root.settings.loadingfinished">
+	<div class="row qst">
+		<md-input-container flex>
+			<label>Type GroupName (e.g. XXX?)</label>
+			<input ng-model="groupName" style="border-radius:5px;" />
+		</md-input-container>
+	</div>
+
+	<hr />
+	<div class="row button-row">
+		<a class="btn btn-link" myclick="creatgroup()">Create Group</a>
+		<a class="btn btn-link" style="margin-left: 50px;" myclick="$root.back()">Back</a>
+		<!-- <a class="btn btn-link" style="margin-left: 50px;" myclick="initCode()">init Code</a> -->
+		<!-- This is for init short group code -->
+	</div>
+</div>
