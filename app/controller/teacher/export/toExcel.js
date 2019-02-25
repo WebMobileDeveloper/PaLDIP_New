@@ -17,13 +17,12 @@
                 $scope.groupName = $rootScope.settings.groupName;
                 break;
             case 'sub':
-                $rootScope.setData('backUrl', "exportSub");
-                $scope.title = $rootScope.settings.subGroupName;
-                $scope.groupName = $rootScope.settings.subGroupName;
+                $rootScope.setData('backUrl', "groupSubRoot");
+                $scope.groupName = $rootScope.settings.groupName + ' / ' + $rootScope.settings.subGroupName;
                 break;
             case 'second':
-                $rootScope.setData('backUrl', "exportSecond");
-                $scope.groupName = $rootScope.settings.secondGroupName;
+                $rootScope.setData('backUrl', "groupSecondRoot");
+                $scope.groupName = $rootScope.settings.groupName + ' / ' + $rootScope.settings.subGroupName + ' / ' + $rootScope.settings.secondGroupName;
                 break;
             default:
                 break;

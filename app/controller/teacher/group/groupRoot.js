@@ -12,6 +12,8 @@
         $rootScope.setData('showMenubar', true);
         $rootScope.setData('backUrl', 'teacherGroup');
         $rootScope.setData('selectedMenu', 'group');
+        $rootScope.setData('groupType', 'group');
+
         const ruleTitles = {
             after: 'By Complete',
             time: 'By Time',
@@ -36,8 +38,6 @@
             $('#editGroupNameModal').modal('hide');
             $('#copyClassModal').modal('hide');
             $('#addModal').modal('hide');
-
-            $rootScope.setData('groupType', 'group');
             $rootScope.setData('rootPageSetting', $scope.pageSetting);
         })
 
@@ -175,7 +175,7 @@
             }
             for (var key in $scope.groupData.QuestionSets) {
                 let set = $scope.groupData.QuestionSets[key]
-                set.setname = $scope.allQuestionSets[key].setname;
+                set.setname = $scope.allQuestionSets[set.key].setname;
                 // =====  item data========
                 set.questions = [];
                 $scope.pageSetting.expand[set.key] = $scope.pageSetting.expand[set.key] || false;
@@ -617,7 +617,6 @@
         // ==========   response functions  ==============
         $scope.showResponse = function (question) {
             $rootScope.setData('question', question);
-            $rootScope.setData('questionSetKey', question.Set);
             $scope.selectQuestion(question);
             switch (question.questionType) {
                 case 'Likert Type':
@@ -652,47 +651,6 @@
                     break;
 
             }
-
-            // if ($scope.subIndex == 0) {             // group root
-
-            // } else {                                // groupset, subgroupset
-
-            //     var groupType = 'sub';
-            //     if ($scope.secondIndex > 0) {
-            //         groupType = 'second';
-            //     }
-            //     $rootScope.setData('groupType', groupType);
-            //     $rootScope.setData('groupSetKey', $scope.groupsets[$scope.subIndex].key);
-            //     $rootScope.setData('subSetKey', groupType == 'second' ? $scope.subGroupsets[$scope.secondIndex].key : undefined);
-            //     $rootScope.setData('groupsets', $scope.groupRoot.groupsets[$scope.groupsets[$scope.subIndex].key]);
-
-            //     // $rootScope.setData('setData', set);
-
-            //     switch (question.questionType) {
-            //         case 'Likert Type':
-            //             $state.go('groupResponseOfLikertAnswer');
-            //             break;
-            //         case "Dropdown Type":
-            //             $state.go('groupResponseOfDropdownAnswer');
-            //             break;
-            //         case "Multiple Type":
-            //             $state.go('groupResponseOfMultipleAnswer');
-            //             break;
-            //         case "Contingent Type":
-            //             $state.go('groupResponseOfContingentAnswer');
-            //             break;
-            //         case "Feedback Type":
-            //             $state.go('groupResponseOfFeedbackAnswer');
-            //             break;
-            //         case "Rating Type":
-            //             $state.go('groupResponseOfRatingAnswer');
-            //             break;
-            //         default:
-            //             $state.go('groupResponseOfAnswer');
-            //             break;
-            //     }
-            // }
-
         }
         // ---------------------------------------------------------------------
 
@@ -745,7 +703,7 @@
             linkKey = window.location.origin + '/directLink/' + linkKey;
             var $temp = $("<input>");
             $("body").append($temp);
-            $temp.val(str).select();
+            $temp.val(linkKey).select();
             document.execCommand("copy");
             $temp.remove();
         }
@@ -809,7 +767,6 @@
                 $scope.groupSetKey = groupSetKey;
                 $scope.groupSet = $scope.groupsets[groupSetKey];
                 $scope.subIndex = subIndex || 0;
-                $scope.groupSetRef = firebase.database().ref('Groups/' + $scope.groupKey + '/groupsets/' + groupSetKey)
                 $rootScope.setData('groupSetKey', $scope.groupSetKey);
                 $rootScope.setData('subIndex', $scope.subIndex);
                 $rootScope.safeApply()
@@ -833,7 +790,6 @@
             });
 
             $scope.subIndex = index;
-            $rootScope.setData('groupSetKey', $scope.groupSetKey);
             $rootScope.setData('subIndex', index);
             $rootScope.setData('subSetKey', undefined);
             $rootScope.setData('secondIndex', undefined);

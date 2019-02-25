@@ -1,34 +1,19 @@
 <div class="container" ng-init="init()" ng-show="$root.settings.loadingfinished" style="margin-top:10px; margin-bottom: 40px;">
     <div class="row question-div center">
-        <label class="qst-title" ng-if='question.title'>{{question.title}}</label>
-        {{question.question}}        
-        <button class="btn btn-primary pull-right" myclick="showtTextGroupSettingModal()" ng-show="question.questionType== 'Text Type'">
-            <md-tooltip class="custom-tooltip no-tail" md-direction="bottom">Text Type Question Group Setting</md-tooltip>
-            Group Setting
-        </button>
+        <div class="col-xs-10">
+            <label class="qst-title" ng-if='question.title'>{{question.title}}</label>
+            {{question.question}}
+        </div>
+        <div class="col-xs-2">
+            <button class="btn btn-primary" myclick="showtTextGroupSettingModal()"
+                ng-show="question.questionType== 'Text Type'">
+                <md-tooltip class="custom-tooltip no-tail" md-direction="bottom">Text Type Question Group Setting</md-tooltip>
+                Group Setting
+            </button>
+        </div>
     </div>
-    <div class="row button-row center">
-        <div class="col-md-6 col-sm-6">
-            <md-input-container flex>
-                <label for="username">Sub Groupset</label>
-                <md-select data-ng-model="GroupIndex" class="md-block flex-gt-sm" ng-change="changeGroup()"
-                    md-container-class="dropDown">
-                    <md-option data-ng-value="$index" data-ng-repeat="name in subNames">{{ name }}</md-option>
-                </md-select>
-            </md-input-container>
-        </div>
-        <div class="col-md-6 col-sm-6">
-            <md-input-container flex>
-                <label for="username">2nd Sub Groupset</label>
-                <md-select data-ng-model="SubGroupIndex" class="md-block flex-gt-sm" ng-change="changeGroup()"
-                    md-container-class="dropDown" ng-disabled="$root.settings.groupType =='sub'">
-                    <md-option data-ng-value="$index" data-ng-repeat="name in secondNames">{{ name }}</md-option>
-                </md-select>
-            </md-input-container>
-        </div>
 
-    </div>
-    <div ng-if="!groupSetting.thumbup" ng-repeat="obj in answers[selectedIndex] track by $index" class="row question-row"
+    <div ng-if="!groupSetting.thumbup" ng-repeat="obj in answers track by $index" class="row question-row"
         style="margin-top:5px;">
         <div class="col-md-12 qtdetails">
             <span class="id-span pull-left">{{obj.show_id}}:</span>
@@ -46,7 +31,7 @@
             </span>
         </div>
     </div>
-    <div ng-if="groupSetting.thumbup" ng-repeat="obj in answers[selectedIndex] | orderBy : ['-order','-likeCount'] track by $index"
+    <div ng-if="groupSetting.thumbup" ng-repeat="obj in answers | orderBy : ['-order','-likeCount'] track by $index"
         class="row question-row" style="margin-top:5px;">
         <div class="col-md-12 qtdetails">
             <span class="id-span pull-left">{{obj.show_id}}:</span>
@@ -79,7 +64,8 @@
                         <md-input-container class="md-block mb-0">
                             <b class="modal-sub-title">Thumbs up:</b>
                             <md-radio-group ng-model="tempSetting.thumbup" layout="row">
-                                <md-radio-button ng-value="true" class="md-primary" style="margin-right:40px;">Enabled</md-radio-button>
+                                <md-radio-button ng-value="true" class="md-primary" style="margin-right:40px;">Enabled
+                                </md-radio-button>
                                 <md-radio-button ng-value="false" class="md-primary">Disabled</md-radio-button>
                             </md-radio-group>
                         </md-input-container>

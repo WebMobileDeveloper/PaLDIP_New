@@ -7,7 +7,7 @@
     responseOfFeedbackAnswerController.$inject = ['$state', '$scope', '$rootScope', '$filter'];
 
     function responseOfFeedbackAnswerController($state, $scope, $rootScope, $filter) {
-        // **************   router:    groupRoot  *****************
+        // **************   router:    responseOfFeedbackAnswer  *****************
 
         $rootScope.setData('showMenubar', true);
         $rootScope.setData('backUrl', "groupRoot");

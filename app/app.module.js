@@ -1,5 +1,5 @@
 //  ===================  Global Consts =====================
-let DevServer = true;
+let DevServer = false;
 
 let config = DevServer ?
     {

@@ -7,7 +7,7 @@
     responseOfSlideAnswerController.$inject = ['$state', '$scope', '$rootScope', '$sce'];
 
     function responseOfSlideAnswerController($state, $scope, $rootScope, $sce) {
-        // **************   router:    groupRoot  *****************
+        // **************   router:    responseOfSlideAnswer  *****************
 
         $rootScope.setData('showMenubar', true);
         $rootScope.setData('backUrl', "groupRoot");

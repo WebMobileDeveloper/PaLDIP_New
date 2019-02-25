@@ -7,6 +7,8 @@
     responseOfExternalController.$inject = ['$state', '$scope', '$rootScope', '$sce', '$filter'];
 
     function responseOfExternalController($state, $scope, $rootScope, $sce, $filter) {
+        // **************   router:    responseOfExternal  *****************
+        
         $rootScope.setData('showMenubar', true);
         $rootScope.setData('backUrl', "groupRoot");
         $scope.question = $rootScope.settings.question;

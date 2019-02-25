@@ -17,13 +17,12 @@
                 $scope.groupName = $rootScope.settings.groupName;
                 break;
             case 'sub':
-                $rootScope.setData('backUrl', "exportSub");
-                $scope.title = $rootScope.settings.subGroupName;
-                $scope.groupName = $rootScope.settings.subGroupName;
+                $rootScope.setData('backUrl', "groupSubRoot");
+                $scope.groupName = $rootScope.settings.groupName + ' / ' + $rootScope.settings.subGroupName;
                 break;
             case 'second':
-                $rootScope.setData('backUrl', "exportSecond");
-                $scope.groupName = $rootScope.settings.secondGroupName;
+                $rootScope.setData('backUrl', "groupSecondRoot");
+                $scope.groupName = $rootScope.settings.groupName + ' / ' + $rootScope.settings.subGroupName + ' / ' + $rootScope.settings.secondGroupName;
                 break;
             default:
                 break;
@@ -100,7 +99,7 @@
         $scope.getAnswers = function (question) {
             let exportQuestionKey = question.code;
             let anonymous = question.anonymous;
-            
+
             if (groupType == 'group') {
                 var answersRef = firebase.database().ref('NewAnswers/' + exportQuestionKey + '/answer/');
             } else {
@@ -111,7 +110,7 @@
                 $scope.answers[exportQuestionKey] = {
                     key: exportQuestionKey,
                     userCount: 0,
-                    items: question.teamRate ? $rootScope.settings.groupNames : (question.ratingItems || []),
+                    items: question.teamRate ? $rootScope.settings.subGroups : (question.ratingItems || []),
                     options: (question.ratingOptions) ? question.ratingOptions : [],
                     question: question.question,
                     answers: [],

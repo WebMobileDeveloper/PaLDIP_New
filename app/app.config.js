@@ -329,7 +329,18 @@ app.config(
                 templateUrl: 'app/templates/teacher/group/groupSubRoot.html',
                 controller: 'groupSubRootController',
                 data: {
-                    pageTitle: 'Group Sub Root'
+                    pageTitle: 'Sub Group Root'
+                },
+                resolve: {
+                    authenticate: function ($q, $rootScope) { return checkAuth($q, $rootScope, 'Teacher') }
+                }
+            })
+            .state('groupSecondRoot', {
+                url: '/teacher/group/secondRoot',
+                templateUrl: 'app/templates/teacher/group/groupSecondRoot.html',
+                controller: 'groupSecondRootController',
+                data: {
+                    pageTitle: 'Second Group  Root'
                 },
                 resolve: {
                     authenticate: function ($q, $rootScope) { return checkAuth($q, $rootScope, 'Teacher') }
@@ -401,7 +412,7 @@ app.config(
                     authenticate: function ($q, $rootScope) { return checkAuth($q, $rootScope, 'Teacher') }
                 }
             })
-            .state('editQuestionsetsInGroupSet', {
+            .state('editGroupSet', {
                 url: '/teacher/group/editGroupSet',
                 templateUrl: 'app/templates/teacher/group/editGroupsetQuestionSets.html',
                 controller: 'editGroupSetController',

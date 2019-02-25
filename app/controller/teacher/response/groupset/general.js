@@ -4,36 +4,29 @@
         .controller('groupResponseOfAnswerController', groupResponseOfAnswerController)
     groupResponseOfAnswerController.$inject = ['$state', '$scope', '$rootScope'];
     function groupResponseOfAnswerController($state, $scope, $rootScope) {
+        // **************   router:    groupResponseOfAnswer  *****************
 
         $rootScope.setData('showMenubar', true);
-        $rootScope.setData('backUrl', "groupRoot");
+        var groupType = $rootScope.settings.groupType;
+        $rootScope.setData('backUrl', groupType == 'sub' ? "groupSubRoot" : "groupSecondRoot");
 
 
         $scope.question = $rootScope.settings.question;
+        $scope.groupKey = $rootScope.settings.groupKey;
         $scope.groupSetKey = $rootScope.settings.groupSetKey;
+        $scope.subIndex = $rootScope.settings.subIndex;
         $scope.subSetKey = $rootScope.settings.subSetKey;
-        $scope.groupsets = $rootScope.settings.groupsets;
+        $scope.secondIndex = $rootScope.settings.secondIndex;
 
-        $scope.subNames = ["All Sub Groups"];
-        $scope.secondNames = ["All 2nd Sub Groups"];
-        for (var i = 0; i < $scope.groupsets.count; i++) {
-            let name = $scope.groupsets.data.groups[i].name || $scope.groupsets.name + ' ' + (i + 1);
-            $scope.subNames.push(name);
-        }
 
-        if ($rootScope.settings.groupType == 'sub') {
-            thumbupRefStr = 'Groups/' + $rootScope.settings.groupKey
+        if (groupType == 'sub') {
+            thumbupRefStr = 'Groups/' + $scope.groupKey
                 + '/groupTextSettings/groupsets/' + $scope.groupSetKey
                 + '/' + $scope.question.Set + '/' + $scope.question.code + '/thumbup'
         } else {
-            thumbupRefStr = 'Groups/' + $rootScope.settings.groupKey
+            thumbupRefStr = 'Groups/' + $scope.groupKey
                 + '/groupTextSettings/subgroupsets/' + $scope.groupSetKey + '/' + $scope.subSetKey
                 + '/' + $scope.question.Set + '/' + $scope.question.code + '/thumbup'
-
-            for (var i = 0; i < $scope.groupsets.subgroupsets[$scope.subSetKey].count; i++) {
-                let name = $scope.groupsets.data.groups[0].subgroupsets[$scope.subSetKey].groups[i].name || $scope.groupsets.subgroupsets[$scope.subSetKey].name + ' ' + (i + 1);
-                $scope.secondNames.push(name);
-            }
         }
         $rootScope.safeApply();
 
@@ -74,7 +67,16 @@
         $scope.getAnswers = function () {
             $scope.answersRef = firebase.database().ref('GroupAnswers').orderByChild('questionKey').equalTo($scope.question.code);
             $scope.answersRef.on('value', function (snapshot) {
-                $scope.allAnswers = snapshot.val() || {}
+                $scope.allAnswers = {}
+                for (key in snapshot.val()) {
+                    let answer = snapshot.val()[key];
+                    if (answer.groupType != groupType || answer.studentgroupkey != $scope.groupKey
+                        || answer.groupSetKey != $scope.groupSetKey || answer.subIndex != $scope.subIndex) continue;
+                    if (groupType == 'second') {
+                        if (answer.subSetKey != $scope.subSetKey || answer.secondIndex != $scope.secondIndex) continue;
+                    }
+                    $scope.allAnswers[key] = answer;
+                }
                 $scope.ref_3 = true
                 $scope.finalCalc()
             });
@@ -84,52 +86,18 @@
             if (!$scope.ref_1 || !$scope.ref_2 || !$scope.ref_3) return
             $scope.answers = [];
 
-            for (var i = 0; i < $scope.subNames.length; i++) {
-                for (var j = 0; j < $scope.secondNames.length; j++) {
-                    $scope.answers.push([]);
-                }
-            }
-
             for (var key in $scope.allAnswers) {
                 var answer = $scope.allAnswers[key];
-
-                var checkSubGroup = true;
-                if ($rootScope.settings.groupType == 'second') {
-                    if (answer.subSetKey != $scope.subSetKey) {
-                        checkSubGroup = false;
-                    }
+                if ($scope.groupSetting.thumbup) {
+                    answer.likeCount = answer.likeUsers ? answer.likeUsers.length : 0
+                    answer.dislikeCount = answer.dislikeUsers ? answer.dislikeUsers.length : 0
+                    answer.order = answer.likeCount - answer.dislikeCount;
                 }
 
-                if (answer.groupType == $rootScope.settings.groupType && answer.studentgroupkey == $rootScope.settings.groupKey
-                    && answer.groupSetKey == $rootScope.settings.groupSetKey && checkSubGroup) {
-
-                    if ($scope.groupSetting.thumbup) {
-                        answer.likeCount = answer.likeUsers ? answer.likeUsers.length : 0
-                        answer.dislikeCount = answer.dislikeUsers ? answer.dislikeUsers.length : 0
-                        answer.order = answer.likeCount - answer.dislikeCount;
-                    }
-
-                    answer.show_id = $scope.users[answer.uid].show_id;
-                    $scope.answers[0].push(answer);
-                    $scope.answers[answer.subIndex + 1].push(answer);
-
-                    if ($rootScope.settings.groupType == 'second') {
-                        $scope.answers[(answer.subIndex + 1) * $scope.secondNames.length].push(answer);
-                        $scope.answers[(answer.subIndex + 1) * $scope.secondNames.length + answer.secondIndex + 1].push(answer);
-                    }
-                }
+                answer.show_id = $scope.users[answer.uid].show_id;
+                $scope.answers.push(answer);
             }
-
-            $scope.GroupIndex = 0;
-            $scope.SubGroupIndex = 0;
-            $scope.changeGroup();
             $rootScope.setData('loadingfinished', true);
-        }
-
-        $scope.changeGroup = function () {
-            $scope.selectedIndex = $scope.GroupIndex * $scope.secondNames.length + $scope.SubGroupIndex;
-            $scope.description = "Answers in all subgroup." + $scope.subNames[$scope.GroupIndex];
-            $rootScope.safeApply();
         }
 
         // =============================   text Type Group Setting functions  ====================================
@@ -144,7 +112,7 @@
 
             firebase.database().ref(thumbupRefStr).set($scope.tempSetting.thumbup ? true : {}).then(() => {
                 $('#textGroupSettingModal').modal('hide');
-                if ($rootScope.settings.groupType == 'sub') {
+                if (groupType == 'sub') {
                     $rootScope.success("Groupset setting has been changed successfully!")
                 } else {
                     $rootScope.success("Subgroupset setting has been changed successfully!")

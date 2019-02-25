@@ -17,13 +17,12 @@
                 $scope.groupName = $rootScope.settings.groupName;
                 break;
             case 'sub':
-                $rootScope.setData('backUrl', "exportSub");
-                $scope.title = $rootScope.settings.subGroupName;
-                $scope.groupName = $rootScope.settings.subGroupName;
+                $rootScope.setData('backUrl', "groupSubRoot");
+                $scope.groupName = $rootScope.settings.groupName + ' / ' + $rootScope.settings.subGroupName;
                 break;
             case 'second':
-                $rootScope.setData('backUrl', "exportSecond");
-                $scope.groupName = $rootScope.settings.secondGroupName;
+                $rootScope.setData('backUrl', "groupSecondRoot");
+                $scope.groupName = $rootScope.settings.groupName + ' / ' + $rootScope.settings.subGroupName + ' / ' + $rootScope.settings.secondGroupName;
                 break;
             default:
                 break;
@@ -33,7 +32,7 @@
         $scope.anonymous = $scope.question.anonymous;
         $scope.show_email = false;
        
-        $scope.items = $scope.question.teamRate ? $rootScope.settings.groupNames : ($scope.question.ratingItems || []);
+        $scope.items = $scope.question.teamRate ? $rootScope.settings.subGroups : ($scope.question.ratingItems || []);
         $scope.options = ($scope.question.ratingOptions) ? $scope.question.ratingOptions : [];
 
         $scope.$on('$destroy', function () {

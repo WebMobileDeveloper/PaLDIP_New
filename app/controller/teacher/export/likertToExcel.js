@@ -11,26 +11,23 @@
 
         $rootScope.setData('showMenubar', true);
         var groupType = $rootScope.settings.groupType;
+       
         switch (groupType) {
             case 'group':
                 $rootScope.setData('backUrl', "groupRoot");
-                // $scope.groupName = $rootScope.settings.groupName;
                 break;
             case 'sub':
-                $rootScope.setData('backUrl', "exportSub");
-                $scope.title = $rootScope.settings.subGroupName;
-                // $scope.groupName = $rootScope.settings.subGroupName;
+                $rootScope.setData('backUrl', "groupSubRoot");
                 break;
             case 'second':
-                $rootScope.setData('backUrl', "exportSecond");
-                // $scope.groupName = $rootScope.settings.secondGroupName;
+                $rootScope.setData('backUrl', "groupSecondRoot");
                 break;
             default:
                 break;
         }
-        $scope.exportSetKey = $rootScope.settings.question.setKey;
+        $scope.exportSetKey = $rootScope.settings.question.Set;
         $scope.siblingSetKey = $rootScope.settings.question.siblingSetKey;
-        
+
         $scope.$on('$destroy', function () {
             if ($scope.allSetsRef) $scope.allSetsRef.off('value')
             if ($scope.usersRef) $scope.usersRef.off('value')

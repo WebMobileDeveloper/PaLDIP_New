@@ -1,23 +1,25 @@
 (function () {
     angular
         .module('myApp')
-        .controller('groupSubRootController', groupSubRootController)
+        .controller('groupSecondRootController', groupSecondRootController)
 
-    groupSubRootController.$inject = ['$state', '$scope', '$rootScope', '$filter'];
+    groupSecondRootController.$inject = ['$state', '$scope', '$rootScope', '$filter'];
 
-    function groupSubRootController($state, $scope, $rootScope, $filter) {
-        // **************   router:    groupSubRoot  *****************
+    function groupSecondRootController($state, $scope, $rootScope, $filter) {
+        // **************   router:    groupSecondRoot  *****************
 
 
         $rootScope.setData('showMenubar', true);
-        $rootScope.setData('backUrl', 'groupRoot');
+        $rootScope.setData('backUrl', 'groupSubRoot');
         $rootScope.setData('selectedMenu', 'group');
-        $rootScope.setData('groupType', 'sub');
+        $rootScope.setData('groupType', 'second');
 
         $scope.groupKey = $rootScope.settings.groupKey;
         $scope.groupSetKey = $rootScope.settings.groupSetKey;
         $scope.subIndex = $rootScope.settings.subIndex;
-        $scope.pageSetting = $rootScope.settings.subPageSetting;
+        $scope.subSetKey = $rootScope.settings.subSetKey;
+        $scope.secondIndex = $rootScope.settings.secondIndex;
+        $scope.pageSetting = $rootScope.settings.secondPageSetting;
 
         $scope.$on('$destroy', function () {
             if ($scope.subGroupRef) $scope.subGroupRef.off('value')
@@ -39,32 +41,18 @@
             // $scope.getHideState();
         }
         $scope.getGroup = function () {
-            $scope.subGroupRef = firebase.database().ref('Groups/' + $scope.groupKey
+            $scope.subGroupRef = firebase.database().ref('Groups/' + $rootScope.settings.groupKey
                 + '/groupsets/' + $scope.groupSetKey);
             $scope.subGroupRef.on('value', function (snapshot) {
                 $scope.groupset = snapshot.val();
-                $scope.groupData = $scope.groupset.data.groups[$scope.subIndex];
-                $scope.groupData.name = $scope.groupData.name || $scope.groupset.name + " " + ($scope.subIndex + 1);
-                $rootScope.setData('subGroupName', $scope.groupData.name);
-                if ($scope.groupset.subgroupsets) {
-                    $scope.subSets = $scope.groupset.subgroupsets;
-                    for (key in $scope.subSets) {
-                        let subSet = $scope.subSets[key];
-                        let subSetData = $scope.groupData.subgroupsets[key];
-                        for (i = 0; i < subSet.count; i++) {
-                            let group = subSetData.groups[i];
-                            group.name = group.name || subSet.name + ' ' + (i + 1);
-                        }
-                    }
-                    let subSetKey = $rootScope.settings.subSetKey || Object.keys($scope.subSets)[0];
-                    $scope.selectSubGroupset(subSetKey, $rootScope.settings.secondIndex)
-                    $scope.subSet = $scope.subSets[subSetKey];
-                }
+                $scope.subSet = $scope.groupset.subgroupsets[$scope.subSetKey];
+                $scope.groupData = $scope.groupset.data.groups[$scope.subIndex].subgroupsets[$scope.subSetKey].groups[$scope.secondIndex];
+                $scope.groupData.name = $scope.groupData.name || $scope.subSet.name + " " + ($scope.secondIndex + 1);
+                $rootScope.setData('secondGroupName', $scope.groupData.name);
                 $scope.ref_1 = true;
                 $scope.finalCalc();
             });
         }
-        
         $scope.getLinks = function () {
             $scope.linkRef = firebase.database().ref('Links');
             $scope.linkRef.on('value', function (snapshot) {
@@ -72,7 +60,7 @@
                 $scope.allLinks = snapshot.val() || {}
                 for (key in $scope.allLinks) {
                     let link = $scope.allLinks[key];
-                    if (link.groupKey == $scope.groupKey && link.groupType == 'sub' && link.groupSetKey == $scope.groupSetKey) {
+                    if (link.groupKey == $scope.groupKey && link.groupType == 'second' && link.groupSetKey == $scope.groupSetKey && link.subSetKey == $scope.subSetKey) {
                         if (link.linkType == 'set') {
                             $scope.links[link.setKey] = link;
                         } else {         //    link.linkType == 'question'
@@ -109,14 +97,6 @@
                 $scope.finalCalc();
             });
         };
-        // $scope.getHideState = function () {
-        //     $scope.hideRef = firebase.database().ref('HiddenQuestions/' + $scope.groupKey);
-        //     $scope.hideRef.on('value', function (snapshot) {
-        //         $scope.allHideQuestions = snapshot.val() || {};
-        //         $scope.ref_6 = true
-        //         $scope.finalCalc()
-        //     });
-        // }
         $scope.finalCalc = function () {
             if (!$scope.ref_1 || !$scope.ref_2 || !$scope.ref_3 || !$scope.ref_4) return;
             $scope.QuestionSets = [];
@@ -131,8 +111,8 @@
                 $scope.QuestionsByType.push(item);
                 $scope.pageSetting.expand[item.key] = $scope.pageSetting.expand[item.key] || false;
             });
-            $scope.groupset.QuestionSets = $scope.groupset.QuestionSets || []
-            $scope.groupset.QuestionSets.forEach((set, setIndex) => {
+            $scope.subSet.QuestionSets = $scope.subSet.QuestionSets || []
+            $scope.subSet.QuestionSets.forEach((set, setIndex) => {
                 set.setname = $scope.allQuestionSets[set.key].setname;
                 // =====  item data========
                 set.questions = [];
@@ -194,13 +174,7 @@
             $scope.items = $scope.pageSetting.sort ? $scope.QuestionSets : $scope.QuestionsByType;
             $rootScope.safeApply();
         }
-        // $scope.showStateChanged = function () {
-        //     if ($scope.pageSetting.show == 'set') {
-        //         $scope.pageSetting.sort = true;
-        //         $scope.sortChanged();
-        //     }
-        //     $rootScope.safeApply();
-        // }
+
         $scope.toggleQuestions = function (item_key) {
             $scope.pageSetting.expand[item_key] = !$scope.pageSetting.expand[item_key];
             $scope.selectItem(item_key);
@@ -241,26 +215,12 @@
             $scope.selectItem(set.key);
             var hidden = set.hidden ? {} : true
             firebase.database().ref('/Groups/' + $scope.groupKey + '/groupsets/' + $scope.groupSetKey +
-                '/QuestionSets/' + index + '/hidden')
+                '/subgroupsets/' + $scope.subSetKey + '/QuestionSets/' + index + '/hidden')
                 .set(hidden).then(function () {
                     $rootScope.success("Questionset hide state changed successfully!")
                 });
         }
         // -------------------------------------------------------------
-
-
-        // *************************************************************************
-        //                  Question related functions
-        // *************************************************************************
-
-
-        //================ question Hide state function========================
-        // $scope.setHideState = function (question) {
-        //     $scope.selectQuestion(question);
-        //     firebase.database().ref('HiddenQuestions/' + $scope.groupKey + '/' + question.Set + '/' + question.code).set(question.hide ? {} : true);
-        // }
-        // --------------------------------------------------------------------------
-
 
         // ===============  export functions =============================
         $scope.exportQuestionDatas = function (obj, type) {
@@ -327,23 +287,12 @@
             $scope.selectQuestion(question);
             var disabled = question.disabled ? {} : true
             var disableRef = firebase.database().ref('Groups/' + $scope.groupKey + '/groupsets/' +
-                $scope.groupSetKey + '/QuestionSets/' + question.setIndex + '/DisabledQuestions/')
+                $scope.groupSetKey + '/subgroupsets/' + $scope.subSetKey + '/QuestionSets/' + question.setIndex + '/DisabledQuestions/')
             if (question.questionType == 'Likert Type') {
                 disableRef.set(disabled);
             } else {
                 disableRef.child(question.code).set(disabled);
             }
-            // if ($scope.subIndex > 0) {
-            //     disableRef = firebase.database().ref('Groups/' + $rootScope.settings.groupKey + '/groupsets/' +
-            //         $scope.groupsets[$scope.subIndex].key +
-            //         '/QuestionSets/' + index + '/DisabledQuestions/');
-            //     if ($scope.secondIndex > 0) {
-            //         disableRef = firebase.database().ref('Groups/' + $rootScope.settings.groupKey + '/groupsets/' +
-            //             $scope.groupsets[$scope.subIndex].key + '/subgroupsets/' + $scope.subGroupsets[$scope.secondIndex].key +
-            //             '/QuestionSets/' + index + '/DisabledQuestions/');
-            //     }
-            // }
-
         }
         // -----------------------------------------------------------
 
@@ -358,8 +307,9 @@
                 questionType: question.questionType,
                 linkType: question.questionType == 'Likert Type' ? 'set' : 'question',
                 questionKey: question.questionType == 'Likert Type' ? {} : question.code,
-                groupType: 'sub',
+                groupType: 'second',
                 groupSetKey: $scope.groupSetKey,
+                subSetKey: $scope.subSetKey,
                 key: $scope.getLinkCode(),
             };
             firebase.database().ref('Links/' + link.key).set(link);
@@ -393,93 +343,5 @@
             return new_id;
         }
         // --------------------------------------------------------------------------
-
-
-        // ============give Score and goto upload external result functions==================
-        $scope.isSetScoreType = function (question) {
-            let scoreTypes = ['Feedback Type', 'Rating Type', 'Text Type']
-            return scoreTypes.indexOf(question.questionType) > -1;
-        }
-        $scope.setScore = function (question) {
-            $scope.selectQuestion(question);
-            $rootScope.setData("question", question)
-            switch (question.questionType) {
-                case 'Feedback Type':
-                    $state.go('teacherGiveFeedback');
-                    break;
-                case 'Rating Type':
-                    $state.go('teacherRating');
-                    break;
-                case 'Text Type':
-                    $state.go('teacherGiveScore');
-                    break;
-                case 'External Activity':
-                    $state.go('teacherUploadExternal');
-                    break;
-            }
-        }
-        // ---------------------------------------------------------------
-        // *************************************************************************
-
-
-
-
-
-        // *************************************************************************
-        //                  Groupset related functions
-        // *************************************************************************
-
-        // ======================  groupset functions  ==========================
-        $scope.selectSubGroupset = function (subSetKey, secondIndex = undefined) {
-            if ($scope.subSetKey != subSetKey) {
-                $scope.subSetKey = subSetKey;
-                $scope.subSet = $scope.subSets[subSetKey];
-                $scope.subSetData = $scope.groupData.subgroupsets[subSetKey];
-                $scope.secondIndex = secondIndex || 0;
-                $rootScope.setData('subSetKey', $scope.subSetKey);
-                $rootScope.setData('secondIndex', $scope.secondIndex);
-                $rootScope.safeApply()
-            }
-        }
-        $scope.getGroupClass = function (obj) {
-            if ($scope.subSetKey == obj.key) {
-                return 'active';
-            }
-        }
-        $scope.getSubGroupClass = function (index) {
-            if ($scope.secondIndex == index) {
-                return 'active';
-            }
-        }
-
-
-        $scope.selectSubGroup = function (index) {
-            let subGroups = [];
-            $scope.subSetData.groups.forEach((group, index) => {
-                subGroups.push(group.name);
-            });
-
-            $scope.secondIndex = index;
-            $rootScope.setData('secondIndex', index);
-            $rootScope.setData('subGroups', subGroups);
-            $rootScope.setData('secondPageSetting', DEFAULT_PAGE_SETTING);
-            $state.go('groupSecondRoot');
-        }
-        // ----------------------------------------------------------------------
-        // *************************************************************************
-        // *************************************************************************
-
-
-        // *************************************************************************
-
-
-        $scope.getClass = function (selectedTab) {
-            if ($scope.pageSetting.selectedTab == selectedTab) {
-                return 'active';
-            }
-        }
-        $scope.setActive = function (selectedTab) {
-            $scope.pageSetting.selectedTab = selectedTab;
-        }
     }
 })();

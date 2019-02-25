@@ -2,9 +2,9 @@
 	<div class="row center" style="margin-top: 50px">
 		<div class="col-md-12 center">
 			<p class="title">
-				{{groupName}} / {{groupSetName}}
+				{{$root.settings.groupName}} / {{$root.settings.subGroupName}} 
 				<span ng-show="$root.settings.groupType == 'second'">
-					{{" / " + subGroupsetName}}
+					{{" / " + $root.settings.secondGroupName}}
 				</span>
 			</p>
 			<p class="title">
@@ -15,8 +15,8 @@
 				</button>
 			</p>
 			<div class="chart-container" ng-if="graphData">
-				<canvas id="mychart" basechart="" width="1000px" height="500px" style="display: block; width: 1000px; height: 500px;"
-				 ng-init="paintgraph()"></canvas>
+				<canvas id="mychart" basechart="" width="1000px" height="500px"
+					style="display: block; width: 1000px; height: 500px;" ng-init="paintgraph()"></canvas>
 			</div>
 		</div>
 	</div>
@@ -28,7 +28,7 @@
 </div>
 
 <div class="modal fade" id="editLikertInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
- aria-hidden="true">
+	aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -47,7 +47,8 @@
 						<md-input-container class="md-block">
 							<b class="modal-sub-title">Show Unique IDs on Graphs</b>
 							<md-radio-group ng-model="tempSettings.showUniqueId" layout="row">
-								<md-radio-button ng-value="false" class="md-primary" style="margin-right:40px;">Hide</md-radio-button>
+								<md-radio-button ng-value="false" class="md-primary" style="margin-right:40px;">Hide
+								</md-radio-button>
 								<md-radio-button ng-value="true" class="md-primary">Show</md-radio-button>
 							</md-radio-group>
 						</md-input-container>
@@ -57,7 +58,8 @@
 						<md-input-container class="md-block">
 							<b class="modal-sub-title">Visible score in student side</b>
 							<md-radio-group ng-model="tempSettings.showScore" layout="row">
-								<md-radio-button ng-value="false" class="md-primary" style="margin-right:40px;">Hide</md-radio-button>
+								<md-radio-button ng-value="false" class="md-primary" style="margin-right:40px;">Hide
+								</md-radio-button>
 								<md-radio-button ng-value="true" class="md-primary">Show</md-radio-button>
 							</md-radio-group>
 						</md-input-container>
@@ -67,7 +69,8 @@
 						<md-input-container class="md-block">
 							<b class="modal-sub-title">Access to Response Page After Submission</b>
 							<md-radio-group ng-model="tempSettings.showResponse" layout="row">
-								<md-radio-button ng-value="false" class="md-primary" style="margin-right:40px;">Disable</md-radio-button>
+								<md-radio-button ng-value="false" class="md-primary" style="margin-right:40px;">Disable
+								</md-radio-button>
 								<md-radio-button ng-value="true" class="md-primary">Enable</md-radio-button>
 							</md-radio-group>
 						</md-input-container>
@@ -88,12 +91,13 @@
 					<div class="col-md-12">
 						<div flex ng-repeat="legend in legendItems track by $index" class="row option-value-container center">
 							<div class="col-md-6 col-sm-6">
-								<input type="text" class="form-control likert-option" ng-model="tempSettings.legendOptions[legend].label"
-								 placeholder="{{legend}}" />
+								<input type="text" class="form-control likert-option"
+									ng-model="tempSettings.legendOptions[legend].label" placeholder="{{legend}}" />
 							</div>
 							<div class="col-md-6 col-sm-6 center">
 								<md-radio-group ng-model="tempSettings.legendOptions[legend].visible" class="visible-radio-group">
-									<md-radio-button ng-value="false" class="md-primary" style="margin-right:20px;">Hide</md-radio-button>
+									<md-radio-button ng-value="false" class="md-primary" style="margin-right:20px;">Hide
+									</md-radio-button>
 									<md-radio-button ng-value="true" class="md-primary">Show</md-radio-button>
 								</md-radio-group>
 							</div>

@@ -2,17 +2,17 @@
 	<div class="row content-header">
 		<div class="container">
 			<div class="col-md-12 center">
-				<span class="title texteffect">{{$root.settings.groupName}} / {{groupData.name}}</span>
+				<span class="title texteffect">{{$root.settings.groupName}} / {{$root.settings.subGroupName}} /
+					{{groupData.name}}</span>
 			</div>
 		</div>
 	</div>
 	<div class="container">
 		<br>
 		<div class="row tab-row">
-			<div class="col-xs-6" ng-class="getClass('QuestionSet')" ng-click="setActive('QuestionSet')">Question Sets</div>
-			<div class="col-xs-6" ng-class="getClass('GroupSet')" ng-click="setActive('GroupSet')">Group Sets</div>
+			<div class="col-xs-12 active">Question Sets</div>
 		</div>
-		<div class="row content-div" ng-show="pageSetting.selectedTab=='QuestionSet'">
+		<div class="row content-div">
 			<div class="col-md-12 header-div">
 				<div class="row">
 					<div class="col-md-12">
@@ -43,7 +43,8 @@
 			</div>
 			<div class="col-md-12 bottom-div">
 				<div class="row">
-					<div class="col-md-12" ng-repeat="item in items track by $index" ng-if="pageSetting.sort || item.questions.length">
+					<div class="col-md-12" ng-repeat="item in items track by $index"
+						ng-if="pageSetting.sort || item.questions.length">
 						<div class="row item-title"
 							ng-class="{'active': pageSetting.itemKey == item.key || pageSetting.setKey == item.key}"
 							data-toggle="collapse" data-target="#{{item.key}}" ng-click="toggleQuestions(item.key)">
@@ -74,7 +75,8 @@
 							</div>
 
 						</div>
-						<div class="row collapse item-questions" id="{{item.key}}" ng-class="{'in': pageSetting.expand[item.key]}">
+						<div class="row collapse item-questions" id="{{item.key}}"
+							ng-class="{'in': pageSetting.expand[item.key]}">
 							<div class="col-md-12 space-column"></div>
 							<div class="col-md-12" ng-repeat='question in item.questions track by $index'
 								ng-click="selectQuestion(question)">
@@ -152,29 +154,7 @@
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="row content-div" ng-show="pageSetting.selectedTab=='GroupSet'">
-			<div class="col-sm-6">
-				<div class="groupsets">
-					<div class="box-title">
-						Groupsets
-					</div>					
-					<div class="col-md-12 groupset" ng-repeat="groupset in  subSets track by $index"
-						ng-class="getGroupClass(groupset)" ng-click="selectSubGroupset(groupset.key)">
-						{{groupset.name}}
-					</div>
-				</div>
-			</div>
-			<div class="col-sm-6">
-				<div class="groupsets">
-					<div class="box-title" style="margin-bottom: 45px;">{{groupSet.name}} Groups</div>
-					<div class="col-md-12 groupset" ng-repeat="group in subSetData.groups track by $index"
-						ng-class="getSubGroupClass($index)" ng-click="selectSubGroup($index)">
-						{{group.name}}&nbsp;({{group.member_count}})
-					</div>
-				</div>
-			</div>
-		</div>
+		</div>		
 	</div>
 </div>
 <style>

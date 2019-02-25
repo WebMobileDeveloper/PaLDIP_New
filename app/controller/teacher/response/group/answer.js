@@ -7,7 +7,7 @@
     responseOfPerAnswerController.$inject = ['$state', '$scope', '$rootScope', '$sce', '$filter'];
 
     function responseOfPerAnswerController($state, $scope, $rootScope, $sce, $filter) {
-        // **************   router:    responseOfAnswer  *****************
+        // **************   router:    responseOfPerAnswer  *****************
         $rootScope.setData('showMenubar', true);
         $rootScope.setData('backUrl', "groupRoot");
         $rootScope.safeApply();

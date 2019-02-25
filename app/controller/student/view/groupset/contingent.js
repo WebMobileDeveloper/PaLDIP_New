@@ -15,6 +15,14 @@
             $scope.question.result_videoURL = $sce.trustAsResourceUrl('https://www.youtube.com/embed/' + $scope.question.result_videoID + "?rel=0&enablejsapi=1");
             $rootScope.removeRecommnedVideo()
         }
+        $scope.groupChoice = $scope.groupChoice ? $scope.groupChoice : 'main';
+        $scope.options = [];
+        $scope.length = $scope.question.subQuestions.length;
+        for (i = 0; i < Math.pow(2, $scope.length); i++) {
+            $scope.options[i] = String("00000000000000" + i.toString(2)).slice(-1 * $scope.length);
+            $scope.options[i] = $scope.options[i].replace(/0/g, "A");
+            $scope.options[i] = $scope.options[i].replace(/1/g, "B");
+        }
         $rootScope.safeApply();
         $scope.$on("$destroy", function () {
             if ($rootScope.instFeedRef) $rootScope.instFeedRef.off('value');
@@ -23,14 +31,6 @@
         });
         $scope.init = function () {
             $rootScope.setData('loadingfinished', false);
-            $scope.groupChoice = $scope.groupChoice ? $scope.groupChoice : 'main';
-            $scope.options = [];
-            $scope.length = $scope.question.subQuestions.length;
-            for (i = 0; i < Math.pow(2, $scope.length); i++) {
-                $scope.options[i] = String("00000000000000" + i.toString(2)).slice(-1 * $scope.length);
-                $scope.options[i] = $scope.options[i].replace(/0/g, "A");
-                $scope.options[i] = $scope.options[i].replace(/1/g, "B");
-            }
             $scope.answerRef = firebase.database().ref('GroupAnswers').orderByChild('questionKey').equalTo($rootScope.settings.questionKey);
             $scope.answerRef.on('value', function (snapshot) {
                 $scope.mainvalues = [];

@@ -4,9 +4,18 @@
         .controller('editGroupSetController', editGroupSetController)
     editGroupSetController.$inject = ['$state', '$scope', '$rootScope', 'dragulaService', '$mdDialog'];
     function editGroupSetController($state, $scope, $rootScope, dragulaService, $mdDialog) {
+        //  **************** router: editGroupSet ********************************
 
         $rootScope.setData('showMenubar', true);
-        $rootScope.setData('backUrl', "groupsets");
+
+        $scope.groupType = $rootScope.settings.groupType;
+        if ($scope.groupType == 'sub') {
+            $rootScope.setData('backUrl', "groupSubRoot");
+        } else {
+            $rootScope.setData('backUrl', "groupSecondRoot");
+        }
+
+
         var scroll = autoScroll([
             document.querySelector('.left-box')
         ], {
@@ -19,15 +28,15 @@
                 }
             });
 
-        $scope.groupSetType = $rootScope.settings.groupSetType;
-        $scope.GroupSetKey = $rootScope.settings.groupSetKey;
-        $scope.GroupSetName = $rootScope.settings.GroupSetName;
-        $scope.TitleString = $rootScope.settings.groupName + ' / ' + $scope.GroupSetName;
 
-        if ($scope.groupSetType == 'secondGroupSet') {
+        $scope.groupSetKey = $rootScope.settings.groupSetKey;
+        $scope.subGroupName = $rootScope.settings.subGroupName;
+        $scope.TitleString = $rootScope.settings.groupName + ' / ' + $scope.subGroupName;
+
+        if ($scope.groupType == 'second') {
             $scope.subSetKey = $rootScope.settings.subSetKey;
-            $scope.subGroupSetName = $rootScope.settings.subGroupSetName;
-            $scope.TitleString += ' / ' + $scope.subGroupSetName;
+            $scope.secondGroupName = $rootScope.settings.secondGroupName;
+            $scope.TitleString += ' / ' + $scope.secondGroupName;
         }
         $rootScope.safeApply();
 
@@ -59,10 +68,10 @@
         }
         //get sets in the group and total set lists
         $scope.getGroupData = function () {//
-            if ($scope.groupSetType == 'firstGroupSet') {
-                $scope.groupRef = firebase.database().ref('Groups/' + $rootScope.settings.groupKey + '/groupsets/' + $scope.GroupSetKey + '/QuestionSets');
+            if ($scope.groupType == 'sub') {
+                $scope.groupRef = firebase.database().ref('Groups/' + $rootScope.settings.groupKey + '/groupsets/' + $scope.groupSetKey + '/QuestionSets');
             } else {
-                $scope.groupRef = firebase.database().ref('Groups/' + $rootScope.settings.groupKey + '/groupsets/' + $scope.GroupSetKey
+                $scope.groupRef = firebase.database().ref('Groups/' + $rootScope.settings.groupKey + '/groupsets/' + $scope.groupSetKey
                     + '/subgroupsets/' + $scope.subSetKey + '/QuestionSets');
             }
             $scope.groupRef.on('value', function (snapshot) {
@@ -261,11 +270,7 @@
                 $scope.dragArray.splice($scope.dragArray.indexOf(set), 1);
                 $rootScope.safeApply();
             }, function () {
-                if ($scope.groupSetType == 'firstGroupSet') {
-                    $state.go('export');
-                } else {
-                    $state.go('exportSecond');
-                }
+                $rootScope.back();
             });
         }
         //Function to save Question sets in the group
@@ -273,8 +278,8 @@
             var rootRef = firebase.database().ref();
             var updates = {};
             var Sets = angular.copy($scope.dragArray);
-            var updateStr = '/Groups/' + $rootScope.settings.groupKey + '/groupsets/' + $scope.GroupSetKey;
-            if ($scope.groupSetType == 'secondGroupSet') {
+            var updateStr = '/Groups/' + $rootScope.settings.groupKey + '/groupsets/' + $scope.groupSetKey;
+            if ($scope.groupType == 'second') {
                 updateStr += '/subgroupsets/' + $scope.subSetKey;
             }
 

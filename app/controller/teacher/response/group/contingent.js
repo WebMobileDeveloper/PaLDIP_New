@@ -4,11 +4,20 @@
 		.controller('responseOfContingentAnswerController', responseOfContingentAnswerController)
 	responseOfContingentAnswerController.$inject = ['$state', '$scope', '$rootScope'];
 	function responseOfContingentAnswerController($state, $scope, $rootScope) {
-		// **************   router:    groupRoot  *****************
-		
+		// **************   router:    responseOfContingentAnswer  *****************
+
 		$rootScope.setData('showMenubar', true);
 		$rootScope.setData('backUrl', "groupRoot");
 		$scope.question = $rootScope.settings.question;
+		$scope.groupChoice = $scope.groupChoice ? $scope.groupChoice : 'main';
+		$scope.options = [];
+		$scope.length = $scope.question.subQuestions.length;
+		for (i = 0; i < Math.pow(2, $scope.length); i++) {
+			$scope.options[i] = String("00000000000000" + i.toString(2)).slice(-1 * $scope.length);
+			$scope.options[i] = $scope.options[i].replace(/0/g, "A");
+			$scope.options[i] = $scope.options[i].replace(/1/g, "B");
+		}
+
 		$rootScope.safeApply();
 
 		$scope.$on("$destroy", function () {
@@ -16,14 +25,17 @@
 			if ($rootScope.publicNoteRef) $rootScope.publicNoteRef.off('value')
 			if ($rootScope.teacherNoteRef) $rootScope.teacherNoteRef.off('value')
 			if ($rootScope.privateNoteRef) $rootScope.privateNoteRef.off('value')
+			if ($scope.userGroupRef) $scope.userGroupRef.off('value')
+			if ($scope.answerRef) $scope.answerRef.off('value')
 		});
 		$scope.init = function () {
 			$rootScope.setData('loadingfinished', false);
 			$scope.getUsersInGroup();
+			$scope.getAnswer();
 		}
 		$scope.getUsersInGroup = function () {
-			var userGroupRef = firebase.database().ref('StudentGroups/');
-			userGroupRef.once('value', function (snapshot) {
+			$scope.userGroupRef = firebase.database().ref('StudentGroups/');
+			$scope.userGroupRef.on('value', function (snapshot) {
 				$scope.usersInGroup = [];
 				for (var userKey in snapshot.val()) {
 					var userGroups = snapshot.val()[userKey];
@@ -33,94 +45,89 @@
 						}
 					}
 				};
-				$scope.viewQuestionContingentAnswer();
+				$scope.ref_1 = true;
+				$scope.finalCalc();
 			});
 		}
 
-		$scope.viewQuestionContingentAnswer = function () {
-			$scope.groupChoice = $scope.groupChoice ? $scope.groupChoice : 'main';
-			var max_length = 60;
-			$scope.options = [];
-			$scope.length = $scope.question.subQuestions.length;
-			for (i = 0; i < Math.pow(2, $scope.length); i++) {
-				$scope.options[i] = String("00000000000000" + i.toString(2)).slice(-1 * $scope.length);
-				$scope.options[i] = $scope.options[i].replace(/0/g, "A");
-				$scope.options[i] = $scope.options[i].replace(/1/g, "B");
-			}
-			var answerRef = firebase.database().ref('NewAnswers/' + $scope.question.code + '/answer');
-			answerRef.on('value', function (snapshot) {
-				$scope.mainvalues = [];
-				$scope.mainlabels = [];
-				$scope.othervalues = [];
-				$scope.otherlabels = [];
-				$scope.totalvalues = [];
-				$scope.totallabels = [];
-
-				$scope.maincount = 0;
-				$scope.othercount = 0;
-				$scope.totalcount = 0;
-				for (var i = 0; i < $scope.options.length; i++) {
-					$scope.mainvalues.push(0);
-					$scope.othervalues.push(0);
-					$scope.totalvalues.push(0);
-					$scope.mainlabels.push($scope.options[i]);
-					$scope.otherlabels.push($scope.options[i]);
-					$scope.totallabels.push($scope.options[i]);
-				}
-				snapshot.forEach(function (childSnapshot) {
-					var answerArr = childSnapshot.val()['answer'];
-					var ansIndex = $scope.getIndex(answerArr);
-					var userKey = childSnapshot.key;
-					if ($scope.usersInGroup.indexOf(userKey) > -1) {
-						$scope.mainvalues[ansIndex]++;
-						$scope.maincount++;
-					} else {
-						$scope.othervalues[ansIndex]++;
-						$scope.othercount++;
-					}
-					$scope.totalvalues[ansIndex]++;
-					$scope.totalcount++;
-				});
-
-				var tempValue = 0;
-
-				for (var i = 0; i < $scope.options.length - 1; i++) {
-					for (var j = i + 1; j < $scope.options.length; j++) {
-						if ($scope.mainvalues[j] > $scope.mainvalues[i]) {
-							tempValue = $scope.mainvalues[i];
-							$scope.mainvalues[i] = $scope.mainvalues[j];
-							$scope.mainvalues[j] = tempValue;
-
-							tempValue = $scope.mainlabels[i];
-							$scope.mainlabels[i] = $scope.mainlabels[j];
-							$scope.mainlabels[j] = tempValue;
-						}
-						if ($scope.othervalues[j] > $scope.othervalues[i]) {
-							tempValue = $scope.othervalues[i];
-							$scope.othervalues[i] = $scope.othervalues[j];
-							$scope.othervalues[j] = tempValue;
-
-							tempValue = $scope.otherlabels[i];
-							$scope.otherlabels[i] = $scope.otherlabels[j];
-							$scope.otherlabels[j] = tempValue;
-						}
-						if ($scope.totalvalues[j] > $scope.totalvalues[i]) {
-							tempValue = $scope.totalvalues[i];
-							$scope.totalvalues[i] = $scope.totalvalues[j];
-							$scope.totalvalues[j] = tempValue;
-
-							tempValue = $scope.totallabels[i];
-							$scope.totallabels[i] = $scope.totallabels[j];
-							$scope.totallabels[j] = tempValue;
-						}
-					}
-				}
-
-				$rootScope.setData('loadingfinished', true);
-				$rootScope.safeApply();
-				$scope.changeGroupChoice();
+		$scope.getAnswer = function () {
+			$scope.answerRef = firebase.database().ref('NewAnswers/' + $scope.question.code + '/answer');
+			$scope.answerRef.on('value', function (snapshot) {
+				$scope.allAnswers = snapshot.val() || {}
+				$scope.ref_2 = true;
+				$scope.finalCalc();
 			});
+		}
+		$scope.finalCalc = function () {
+			if (!$scope.ref_1 || !$scope.ref_2) return;
 
+			$scope.mainvalues = [];
+			$scope.mainlabels = [];
+			$scope.othervalues = [];
+			$scope.otherlabels = [];
+			$scope.totalvalues = [];
+			$scope.totallabels = [];
+
+			$scope.maincount = 0;
+			$scope.othercount = 0;
+			$scope.totalcount = 0;
+			for (var i = 0; i < $scope.options.length; i++) {
+				$scope.mainvalues.push(0);
+				$scope.othervalues.push(0);
+				$scope.totalvalues.push(0);
+				$scope.mainlabels.push($scope.options[i]);
+				$scope.otherlabels.push($scope.options[i]);
+				$scope.totallabels.push($scope.options[i]);
+			}
+			for (userKey in $scope.allAnswers) {
+				var answerArr = $scope.allAnswers[userKey].answer;
+				var ansIndex = $scope.getIndex(answerArr);
+				if ($scope.usersInGroup.indexOf(userKey) > -1) {
+					$scope.mainvalues[ansIndex]++;
+					$scope.maincount++;
+				} else {
+					$scope.othervalues[ansIndex]++;
+					$scope.othercount++;
+				}
+				$scope.totalvalues[ansIndex]++;
+				$scope.totalcount++;
+			}
+			var tempValue = 0;
+			for (var i = 0; i < $scope.options.length - 1; i++) {
+				for (var j = i + 1; j < $scope.options.length; j++) {
+					if ($scope.mainvalues[j] > $scope.mainvalues[i]) {
+						tempValue = $scope.mainvalues[i];
+						$scope.mainvalues[i] = $scope.mainvalues[j];
+						$scope.mainvalues[j] = tempValue;
+
+						tempValue = $scope.mainlabels[i];
+						$scope.mainlabels[i] = $scope.mainlabels[j];
+						$scope.mainlabels[j] = tempValue;
+					}
+					if ($scope.othervalues[j] > $scope.othervalues[i]) {
+						tempValue = $scope.othervalues[i];
+						$scope.othervalues[i] = $scope.othervalues[j];
+						$scope.othervalues[j] = tempValue;
+
+						tempValue = $scope.otherlabels[i];
+						$scope.otherlabels[i] = $scope.otherlabels[j];
+						$scope.otherlabels[j] = tempValue;
+					}
+					if ($scope.totalvalues[j] > $scope.totalvalues[i]) {
+						tempValue = $scope.totalvalues[i];
+						$scope.totalvalues[i] = $scope.totalvalues[j];
+						$scope.totalvalues[j] = tempValue;
+
+						tempValue = $scope.totallabels[i];
+						$scope.totallabels[i] = $scope.totallabels[j];
+						$scope.totallabels[j] = tempValue;
+					}
+				}
+			}
+
+			$scope.changeGroupChoice();
+			$rootScope.setData('loadingfinished', true);
+			$rootScope.safeApply();
 		}
 		$scope.getIndex = function (arr) {
 			var ansIndex = 0;

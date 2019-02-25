@@ -4,15 +4,20 @@
 		.controller('groupResponseOfDropdownAnswerController', groupResponseOfDropdownAnswerController)
 	groupResponseOfDropdownAnswerController.$inject = ['$state', '$scope', '$rootScope'];
 	function groupResponseOfDropdownAnswerController($state, $scope, $rootScope) {
+		// **************   router:    groupResponseOfDropdownAnswer  *****************
 
 		$rootScope.setData('showMenubar', true);
-		$rootScope.setData('backUrl', "groupRoot");
+		var groupType = $rootScope.settings.groupType;
+		$rootScope.setData('backUrl', groupType == 'sub' ? "groupSubRoot" : "groupSecondRoot");
+
 		$scope.question = $rootScope.settings.question;
+		$scope.groupKey = $rootScope.settings.groupKey;
 		$scope.groupSetKey = $rootScope.settings.groupSetKey;
+		$scope.subIndex = $rootScope.settings.subIndex;
 		$scope.subSetKey = $rootScope.settings.subSetKey;
-		$scope.groupsets = $rootScope.settings.groupsets;
-		$scope.subNames = ["All Sub Groups"];
-		$scope.secondNames = ["All 2nd Sub Groups"];
+		$scope.secondIndex = $rootScope.settings.secondIndex;
+		$scope.groupChoice = $scope.groupChoice ? $scope.groupChoice : 'main';
+
 		var max_length = 60;
 		let optionCount = $scope.question.options.length
 		$scope.Lables = $scope.question.options;
@@ -21,18 +26,6 @@
 				$scope.Lables[i] = $scope.Lables[i].substring(0, max_length) + "...";
 			}
 		}
-		for (var i = 0; i < $scope.groupsets.count; i++) {
-            let name = $scope.groupsets.data.groups[i].name || $scope.groupsets.name + ' ' + (i + 1);
-            $scope.subNames.push(name);
-        }
-
-
-        if ($rootScope.settings.groupType == 'second') {
-            for (var i = 0; i < $scope.groupsets.subgroupsets[$scope.subSetKey].count; i++) {
-                let name = $scope.groupsets.data.groups[0].subgroupsets[$scope.subSetKey].groups[i].name || $scope.groupsets.subgroupsets[$scope.subSetKey].name + ' ' + (i + 1);
-                $scope.secondNames.push(name);
-            }
-        }
 		$rootScope.safeApply();
 
 		$scope.$on("$destroy", function () {
@@ -60,14 +53,13 @@
 				for (var key in snapshot.val()) {
 					var ansSnapshot = snapshot.val()[key];
 					var checkSubGroup = true;
-					if ($rootScope.settings.groupType == 'second') {
-						if (ansSnapshot.subSetKey != $scope.subSetKey) {
+					if (groupType == 'second') {
+						if (ansSnapshot.subIndex != $scope.subIndex || ansSnapshot.subSetKey != $scope.subSetKey) {
 							checkSubGroup = false;
 						}
 					}
-
-					if (ansSnapshot.groupType == $rootScope.settings.groupType && ansSnapshot.studentgroupkey == $rootScope.settings.groupKey
-						&& ansSnapshot.groupSetKey == $rootScope.settings.groupSetKey && checkSubGroup) {
+					if (ansSnapshot.groupType == groupType && ansSnapshot.studentgroupkey == $scope.groupKey
+						&& ansSnapshot.groupSetKey == $scope.groupSetKey && checkSubGroup) {
 						$scope.allAnswers[key] = ansSnapshot
 					}
 				}
@@ -79,33 +71,29 @@
 			if (!$scope.ref_1 || !$scope.ref_2) return
 
 			switch ($scope.question.enableGroup) {
-                case 'email':
-                    $scope.filterList = ['All Users']
-                    for (key in $scope.allAnswers) {
-                        let userKey = $scope.allAnswers[key].uid
-                        if ($scope.filterList.indexOf($scope.users[userKey].institution) == -1) $scope.filterList.push($scope.users[userKey].institution)
-                    }
-                    $scope.selectedFilter = ($scope.selectedFilter && $scope.filterList.indexOf($scope.selectedFilter) > -1) ? $scope.selectedFilter : 'All Users'
-                    break;
-                default:
-                    $scope.filterList = undefined
-                    break;
+				case 'email':
+					$scope.filterList = ['All Users']
+					for (key in $scope.allAnswers) {
+						let userKey = $scope.allAnswers[key].uid
+						if ($scope.filterList.indexOf($scope.users[userKey].institution) == -1) $scope.filterList.push($scope.users[userKey].institution)
+					}
+					$scope.selectedFilter = ($scope.selectedFilter && $scope.filterList.indexOf($scope.selectedFilter) > -1) ? $scope.selectedFilter : 'All Users'
+					break;
+				default:
+					$scope.filterList = undefined
+					break;
 			}
-			
-			$scope.answers = [];
-			for (var i = 0; i < $scope.subNames.length; i++) {
-				for (var j = 0; j < $scope.secondNames.length; j++) {
-					$scope.answers.push({
-						values: Array(optionCount).fill(0),
-						total: 0,
-					});
-				}
-			}
+
+			$scope.mainvalues = Array(optionCount).fill(0)
+			$scope.othervalues = Array(optionCount).fill(0)
+			$scope.totalvalues = Array(optionCount).fill(0)
+
+			$scope.maincount = 0;
+			$scope.othercount = 0;
+			$scope.totalcount = 0;
 
 			for (anskey in $scope.allAnswers) {
-				var answer = $scope.allAnswers[anskey];
-				var answerkey = answer.answerkey;
-
+				let answer = $scope.allAnswers[anskey]
 				let isMatched = true
 				switch ($scope.question.enableGroup) {
 					case 'email':
@@ -115,46 +103,60 @@
 						break;
 				}
 				if (!isMatched) continue
-
-				$scope.answers[0].values[answerkey]++
-				$scope.answers[0].total++;
-
-				var index = answer.subIndex + 1;
-				$scope.answers[index].values[answerkey]++
-				$scope.answers[index].total++;
-
-
-				if ($rootScope.settings.groupType == 'second') {
-					index = (answer.subIndex + 1) * $scope.secondNames.length;
-					$scope.answers[index].values[answerkey]++
-					$scope.answers[index].total++;
-
-					index = (answer.subIndex + 1) * $scope.secondNames.length + answer.secondIndex + 1;
-					$scope.answers[index].values[answerkey]++
-					$scope.answers[index].total++;
+				var checkSameSubGroup = true;
+				if (groupType == 'sub') {
+					if (answer.subIndex != $scope.subIndex) {
+						checkSameSubGroup = false;
+					}
+				} else {
+					if (answer.secondIndex != $scope.secondIndex) {
+						checkSameSubGroup = false;
+					}
 				}
+
+				let key = answer.answerkey;
+				if (checkSameSubGroup) {
+					$scope.mainvalues[key]++
+					$scope.maincount++;
+				} else {
+					$scope.othervalues[key]++
+					$scope.othercount++;
+				}
+				$scope.totalvalues[key]++
+				$scope.totalcount++;
 			}
-			$scope.GroupIndex = $scope.GroupIndex == undefined ? 0 : $scope.GroupIndex;
-			$scope.SubGroupIndex = $scope.SubGroupIndex == undefined ? 0 : $scope.SubGroupIndex;
-			$scope.changeGroup();
+
 			$rootScope.setData('loadingfinished', true)
 			$rootScope.safeApply();
+			$scope.changeGroupChoice();
 		}
 
-		$scope.changeGroup = function () {
-			$scope.selectedIndex = $scope.GroupIndex * $scope.secondNames.length + $scope.SubGroupIndex;
-			$scope.chartDescription = ""
-			$scope.drawDropdownAnswerChart();
+		$scope.changeGroupChoice = function () {
+			switch ($scope.groupChoice) {
+				case 'main':
+					$scope.chartDescription = "Compared only in your group!";
+					$scope.numberOfAnswers = $scope.maincount;
+					$scope.paintgraph($scope.mainvalues, "pieChart");
+					break;
+				case 'other':
+					$scope.chartDescription = "Compared to all groups except your group!";
+					$scope.numberOfAnswers = $scope.othercount;
+					$scope.paintgraph($scope.othervalues, "pieChart");
+					break;
+				case 'all':
+					$scope.chartDescription = "Compared to all groups include your group!";
+					$scope.numberOfAnswers = $scope.totalcount;
+					$scope.paintgraph($scope.totalvalues, "pieChart");
+					break;
+			}
 			$rootScope.safeApply();
 		}
 
-		$scope.drawDropdownAnswerChart = function () {
-			var data = $scope.answers[$scope.selectedIndex];
-			$scope.numberOfAnswers = data.total;
-			$scope.paintgraph(data.values, "pieChart");
-			$rootScope.safeApply();
-		}
+
 		$scope.paintgraph = function (value, Dom) {
+			if ($scope.numberOfAnswers == 0) {
+				$rootScope.error("Sorry,There is not any data!");
+			}
 			var canvas = document.getElementById(Dom);
 			var ctx = canvas.getContext("2d");
 			// ==========update chart================

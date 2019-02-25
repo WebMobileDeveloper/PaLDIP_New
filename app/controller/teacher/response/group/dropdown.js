@@ -4,7 +4,7 @@
 		.controller('responseOfDropdownAnswerController', responseOfDropdownAnswerController)
 	responseOfDropdownAnswerController.$inject = ['$state', '$scope', '$rootScope'];
 	function responseOfDropdownAnswerController($state, $scope, $rootScope) {
-		// **************   router:    groupRoot  *****************
+		// **************   router:    responseOfDropdownAnswer  *****************
 
 		$rootScope.setData('showMenubar', true);
 		$rootScope.setData('backUrl', "groupRoot");

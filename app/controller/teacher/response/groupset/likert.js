@@ -5,37 +5,26 @@
 		.controller('groupResponseOfLikertAnswerController', groupResponseOfLikertAnswerController)
 	groupResponseOfLikertAnswerController.$inject = ['$state', '$scope', '$rootScope'];
 	function groupResponseOfLikertAnswerController($state, $scope, $rootScope) {
+		// **************   router:    groupResponseOfLikertAnswer  *****************
 
 		$rootScope.setData('showMenubar', true);
-		$rootScope.setData('backUrl', "groupRoot");
-		$scope.questionSetKey = $rootScope.settings.questionSet.key;
-		$scope.groupsets = $rootScope.settings.groupsets
+		var groupType = $rootScope.settings.groupType;
+		$rootScope.setData('backUrl', groupType == 'sub' ? "groupSubRoot" : "groupSecondRoot");
 
-		$scope.groupName = $rootScope.settings.groupName
-		$scope.groupSetName = $scope.groupsets.name
-		$scope.subGroupNames = []
+		$scope.question = $rootScope.settings.question;
+		$scope.groupKey = $rootScope.settings.groupKey;
+		$scope.groupSetKey = $rootScope.settings.groupSetKey;
+		$scope.subIndex = $rootScope.settings.subIndex;
+		$scope.subSetKey = $rootScope.settings.subSetKey;
+		$scope.secondIndex = $rootScope.settings.secondIndex;
 
-		$scope.groupsets.data.groups.forEach((group, index) => {
-			$scope.subGroupNames[index] = group.name ? group.name : $scope.groupSetName + " " + (index + 1)
-		});
+		$scope.questionSetKey = $scope.question.Set;
 
-
-		if ($rootScope.settings.groupType == 'second') {
-			$scope.subGroupsetName = $scope.groupsets.subgroupsets[$rootScope.settings.subSetKey].name
-			$scope.secondGroupNames = []
-			let secondGroups = $scope.groupsets.data.groups[0].subgroupsets[$rootScope.settings.subSetKey].groups
-			secondGroups.forEach((group, index) => {
-				$scope.secondGroupNames[index] = group.name ? group.name : $scope.subGroupsetName + " " + (index + 1)
-			});
-		}
-
-
-
-		var settingRefStr = 'Groups/' + $rootScope.settings.groupKey + '/groupLikertSettings/'
-		if ($rootScope.settings.groupType == 'sub') {
-			settingRefStr = settingRefStr + '/groupsets/' + $rootScope.settings.groupSetKey + '/' + $scope.questionSetKey;
+		var settingRefStr = 'Groups/' + $scope.groupKey + '/groupLikertSettings/'
+		if (groupType == 'sub') {
+			settingRefStr = settingRefStr + '/groupsets/' + $scope.groupSetKey + '/' + $scope.questionSetKey;
 		} else {
-			settingRefStr = settingRefStr + '/subgroupsets/' + $rootScope.settings.groupSetKey + '/' + $rootScope.settings.subSetKey + '/' + $scope.questionSetKey;
+			settingRefStr = settingRefStr + '/subgroupsets/' + $scope.groupSetKey + '/' + $scope.subSetKey + '/' + $scope.questionSetKey;
 		}
 		$scope.legendItems = ['average in all group',
 			'average in group',
@@ -60,6 +49,7 @@
 			$scope.getGroupLikertSettings();
 			$scope.getSetData();
 		}
+		
 		$scope.getGroupLikertSettings = function () {
 			$scope.showSettingRef = firebase.database().ref(settingRefStr);
 			$scope.showSettingRef.on('value', function (snapshot) {
@@ -189,7 +179,7 @@
 						for (subIndex in setAns) {
 							var childGroupAnsExist = false;
 
-							if ($rootScope.settings.groupType == 'sub') {
+							if (groupType == 'sub') {
 								var subGroupAns = setAns[subIndex].answers || {};
 								for (userKey in subGroupAns) {
 									var userAns = subGroupAns[userKey].answer;
@@ -399,6 +389,7 @@
 					}
 				}
 				$scope.answers = $scope.calcAverage($scope.answers);
+				console.log($scope.answers)
 				calcValues();
 			});
 		}
@@ -437,81 +428,119 @@
 			}
 			return tempans;
 		}
-
+		$scope.addValue = function (data, label, color, pointStyle, radius, show_id = undefined) {
+			if (data == undefined) {
+				console.log(label)
+			}
+			$scope.calcValues.push(angular.copy(data));
+			$scope.labels.push(label);
+			$scope.colors.push(color);
+			$scope.pointStyles.push(pointStyle);
+			$scope.radiuses.push(radius);
+			if (show_id) {
+				$scope.userKeys.push(Array(data.length).fill(show_id))
+			} else {
+				$scope.userKeys.push(Array(data.length).fill(undefined))
+			}
+			$rootScope.safeApply();
+		}
 		calcValues = function () {
 			var colors = ['#0000FF', '#FF0000', '#00FF00', '#FFFF00', '#FF00FF', '#FF8080', '#808080', '#C2B280', '#800000', '#FF8000', '#803E75', '#A6BDD7', '#817066', '#007D34',
 				'#00538A', '#53377A', '#B32851', '#593315', '#232C16', '#DCD300', '#882D17', '#8DB600', '#654522', '#E25822', '#2B3D26', '#0000FF', '#FF0000', '#00FF00', '#FF00FF', '#000000'];
-
-			$scope.labels = ['average in all group', 'average in group', 'average in groupset'];
-			$scope.colors = ['#FFC000', '#00B050', '#7A049C'];
-			$scope.pointStyles = ['rectRounded', 'rectRounded', 'rect'];
-			$scope.radiuses = [8, 8, 8];
-
-
-			//range of scores in group(class)
-
-			//============= get subscale answers  =============
-
-			//============= get subscale answers  =============
 			var R = $rootScope.settings;
-			let xLength = $scope.subscaleKeys.length + 2
-			// $scope.calcValues.push(Array(xLength).fill(undefined))
 			$scope.calcValues = [];
-			$scope.calcValues.push(angular.copy($scope.answers['average']));
+			$scope.labels = [];
+			$scope.colors = [];
+			$scope.pointStyles = [];
+			$scope.radiuses = [];
+			$scope.userKeys = [];
 
-			if (!$scope.answers[R.groupKey]) $scope.answers[R.groupKey] = { 'average': Array(xLength).fill(undefined) }
-			$scope.calcValues.push(angular.copy($scope.answers[R.groupKey]['average']));
+			//============= get subscale answers  =============
+			var options = $scope.groupLikertSettings.legendOptions;
+			// average in all group
+			if (options[$scope.legendItems[0]].visible) {
+				$scope.addValue($scope.answers.average, options[$scope.legendItems[0]].label, '#FFC000', 'rectRounded', 10);
+			}
+			// average in group
+			if (options[$scope.legendItems[1]].visible) {
+				$scope.addValue($scope.answers[R.groupKey].average, options[$scope.legendItems[1]].label, '#00B050', 'rectRounded', 10);
+			}
 
-			if (!$scope.answers[R.groupKey][R.groupSetKey]) $scope.answers[R.groupKey][R.groupSetKey] = { 'average': Array(xLength).fill(undefined) }
-			$scope.calcValues.push(angular.copy($scope.answers[R.groupKey][R.groupSetKey]['average']));
 
-
+			// average in tutorial set
+			var setans = $scope.answers[R.groupKey][R.groupSetKey];
+			if (Object.keys(setans).length > 2 && options[$scope.legendItems[2]].visible) {
+				$scope.addValue(setans.average, options[$scope.legendItems[2]].label, '#7A049C', 'rectRounded', 10);
+			}
 
 			if (R.groupType == 'sub') {
-				var setAns = $scope.answers[R.groupKey][R.groupSetKey];
-				for (key in setAns) {
-					if (key != 'average') {
-						$scope.calcValues.push(angular.copy(setAns[key]['average']));
-						$scope.labels.push('average of ' + $scope.subGroupNames[key]);
-						$scope.colors.push('#' + colors[key % colors.length]);
-						$scope.pointStyles.push('circle');
-						$scope.radiuses.push(4);
+				// average in your tutorial
+				var tutoAns = setans[R.subIndex];
+				if (options[$scope.legendItems[3]].visible) {
+					$scope.addValue(tutoAns.average, options[$scope.legendItems[3]].label, '#0432FF', 'triangle', 10);
+				}
+				// // your score
+				// if (options[$scope.legendItems[8]].visible) {
+				// 	$scope.addValue(tutoAns[R.userId], options[$scope.legendItems[8]].label, '#FF0000', 'circle', 8);
+				// }
+
+				$scope.mainValues = $scope.calcValues.length;
+				// score of tutorial members
+				var index = 0;
+				for (tutoUserID in tutoAns) {
+					if (tutoUserID != 'average' && options[$scope.legendItems[4]].visible) {
+						// && tutoUserID != R.userId
+						$scope.addValue(tutoAns[tutoUserID], 'score of tutorial members', colors[(colors.length - 1 - index) % colors.length], 'circle', 6);
+						index++;
 					}
 				}
 			} else {
-				var setAns = $scope.answers[R.groupKey][R.groupSetKey];
-				for (key in setAns) {
-					if (key != 'average') {
-						$scope.calcValues.push(angular.copy(setAns[key]['average']));
-						$scope.labels.push('average of ' + $scope.subGroupNames[key]);
-						$scope.colors.push('#' + colors[key % colors.length]);
-						$scope.pointStyles.push('triangle');
-						$scope.radiuses.push(8);
+				// average in your tutorial
+				var tutoAns = setans[R.subIndex];
+				if (options[$scope.legendItems[3]].visible) {
+					$scope.addValue(tutoAns.average, options[$scope.legendItems[3]].label, '#0432FF', 'rect', 10);
+				}
+				// average in team set
+				var teamSetAns = tutoAns[R.subSetKey];
+				if (Object.keys(teamSetAns).length > 2 && options[$scope.legendItems[5]].visible) {
+					$scope.addValue(teamSetAns.average, options[$scope.legendItems[5]].label, '#FF00FF', 'rect', 8);
+				}
 
+				console.log(teamSetAns)
+				console.log(R.secondIndex)
+				// average in team
+				var teamAns = teamSetAns[R.secondIndex];
+				if (options[$scope.legendItems[6]].visible) {
+					$scope.addValue(teamAns.average, options[$scope.legendItems[6]].label, '#FF8080', 'triangle', 8);
+				}
+				// // your score
+				// if (options[$scope.legendItems[8]].visible) {
+				// 	$scope.addValue(teamAns[R.userId], options[$scope.legendItems[8]].label, '#FF0000', 'circle', 6);
+				// }
 
-						var teamsetAns = setAns[key][R.subSetKey];
-						$scope.calcValues.push(angular.copy(teamsetAns['average']));
-						$scope.labels.push('average of subgroupset');
-						$scope.colors.push('#FF0000');
-						$scope.pointStyles.push('rect');
-						$scope.radiuses.push(6);
-
-						for (key1 in teamsetAns) {
-							if (key1 != 'average') {
-								$scope.calcValues.push(angular.copy(teamsetAns[key1]['average']));
-								$scope.labels.push('average of ' + $scope.secondGroupNames[key1]);
-								$scope.colors.push(colors[(colors.length - 1 - key1) % colors.length]);
-								$scope.pointStyles.push('circle');
-								$scope.radiuses.push(4);
-							}
+				$scope.mainValues = $scope.calcValues.length;
+				// score of team members
+				var index = 0;
+				for (teamUserID in teamAns) {
+					if (teamUserID != 'average' && options[$scope.legendItems[7]].visible) {
+						// && teamUserID != R.userId
+						$scope.addValue(teamAns[teamUserID], options[$scope.legendItems[7]].label, colors[(colors.length - 1 - index) % colors.length], 'circle', 4);
+						index++;
+					}
+				}
+			}
+			var dataLength = $scope.calcValues[0].length
+			for (var i = 1; i < $scope.calcValues.length; i++) {
+				for (var j = 0; j < i; j++) {
+					for (var k = 0; k < dataLength; k++) {
+						if ($scope.calcValues[i][k] != undefined && $scope.calcValues[i][k] == $scope.calcValues[j][k] && $scope.userKeys[i][k] != undefined && $scope.userKeys[j][k] != undefined) {
+							$scope.userKeys[j][k] = $scope.userKeys[j][k] + ', ' + $scope.userKeys[i][k]
+							$scope.userKeys[i][k] = undefined
+							$scope.calcValues[i][k] = undefined
 						}
 					}
 				}
 			}
-
-
-
-
 
 			// calc labels
 			$scope.scoreLabels = [];
@@ -543,6 +572,111 @@
 			}
 			$scope.draw();
 		}
+		// calcValues = function () {
+		// 	var colors = ['#0000FF', '#FF0000', '#00FF00', '#FFFF00', '#FF00FF', '#FF8080', '#808080', '#C2B280', '#800000', '#FF8000', '#803E75', '#A6BDD7', '#817066', '#007D34',
+		// 		'#00538A', '#53377A', '#B32851', '#593315', '#232C16', '#DCD300', '#882D17', '#8DB600', '#654522', '#E25822', '#2B3D26', '#0000FF', '#FF0000', '#00FF00', '#FF00FF', '#000000'];
+
+		// 	$scope.labels = ['average in all group', 'average in group', 'average in groupset'];
+		// 	$scope.colors = ['#FFC000', '#00B050', '#7A049C'];
+		// 	$scope.pointStyles = ['rectRounded', 'rectRounded', 'rect'];
+		// 	$scope.radiuses = [8, 8, 8];
+
+
+		// 	//range of scores in group(class)
+
+		// 	//============= get subscale answers  =============
+
+		// 	//============= get subscale answers  =============
+		// 	var R = $rootScope.settings;
+		// 	let xLength = $scope.subscaleKeys.length + 2
+		// 	// $scope.calcValues.push(Array(xLength).fill(undefined))
+		// 	$scope.calcValues = [];
+		// 	$scope.calcValues.push(angular.copy($scope.answers['average']));
+
+		// 	if (!$scope.answers[R.groupKey]) $scope.answers[R.groupKey] = { 'average': Array(xLength).fill(undefined) }
+		// 	$scope.calcValues.push(angular.copy($scope.answers[R.groupKey]['average']));
+
+		// 	if (!$scope.answers[R.groupKey][R.groupSetKey]) $scope.answers[R.groupKey][R.groupSetKey] = { 'average': Array(xLength).fill(undefined) }
+		// 	$scope.calcValues.push(angular.copy($scope.answers[R.groupKey][R.groupSetKey]['average']));
+
+
+
+		// 	if (R.groupType == 'sub') {
+		// 		var setAns = $scope.answers[R.groupKey][R.groupSetKey];
+		// 		for (key in setAns) {
+		// 			if (key != 'average') {
+		// 				$scope.calcValues.push(angular.copy(setAns[key]['average']));
+		// 				$scope.labels.push('average of ' + $scope.subGroupNames[key]);
+		// 				$scope.colors.push('#' + colors[key % colors.length]);
+		// 				$scope.pointStyles.push('circle');
+		// 				$scope.radiuses.push(4);
+		// 			}
+		// 		}
+		// 	} else {
+		// 		var setAns = $scope.answers[R.groupKey][R.groupSetKey];
+		// 		for (key in setAns) {
+		// 			if (key != 'average') {
+		// 				$scope.calcValues.push(angular.copy(setAns[key]['average']));
+		// 				$scope.labels.push('average of ' + $scope.subGroupNames[key]);
+		// 				$scope.colors.push('#' + colors[key % colors.length]);
+		// 				$scope.pointStyles.push('triangle');
+		// 				$scope.radiuses.push(8);
+
+
+		// 				var teamsetAns = setAns[key][R.subSetKey];
+		// 				$scope.calcValues.push(angular.copy(teamsetAns['average']));
+		// 				$scope.labels.push('average of subgroupset');
+		// 				$scope.colors.push('#FF0000');
+		// 				$scope.pointStyles.push('rect');
+		// 				$scope.radiuses.push(6);
+
+		// 				for (key1 in teamsetAns) {
+		// 					if (key1 != 'average') {
+		// 						$scope.calcValues.push(angular.copy(teamsetAns[key1]['average']));
+		// 						$scope.labels.push('average of ' + $scope.secondGroupNames[key1]);
+		// 						$scope.colors.push(colors[(colors.length - 1 - key1) % colors.length]);
+		// 						$scope.pointStyles.push('circle');
+		// 						$scope.radiuses.push(4);
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+
+
+
+
+
+		// 	// calc labels
+		// 	$scope.scoreLabels = [];
+		// 	for (key in $scope.setData.labels) {
+		// 		label = $scope.setData.labels[key];
+		// 		if (!label.subscales) continue;
+		// 		var result = true;
+		// 		for (var i = 0; i < label.subscales.length; i++) {
+		// 			var subscale = label.subscales[i];
+		// 			var subIndex = $scope.subscaleKeys.indexOf(subscale.subscaleKey);
+		// 			switch (subscale.operator) {
+		// 				case ">":
+		// 					result = result && ($scope.calcValues[0][subIndex] > subscale.num);
+		// 					break;
+		// 				case ">=":
+		// 					result = result && ($scope.calcValues[0][subIndex] >= subscale.num);
+		// 					break;
+		// 				case "<":
+		// 					result = result && ($scope.calcValues[0][subIndex] < subscale.num);
+		// 					break;
+		// 				case "<=":
+		// 					result = result && ($scope.calcValues[0][subIndex] <= subscale.num);
+		// 					break;
+		// 			}
+		// 		}
+		// 		if (result) {
+		// 			$scope.scoreLabels.push(label.title);
+		// 		}
+		// 	}
+		// 	$scope.draw();
+		// }
 		$scope.draw = function () {
 			var data = [];
 			for (i = 0; i < $scope.calcValues.length; i++) {

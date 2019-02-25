@@ -1,39 +1,16 @@
-<div class="container" ng-init="initExport()" style="margin-top:10px; margin-bottom: 40px;">
-
-    <div class="row question-div center">
-        <label class="qst-title" ng-if='question.title'>{{question.title}}</label>
-        {{question.question}}
-    </div>
-
-    <div class="row button-row center">
-        <div class="col-md-6 col-sm-6">
-            <md-input-container flex>
-                <label for="username">Sub Groupset</label>
-                <md-select data-ng-model="GroupIndex" class="md-block flex-gt-sm" ng-change="changeGroup()"
-                    md-container-class="dropDown">
-                    <md-option data-ng-value="$index" data-ng-repeat="name in subNames">{{ name }}</md-option>
-                </md-select>
-            </md-input-container>
+<div class="container" ng-init="init()">
+    <div class="answer-form" ng-if="$root.settings.loadingfinished">
+        <div class="row question-div center">
+            <label class="qst-title" ng-if='question.title'>{{question.title}}</label>
+            {{question.question}}
         </div>
-        <div class="col-md-6 col-sm-6">
-            <md-input-container flex>
-                <label for="username">2nd Sub Groupset</label>
-                <md-select data-ng-model="SubGroupIndex" class="md-block flex-gt-sm" ng-change="changeGroup()"
-                    md-container-class="dropDown" ng-disabled="$root.settings.groupType =='sub'">
-                    <md-option data-ng-value="$index" data-ng-repeat="name in secondNames">{{ name }}</md-option>
-                </md-select>
-            </md-input-container>
-        </div>
-
-    </div>
-    <div class="row center">
-        <h4 ng-if="answers[selectedIndex].length==0">There isn't any answer data!</h4>
-    </div>
-    <div class="answer-form" ng-if="answers[selectedIndex].length>0">
+        <hr />
         <div class="row">
             <div class="col-md-12">
                 <div class="well">
-                    <label style="margin-left: 20px; color: #a2a2a2;">Answers</label>
+                    <label
+                        style="margin-left: 20px; color: #a2a2a2;">{{top_answers?'Top ' + top_answers + ' Answers':'All Answers'}}
+                    </label>
                     <md-radio-group ng-model="orderBy" ng-change="orderChanged(orderBy)" class="order-radio">
                         <md-radio-button value="rating" class="md-primary">Rating</md-radio-button>
                         <md-radio-button value="awardScore" class="md-primary">Award Score</md-radio-button>
@@ -41,43 +18,39 @@
                     <label class="order-radio-label">Order By</label>
                     <div class="mid-cell">
                         <div class="answer-div">
-                            <div class="answer-list" ng-repeat="item in answers[selectedIndex]"
-                                ng-class="($index == itemIndex)?'selected':'';" ng-click="changeIndex($index)">
+                            <div class="answer-list" ng-repeat="item in answers track by $index"
+                                ng-class="($index == answerIndex)?'selected':'';" ng-click="changeIndex($index)">
                                 {{$index+1}}.&emsp;{{item.answer}}
-                                <span class="pull-right"
-                                    ng-if="orderBy=='rating'">{{item.avRating?item.avRating:'-'}}&emsp;</span>
-                                <span class="pull-right" ng-if="orderBy=='awardScore'">{{item.awardScore}}&emsp;</span>
+                                <span class="pull-right">{{orderBy=='rating'?item.totalScore:item.totalAwardScore}}&emsp;</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
         <div class="row starfield-container" ng-show="type">
-            <label style="color: #a2a2a2;">
-                Average Scores(&nbsp;{{answers[selectedIndex][itemIndex].userCount}}&nbsp; Feedbacks)
-            </label>
+            <hr />
+            <label style="color: #a2a2a2;">Total Scores(&nbsp;{{answers[answerIndex].userCount}}&nbsp;Feedbacks)</label>
             <div class="col-md-12 starfield">
                 <div class="row option-row" ng-repeat="option in feedqts track by $index">
-                    <div class="col-md-9 col-sm-9  col-xs-9 option">
+                    <div class="col-xs-9  option">
                         {{option}}
                     </div>
-                    <div class="col-md-3  col-sm-3 col-xs-3 center value">
-                        <span>{{answers[selectedIndex][itemIndex].scores[$index]}}</span>
+                    <div class="col-xs-3  value center">
+                        <span>{{answers[answerIndex].resultScore[$index]}}</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- <hr ng-if="type % 2 == 0" />​ -->
-        <div class="row feedText" ng-if="type % 2 == 0">
+        <div class="row feedText" ng-show="type % 2 == 0">
             <div class="col-md-12">
                 <div class="well ">
-                    <label style="margin-left: 20px;	color: #a2a2a2;">Feedbacks</label>
+                    <label style="margin-left: 20px; color: #a2a2a2;">Feedbacks</label>
                     <div class="mid-cell">
                         <div class="answer-div">
-                            <div ng-repeat="feed in answers[selectedIndex][itemIndex].feedbacktext track by $index">
+                            <div ng-repeat="feed in answers[answerIndex].feedbacktext track by $index">
                                 {{$index+1}}.&emsp;{{feed}}
                             </div>
                         </div>
@@ -85,6 +58,8 @@
                 </div>
             </div>
         </div>
+
+
         <!-- <hr /> -->
         <div class="row center navigation-row">
             <div class="col-md-6 col-sm-6 col-xs-6">

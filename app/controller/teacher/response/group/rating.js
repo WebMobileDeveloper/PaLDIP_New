@@ -5,7 +5,7 @@
         .controller('responseOfRatingAnswerController', responseOfRatingAnswerController)
 
     responseOfRatingAnswerController.$inject = ['$state', '$scope', '$rootScope', '$filter'];
-    // **************   router:    groupRoot  *****************
+    // **************   router:    responseOfRatingAnswer  *****************
 
     function responseOfRatingAnswerController($state, $scope, $rootScope, $filter) {
         $rootScope.setData('showMenubar', true);

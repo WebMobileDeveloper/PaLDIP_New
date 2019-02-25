@@ -4,11 +4,11 @@
 		.controller('responseOfLikertAnswerController', responseOfLikertAnswerController)
 	responseOfLikertAnswerController.$inject = ['$state', '$scope', '$rootScope', '$filter'];
 	function responseOfLikertAnswerController($state, $scope, $rootScope, $filter) {
-		// **************   router:    groupRoot  *****************
+		// **************   router:    responseOfLikertAnswer  *****************
 
 		$rootScope.setData('showMenubar', true);
 		$rootScope.setData('backUrl', "groupRoot");
-		$scope.setKey = $rootScope.settings.questionSetKey;
+		$scope.setKey = $rootScope.settings.questions.Set;
 		$scope.origin_groupKey = $rootScope.settings.origin_groupKey ? $rootScope.settings.origin_groupKey : '';
 		$scope.versionIndex = 0;
 		$rootScope.safeApply();

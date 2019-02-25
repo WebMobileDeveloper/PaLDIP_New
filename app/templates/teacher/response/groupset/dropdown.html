@@ -3,26 +3,7 @@
 		<label class="qst-title" ng-if='question.title'>{{question.title}}</label>
 		<label>{{question.question}}</label>
 	</div>
-	<div class="row button-row select-row">
-		<div class="col-md-6 col-sm-6">
-			<md-input-container flex>
-				<label for="username">Sub Groupset</label>
-				<md-select data-ng-model="GroupIndex" class="md-block flex-gt-sm" ng-change="changeGroup()" md-container-class="dropDown">
-					<md-option data-ng-value="$index" data-ng-repeat="name in subNames">{{ name }}</md-option>
-				</md-select>
-			</md-input-container>
-		</div>
-		<div class="col-md-6 col-sm-6">
-			<md-input-container flex>
-				<label for="username">2nd Sub Groupset</label>
-				<md-select data-ng-model="SubGroupIndex" class="md-block flex-gt-sm" ng-change="changeGroup()" md-container-class="dropDown"
-				 ng-disabled="$root.settings.groupType =='sub'">
-					<md-option data-ng-value="$index" data-ng-repeat="name in secondNames">{{ name }}</md-option>
-				</md-select>
-			</md-input-container>
-		</div>
-	</div>
-	<hr />
+
 	<div class="row chart-row">
 		<div class="chart-container">
 			<canvas id="pieChart" basechart="" width="550px" height="400px"></canvas>
@@ -34,7 +15,7 @@
 								color: #f75a9a;
 								font-size: 1.2em;
 								margin-top: 10px;">
-		<span>total answers:&emsp;{{numberOfAnswers}}</span>
+		<span ng-show="chartDescription">{{chartDescription}}&emsp;(total answers:&emsp;{{numberOfAnswers}})</span>
 	</div>
 	<div class="row" ng-show="question.enableGroup">
 		<md-input-container flex class="mb-0">
@@ -44,11 +25,19 @@
 			<div class="col-md-8">
 				<div class="form-group mb-0">
 					<select class="form-control" ng-model="selectedFilter" ng-change="finalCalc()">
-						<option ng-repeat="item in filterList track by $index" ng-value="item" ng-selected="item==selectedFilter">{{item}}</option>
+						<option ng-repeat="item in filterList track by $index" ng-value="item" ng-selected="item==selectedFilter">
+							{{item}}</option>
 					</select>
 				</div>
 			</div>
 		</md-input-container>
+	</div>
+	<div class="row main-other-choice">
+		<md-radio-group ng-model="groupChoice" ng-change="changeGroupChoice()" layout="row">
+			<md-radio-button value="main" class="md-primary">This Group</md-radio-button>
+			<md-radio-button value="other" class="md-primary">Other Groups</md-radio-button>
+			<md-radio-button value="all" class="md-primary">All Groups</md-radio-button>
+		</md-radio-group>
 	</div>
 	<div class="row button-row">
 		<a class="btn btn-link" myclick="$root.back()">Back</a>

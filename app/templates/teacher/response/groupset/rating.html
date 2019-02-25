@@ -4,28 +4,7 @@
         <label class="qst-title" ng-if='question.title'>{{question.title}}</label>
         {{question.question}}
     </div>
-
-    <div class="row button-row center">
-        <div class="col-md-6 col-sm-6">
-            <md-input-container flex>
-                <label for="username">Sub Groupset</label>
-                <md-select ng-model="GroupIndex" class="md-block flex-gt-sm" ng-change="changeGroup(GroupIndex)"
-                    md-container-class="dropDown" ng-disabled="question.teamRate && $root.settings.groupType == 'sub'">
-                    <md-option ng-value="$index" ng-repeat="name in subNames track by $index">{{ name }}</md-option>
-                </md-select>
-            </md-input-container>
-        </div>
-        <div class="col-md-6 col-sm-6">
-            <md-input-container flex>
-                <label for="username">2nd Sub Groupset</label>
-                <md-select ng-model="SubGroupIndex" class="md-block flex-gt-sm" ng-change="changeSubGroup(SubGroupIndex)"
-                    md-container-class="dropDown" ng-disabled="$root.settings.groupType =='sub' || question.teamRate">
-                    <md-option ng-value="$index" ng-repeat="name in secondNames track by $index">{{ name }}</md-option>
-                </md-select>
-            </md-input-container>
-        </div>
-
-    </div>
+    
     <div class="row answer-form">
         <div class="row">
             <div class="well">

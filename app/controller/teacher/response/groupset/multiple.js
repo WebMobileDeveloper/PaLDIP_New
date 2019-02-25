@@ -4,30 +4,24 @@
 		.controller('groupResponseOfMultipleAnswerController', groupResponseOfMultipleAnswerController)
 	groupResponseOfMultipleAnswerController.$inject = ['$state', '$scope', '$rootScope'];
 	function groupResponseOfMultipleAnswerController($state, $scope, $rootScope) {
+		// **************   router:    groupResponseOfMultipleAnswer  *****************
 
 		$rootScope.setData('showMenubar', true);
-		$rootScope.setData('backUrl', "groupRoot");
+		var groupType = $rootScope.settings.groupType;
+		$rootScope.setData('backUrl', groupType == 'sub' ? "groupSubRoot" : "groupSecondRoot");
 
 		$scope.question = $rootScope.settings.question;
+		$scope.groupKey = $rootScope.settings.groupKey;
 		$scope.groupSetKey = $rootScope.settings.groupSetKey;
+		$scope.subIndex = $rootScope.settings.subIndex;
 		$scope.subSetKey = $rootScope.settings.subSetKey;
-		$scope.groupsets = $rootScope.settings.groupsets;
-		$scope.options = $scope.question.options;
-		$scope.subNames = ["All Sub Groups"];
-		$scope.secondNames = ["All 2nd Sub Groups"];
-		var max_length = 60;
-		for (var i = 0; i < $scope.groupsets.count; i++) {
-            let name = $scope.groupsets.data.groups[i].name || $scope.groupsets.name + ' ' + (i + 1);
-            $scope.subNames.push(name);
-        }
+		$scope.secondIndex = $rootScope.settings.secondIndex;
 
-        if ($rootScope.settings.groupType == 'second') {
-            for (var i = 0; i < $scope.groupsets.subgroupsets[$scope.subSetKey].count; i++) {
-                let name = $scope.groupsets.data.groups[0].subgroupsets[$scope.subSetKey].groups[i].name || $scope.groupsets.subgroupsets[$scope.subSetKey].name + ' ' + (i + 1);
-                $scope.secondNames.push(name);
-            }
-        }
+
+        $scope.groupChoice = $scope.groupChoice ? $scope.groupChoice : 'main';
+		$scope.options = $scope.question.options;
 		$rootScope.safeApply();
+		
 		$scope.$on("$destroy", function () {
 			if ($scope.usersRef) $scope.usersRef.off('value')
 			if ($scope.answersRef) $scope.answersRef.off('value')
@@ -53,14 +47,14 @@
 				for (var key in snapshot.val()) {
 					var ansSnapshot = snapshot.val()[key];
 					var checkSubGroup = true;
-					if ($rootScope.settings.groupType == 'second') {
+					if (groupType == 'second') {
 						if (ansSnapshot.subSetKey != $scope.subSetKey) {
 							checkSubGroup = false;
 						}
 					}
 
-					if (ansSnapshot.groupType == $rootScope.settings.groupType && ansSnapshot.studentgroupkey == $rootScope.settings.groupKey
-						&& ansSnapshot.groupSetKey == $rootScope.settings.groupSetKey && checkSubGroup) {
+					if (ansSnapshot.groupType == groupType && ansSnapshot.studentgroupkey == $scope.groupKey
+						&& ansSnapshot.groupSetKey == $scope.groupSetKey && checkSubGroup) {
 						$scope.allAnswers[key] = ansSnapshot
 					}
 				}
@@ -85,24 +79,26 @@
 					break;
 			}
 
-			$scope.answers = [];
-			for (var i = 0; i < $scope.subNames.length; i++) {
-				for (var j = 0; j < $scope.secondNames.length; j++) {
-					var values = [];
-					var labels = [];
-					for (var k = 0; k < $scope.options.length; k++) {
-						values.push(0);
-						labels.push($scope.options[k]);
-					}
-					$scope.answers.push({
-						values: values,
-						labels: labels,
-						total: 0,
-					});
-				}
+			$scope.mainvalues = [];
+			$scope.mainlabels = [];
+			$scope.othervalues = [];
+			$scope.otherlabels = [];
+			$scope.totalvalues = [];
+			$scope.totallabels = [];
+
+			$scope.maincount = 0;
+			$scope.othercount = 0;
+			$scope.totalcount = 0;
+			for (var i = 0; i < $scope.options.length; i++) {
+				$scope.mainvalues.push(0);
+				$scope.othervalues.push(0);
+				$scope.totalvalues.push(0);
+				$scope.mainlabels.push($scope.options[i]);
+				$scope.otherlabels.push($scope.options[i]);
+				$scope.totallabels.push($scope.options[i]);
 			}
-			for (anskey in $scope.allAnswers) {
-				var answer = $scope.allAnswers[anskey];
+			for (var anskey in $scope.allAnswers) {
+				let answer = $scope.allAnswers[anskey]
 				let isMatched = true
 				switch ($scope.question.enableGroup) {
 					case 'email':
@@ -112,78 +108,93 @@
 						break;
 				}
 				if (!isMatched) continue
+				var checkSameSubGroup = true;
 
 				var answerArr = answer.answer.split("#%%#");
-				for (var k = 0; k < $scope.options.length; k++) {
-					if (answerArr.indexOf($scope.options[k]) > -1) {
-						$scope.answers[0].values[k]++;
-						$scope.answers[answer.subIndex + 1].values[k]++;
+				var checkSameSubGroup = true;
+				if (groupType == 'sub') {
+					if (answer.subIndex != $scope.subIndex) {
+						checkSameSubGroup = false;
+					}
+				} else {
+					if (answer.secondIndex != $scope.secondIndex) {
+						checkSameSubGroup = false;
 					}
 				}
-				$scope.answers[0].total++;
-				$scope.answers[answer.subIndex + 1].total++;
 
-
-
-				if ($rootScope.settings.groupType == 'second') {
-					for (var k = 0; k < $scope.options.length; k++) {
-						if (answerArr.indexOf($scope.options[k]) > -1) {
-							$scope.answers[(answer.subIndex + 1) * $scope.secondNames.length].values[k]++;
-							$scope.answers[(answer.subIndex + 1) * $scope.secondNames.length + answer.secondIndex + 1].values[k]++;
-						}
+				if (checkSameSubGroup) {
+					for (var i = 0; i < $scope.options.length; i++) {
+						if (answerArr.indexOf($scope.options[i]) > -1) $scope.mainvalues[i]++;
 					}
-					$scope.answers[(answer.subIndex + 1) * $scope.secondNames.length].total++;
-					$scope.answers[(answer.subIndex + 1) * $scope.secondNames.length + answer.secondIndex + 1].total++;
-				}
-
-				var tempValue = 0;
-				for (var index = 0; index < $scope.answers.length; index++) {
-					for (var i = 0; i < $scope.options.length - 1; i++) {
-						for (var j = i + 1; j < $scope.options.length; j++) {
-							if ($scope.answers[index].values[j] > $scope.answers[index].values[i]) {
-								tempValue = $scope.answers[index].values[i];
-								$scope.answers[index].values[i] = $scope.answers[index].values[j];
-								$scope.answers[index].values[j] = tempValue;
-
-								tempValue = $scope.answers[index].labels[i];
-								$scope.answers[index].labels[i] = $scope.answers[index].labels[j];
-								$scope.answers[index].labels[j] = tempValue;
-							}
-						}
+					$scope.maincount++;
+				} else {
+					for (var i = 0; i < $scope.options.length; i++) {
+						if (answerArr.indexOf($scope.options[i]) > -1) $scope.othervalues[i]++;
 					}
+					$scope.othercount++;
 				}
-				
+				for (var i = 0; i < $scope.options.length; i++) {
+					if (answerArr.indexOf($scope.options[i]) > -1) $scope.totalvalues[i]++;
+				}
+				$scope.totalcount++;
+
 			}
-			$scope.GroupIndex = $scope.GroupIndex == undefined ? 0 : $scope.GroupIndex;
-			$scope.SubGroupIndex = $scope.SubGroupIndex == undefined ? 0 : $scope.SubGroupIndex;
-			$scope.changeGroup();
-			$rootScope.setData('loadingfinished', true)
-		}
+			var tempValue = 0;
+			for (var i = 0; i < $scope.options.length - 1; i++) {
+				for (var j = i + 1; j < $scope.options.length; j++) {
+					if ($scope.mainvalues[j] > $scope.mainvalues[i]) {
+						tempValue = $scope.mainvalues[i];
+						$scope.mainvalues[i] = $scope.mainvalues[j];
+						$scope.mainvalues[j] = tempValue;
 
-		$scope.changeGroup = function () {
+						tempValue = $scope.mainlabels[i];
+						$scope.mainlabels[i] = $scope.mainlabels[j];
+						$scope.mainlabels[j] = tempValue;
+					}
+					if ($scope.othervalues[j] > $scope.othervalues[i]) {
+						tempValue = $scope.othervalues[i];
+						$scope.othervalues[i] = $scope.othervalues[j];
+						$scope.othervalues[j] = tempValue;
 
-			$scope.selectedIndex = $scope.GroupIndex * $scope.secondNames.length + $scope.SubGroupIndex;
-			$scope.chartDescription = ""
-			$scope.drawMultipleAnswerChart();
-			$rootScope.safeApply();
-		}
+						tempValue = $scope.otherlabels[i];
+						$scope.otherlabels[i] = $scope.otherlabels[j];
+						$scope.otherlabels[j] = tempValue;
+					}
+					if ($scope.totalvalues[j] > $scope.totalvalues[i]) {
+						tempValue = $scope.totalvalues[i];
+						$scope.totalvalues[i] = $scope.totalvalues[j];
+						$scope.totalvalues[j] = tempValue;
 
-		$scope.drawMultipleAnswerChart = function () {
-
-			var data = $scope.answers[$scope.selectedIndex];
-			var labels = [];
-			var values = [];
-			for (var k = 0; k < data.values.length; k++) {
-				if (data.labels[k] == undefined)
-					continue;
-				// $scope.mainvalues.push(Math.round(mainvalues[k] / $scope.maincount * 100 * 10) / 10);
-				values.push(data.values[k]);
-				labels.push(data.labels[k].substring(0, max_length) + "...");
+						tempValue = $scope.totallabels[i];
+						$scope.totallabels[i] = $scope.totallabels[j];
+						$scope.totallabels[j] = tempValue;
+					}
+				}
 			}
-			$scope.numberOfAnswers = data.total;
-			$scope.paintgraph(labels, values, "barChart");
-			$rootScope.safeApply();
+			$scope.changeGroupChoice()
+			$rootScope.setData('loadingfinished', true);
 		}
+
+		$scope.changeGroupChoice = function () {
+            switch ($scope.groupChoice) {
+                case 'main':
+                    $scope.chartDescription = "Compared only in your group!";
+                    $scope.numberOfAnswers = $scope.maincount;
+                    $scope.paintgraph($scope.mainlabels, $scope.mainvalues, "barChart");
+                    break;
+                case 'other':
+                    $scope.chartDescription = "Compared to all groups except your group!";
+                    $scope.numberOfAnswers = $scope.othercount;
+                    $scope.paintgraph($scope.otherlabels, $scope.othervalues, "barChart");
+                    break;
+                case 'all':
+                    $scope.chartDescription = "Compared to all groups include your group!";
+                    $scope.numberOfAnswers = $scope.totalcount;
+                    $scope.paintgraph($scope.totallabels, $scope.totalvalues, "barChart");
+                    break;
+            }
+            $rootScope.safeApply();
+        }
 
 		$scope.paintgraph = function (title, value, Dom) {
 			var canvas = document.getElementById(Dom);

@@ -4,7 +4,7 @@
 		.controller('responseOfMultipleAnswerController', responseOfMultipleAnswerController)
 	responseOfMultipleAnswerController.$inject = ['$state', '$scope', '$rootScope'];
 	function responseOfMultipleAnswerController($state, $scope, $rootScope) {
-		// **************   router:    groupRoot  *****************
+		// **************   router:    responseOfMultipleAnswer  *****************
 
 		$rootScope.setData('showMenubar', true);
 		$rootScope.setData('backUrl', "groupRoot");

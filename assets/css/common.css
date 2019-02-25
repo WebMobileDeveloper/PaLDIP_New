@@ -947,7 +947,7 @@ button.import {
 }
 
 .header-div {
-    height: 50px;
+    min-height: 70px;
 }
 
 .expand-button {
@@ -984,7 +984,7 @@ button.import {
     color: #060695;
 }
 .bottom-div {
-    height: calc(100% - 50px);
+    height: calc(100% - 70px);
     border: solid 1px #b6b6b9;
     overflow-y: auto;
     overflow-x: hidden;

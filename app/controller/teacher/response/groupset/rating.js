@@ -4,45 +4,31 @@
         .controller('groupResponseOfRatingAnswerController', groupResponseOfRatingAnswerController)
     groupResponseOfRatingAnswerController.$inject = ['$state', '$scope', '$rootScope', '$filter'];
     function groupResponseOfRatingAnswerController($state, $scope, $rootScope, $filter) {
+        // **************   router:    groupResponseOfRatingAnswer  *****************
 
         $rootScope.setData('showMenubar', true);
-        $rootScope.setData('backUrl', "groupRoot");
-
-        $scope.groupSetKey = $rootScope.settings.groupSetKey;
-        $scope.subSetKey = $rootScope.settings.subSetKey;
-        $scope.groupsets = $rootScope.settings.groupsets;
-        $scope.subNames = ["All Sub Groups"];
-        $scope.secondNames = ["All 2nd Sub Groups"];
-
-        let subGroups = []
-        for (var i = 0; i < $scope.groupsets.count; i++) {
-            let name = $scope.groupsets.data.groups[i].name || $scope.groupsets.name + ' ' + (i + 1);
-            $scope.subNames.push(name);
-            subGroups.push(name);
-        }
-        if ($rootScope.settings.groupType == 'second') {
-            subGroups = []
-            for (var i = 0; i < $scope.groupsets.subgroupsets[$scope.subSetKey].count; i++) {
-                let name = $scope.groupsets.data.groups[0].subgroupsets[$scope.subSetKey].groups[i].name || $scope.groupsets.subgroupsets[$scope.subSetKey].name + ' ' + (i + 1);
-                $scope.secondNames.push(name);
-                subGroups.push(name);
-            }
-        }
+        var groupType = $rootScope.settings.groupType;
+        $rootScope.setData('backUrl', groupType == 'sub' ? "groupSubRoot" : "groupSecondRoot");
 
         $scope.question = $rootScope.settings.question;
+        $scope.groupKey = $rootScope.settings.groupKey;
+        $scope.groupSetKey = $rootScope.settings.groupSetKey;
+        $scope.subIndex = $rootScope.settings.subIndex;
+        $scope.subSetKey = $rootScope.settings.subSetKey;
+        $scope.secondIndex = $rootScope.settings.secondIndex;
+
+
         $scope.type = $scope.question.ratingtype;
-        $scope.items = $scope.question.teamRate ? subGroups : $scope.question.ratingItems;
+        $scope.items = $scope.question.teamRate ? $rootScope.settings.subGroups : $scope.question.ratingItems;
         $scope.options = $scope.question.ratingOptions || [];
         $scope.top_answers = $scope.question.top_answers;
         $scope.isAward = $scope.question.awardScore && $scope.question.awardPeoples
         $scope.orderBy = 'rating';
-        $scope.GroupIndex = 0;
-        $scope.SubGroupIndex = 0;
         $scope.itemIndex = 0;
 
-        let settingRefStr = 'Questions/' + $scope.question.code + '/teacherFeedback/' + $rootScope.settings.groupKey +
+        let settingRefStr = 'Questions/' + $scope.question.code + '/teacherFeedback/' + $scope.groupKey +
             + '/' + $scope.groupSetKey + '/';
-        if ($rootScope.settings.groupType == 'sub') {       //if 1st child group answer
+        if (groupType == 'sub') {       //if 1st child group answer
             $scope.settingRef = firebase.database().ref(settingRefStr + 'data');
         } else {
             $scope.settingRef = firebase.database().ref(settingRefStr + $scope.subSetKey + '/data');
@@ -83,12 +69,14 @@
                 let allAnswers = snapshot.val() || {}
                 for (var key in allAnswers) {
                     var answer = allAnswers[key];
-                    if (answer.groupType != $rootScope.settings.groupType ||
-                        answer.studentgroupkey != $rootScope.settings.groupKey ||
-                        answer.groupSetKey != $scope.groupSetKey
-                    ) continue;
-                    if ($rootScope.settings.groupType == 'second') {       //if 2nd child group answer
-                        if (answer.subSetKey != $scope.subSetKey) continue;
+                    if (answer.groupType != groupType || answer.studentgroupkey != $scope.groupKey ||
+                        answer.groupSetKey != $scope.groupSetKey) continue;
+
+                    if (groupType == 'sub') {       //if 1st child group answer
+                        if (!$scope.question.teamRate && answer.subIndex != $scope.subIndex) continue;
+                    } else {               //if 2nd child group answer
+                        if (answer.subIndex != $scope.subIndex || answer.subSetKey != $scope.subSetKey) continue;
+                        if (!$scope.question.teamRate && answer.secondIndex != $scope.secondIndex) continue;
                     }
                     $scope.allAnswers[answer.uid] = answer
                 }
@@ -124,14 +112,6 @@
             }
             for (userKey in $scope.allAnswers) {
                 let userAns = $scope.allAnswers[userKey];
-                if ($rootScope.settings.groupType == 'sub') {       //if 1st child group answer
-                    if (!$scope.question.teamRate && $scope.GroupIndex && $scope.GroupIndex - 1 != userAns.subIndex) continue;
-                } else {
-                    if ($scope.GroupIndex && $scope.GroupIndex - 1 != userAns.subIndex) continue;
-                    if (!$scope.question.teamRate && $scope.SubGroupIndex && $scope.SubGroupIndex - 1 != userAns.secondIndex) continue;
-                }
-
-
                 userAns.answer.forEach((itemAnswer, itemIndex) => {
                     let valueExist = false;
                     let tempItemAnswer = $scope.temp_answers[itemIndex];
@@ -210,15 +190,6 @@
                 }
             }
             $rootScope.safeApply();
-        }
-
-        $scope.changeGroup = function (GroupIndex) {
-            $scope.GroupIndex = GroupIndex;
-            $scope.finalCalc()
-        }
-        $scope.changeSubGroup = function (SubGroupIndex) {
-            $scope.SubGroupIndex = SubGroupIndex;
-            $scope.finalCalc()
         }
 
         //When click next answer button( " > " )
